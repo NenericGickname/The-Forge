@@ -3681,6 +3681,29 @@ body.fxL #shopgrid .shopcard>*{flex-shrink:0!important}
 body.fxL #shopgrid .conversionsliderv67 .cel{font-size:11px!important;padding:6px 4px!important;line-height:1.2!important;height:auto!important}
 body.fxL #shopgrid .conversionsliderv67 .sd{font-size:9px!important}
 body.fxL #shopgrid .conversionsliderv67 .conversionreadoutv67{font-size:10px!important}
+/* round 7: status icons get room (they were clipped at the top) */
+body.fxL #battle .fxFoe{grid-template-rows:14px 10px 3px}
+body.fxL #battle #foehps{grid-auto-rows:27px!important;row-gap:2px!important}
+body.fxL #battle .fxFoe .hplabel{height:14px!important;line-height:14px!important;align-items:center}
+body.fxL #battle .fxFoe .hplabel>span{line-height:14px!important}
+body.fxL #battle .fxFoe .hpbar{height:10px!important}
+body.fxL #battle .fxFoe .hptxt{line-height:10px!important;font-size:8px!important}
+body.fxL #battle .fxFoe .specialname{top:14px;height:10px;line-height:10px!important}
+body.fxL #battle .fxrow{display:inline-flex!important;align-items:center;gap:2px;height:14px;overflow:visible!important}
+body.fxL #battle .fxrow .fx{width:13px!important;height:13px!important;min-width:13px;font-size:9px!important;line-height:13px!important;padding:0!important;margin:0!important;box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:3px}
+body.fxL #battle .fxFoe .fxrow *{max-height:none}
+body.fxL #battle .hprow>.hpwrap:first-child .hplabel{height:14px!important;line-height:14px!important;display:flex;align-items:center}
+/* round 7: tracked quest names end with … before the Claim button */
+body.fxL .trackedquestv74>div{min-width:0;overflow:hidden}
+body.fxL .trackedquestv74>div b,body.fxL .trackedquestv74>div small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.fxL .trackedquestv74 .questclaimtrackv84{flex:0 0 auto}
+/* round 7: small phones (iPhone SE / 8 size) - equipment stats stay readable inside their cards */
+@media (max-height:390px) and (max-width:700px){
+  body.fxL .slot .slstats,body.fxL .slot .slstats *{font-size:8px!important;line-height:1.22!important}
+  body.fxL .slot .in{font-size:11px!important}
+  body.fxL .slot .in .emb,body.fxL .slot .in img{width:20px!important;height:20px!important}
+  body.fxL .slot{padding:4px 5px!important}
+}
 </style></head>
 <body>
 <div class="flash" id="flash"></div>
@@ -8163,6 +8186,8 @@ function renderActivePanel() {
   if (!panel) return;
   var a = ensureState_p21();
   if (!a) return;
+  // older saves can hold skills in the bar that are no longer unlocked
+  if (a.loadout.some(skillLocked)) a.loadout = a.loadout.filter(id => !skillLocked(id));
   var h = '<div class="actinfo111"><b style="color:#e8c368">Active points: ' + S.spA + "</b></div>";
   h += loadoutBar();
   h += '<div class="acthdr111 off">⚔ OFFENSIVE</div><div class="actgrid111 g3">';
@@ -8248,6 +8273,13 @@ function renderActivePanel() {
         a.dur[k] = 0;
         a.cd[k] = 0;
       }
+      // skills that are locked again leave the action bar
+      a.loadout = a.loadout.filter(function (id) {
+        return !skillLocked(id);
+      });
+      try {
+        renderCombatBtns();
+      } catch (e) {}
       try {
         beep(500, 0.12, "sawtooth");
         scheduleSave();
@@ -33729,7 +33761,7 @@ function sizeBattle(){
   var h = function(sel){ var e = bat.querySelector(sel); return e ? e.offsetHeight : 0; };
   // The bottom band has one fixed height. The enemy bars shrink to fit it,
   // so the scene never changes size when the number of enemies changes.
-  var bottom = Math.max(80, h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"));
+  var bottom = Math.max(87, h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"));
   if (foes) { foes.style.zoom = ""; groupFoes(foes); }
   var cv = Math.max(60, Math.floor(inner - 23 - 13 - bottom - gap * 4));
   bat.style.setProperty("--fxCvH", cv + "px");

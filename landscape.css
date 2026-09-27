@@ -471,3 +471,26 @@ body.fxL #shopgrid .shopcard>*{flex-shrink:0!important}
 body.fxL #shopgrid .conversionsliderv67 .cel{font-size:11px!important;padding:6px 4px!important;line-height:1.2!important;height:auto!important}
 body.fxL #shopgrid .conversionsliderv67 .sd{font-size:9px!important}
 body.fxL #shopgrid .conversionsliderv67 .conversionreadoutv67{font-size:10px!important}
+/* round 7: status icons get room (they were clipped at the top) */
+body.fxL #battle .fxFoe{grid-template-rows:14px 10px 3px}
+body.fxL #battle #foehps{grid-auto-rows:27px!important;row-gap:2px!important}
+body.fxL #battle .fxFoe .hplabel{height:14px!important;line-height:14px!important;align-items:center}
+body.fxL #battle .fxFoe .hplabel>span{line-height:14px!important}
+body.fxL #battle .fxFoe .hpbar{height:10px!important}
+body.fxL #battle .fxFoe .hptxt{line-height:10px!important;font-size:8px!important}
+body.fxL #battle .fxFoe .specialname{top:14px;height:10px;line-height:10px!important}
+body.fxL #battle .fxrow{display:inline-flex!important;align-items:center;gap:2px;height:14px;overflow:visible!important}
+body.fxL #battle .fxrow .fx{width:13px!important;height:13px!important;min-width:13px;font-size:9px!important;line-height:13px!important;padding:0!important;margin:0!important;box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:3px}
+body.fxL #battle .fxFoe .fxrow *{max-height:none}
+body.fxL #battle .hprow>.hpwrap:first-child .hplabel{height:14px!important;line-height:14px!important;display:flex;align-items:center}
+/* round 7: tracked quest names end with … before the Claim button */
+body.fxL .trackedquestv74>div{min-width:0;overflow:hidden}
+body.fxL .trackedquestv74>div b,body.fxL .trackedquestv74>div small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.fxL .trackedquestv74 .questclaimtrackv84{flex:0 0 auto}
+/* round 7: small phones (iPhone SE / 8 size) - equipment stats stay readable inside their cards */
+@media (max-height:390px) and (max-width:700px){
+  body.fxL .slot .slstats,body.fxL .slot .slstats *{font-size:8px!important;line-height:1.22!important}
+  body.fxL .slot .in{font-size:11px!important}
+  body.fxL .slot .in .emb,body.fxL .slot .in img{width:20px!important;height:20px!important}
+  body.fxL .slot{padding:4px 5px!important}
+}

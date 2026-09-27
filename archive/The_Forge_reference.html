@@ -7601,6 +7601,8 @@ function renderActivePanel() {
   if (!panel) return;
   var a = ensureState_p21();
   if (!a) return;
+  // older saves can hold skills in the bar that are no longer unlocked
+  if (a.loadout.some(skillLocked)) a.loadout = a.loadout.filter(id => !skillLocked(id));
   var h = '<div class="actinfo111"><b style="color:#e8c368">Active points: ' + S.spA + "</b></div>";
   h += loadoutBar();
   h += '<div class="acthdr111 off">⚔ OFFENSIVE</div><div class="actgrid111 g3">';
@@ -7686,6 +7688,13 @@ function renderActivePanel() {
         a.dur[k] = 0;
         a.cd[k] = 0;
       }
+      // skills that are locked again leave the action bar
+      a.loadout = a.loadout.filter(function (id) {
+        return !skillLocked(id);
+      });
+      try {
+        renderCombatBtns();
+      } catch (e) {}
       try {
         beep(500, 0.12, "sawtooth");
         scheduleSave();

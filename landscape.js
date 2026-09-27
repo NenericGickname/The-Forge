@@ -297,7 +297,7 @@ function sizeBattle(){
   var h = function(sel){ var e = bat.querySelector(sel); return e ? e.offsetHeight : 0; };
   // The bottom band has one fixed height. The enemy bars shrink to fit it,
   // so the scene never changes size when the number of enemies changes.
-  var bottom = Math.max(80, h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"));
+  var bottom = Math.max(87, h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"));
   if (foes) { foes.style.zoom = ""; groupFoes(foes); }
   var cv = Math.max(60, Math.floor(inner - 23 - 13 - bottom - gap * 4));
   bat.style.setProperty("--fxCvH", cv + "px");

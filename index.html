@@ -3130,8 +3130,8 @@ button:disabled {
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="mobile.css?v=4b79379b05">
-<link rel="stylesheet" href="landscape.css?v=4b79379b05">
+<link rel="stylesheet" href="mobile.css?v=18eacbb68a">
+<link rel="stylesheet" href="landscape.css?v=18eacbb68a">
 </head>
 <body>
 <div class="flash" id="flash"></div>
@@ -7614,6 +7614,8 @@ function renderActivePanel() {
   if (!panel) return;
   var a = ensureState_p21();
   if (!a) return;
+  // older saves can hold skills in the bar that are no longer unlocked
+  if (a.loadout.some(skillLocked)) a.loadout = a.loadout.filter(id => !skillLocked(id));
   var h = '<div class="actinfo111"><b style="color:#e8c368">Active points: ' + S.spA + "</b></div>";
   h += loadoutBar();
   h += '<div class="acthdr111 off">⚔ OFFENSIVE</div><div class="actgrid111 g3">';
@@ -7699,6 +7701,13 @@ function renderActivePanel() {
         a.dur[k] = 0;
         a.cd[k] = 0;
       }
+      // skills that are locked again leave the action bar
+      a.loadout = a.loadout.filter(function (id) {
+        return !skillLocked(id);
+      });
+      try {
+        renderCombatBtns();
+      } catch (e) {}
       try {
         beep(500, 0.12, "sawtooth");
         scheduleSave();
@@ -32433,7 +32442,7 @@ setInterval(() => {
   } catch (e) {}
 }, 500);
 </script>
-<script src="mobile.js?v=4b79379b05"></script>
-<script src="landscape.js?v=4b79379b05"></script>
+<script src="mobile.js?v=18eacbb68a"></script>
+<script src="landscape.js?v=18eacbb68a"></script>
 </body>
 </html>
