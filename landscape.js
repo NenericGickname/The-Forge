@@ -221,18 +221,26 @@ function markGrow(){
 var treeKey = "", treeVer = 0, treeObs = null;
 function fitZooms(){
   var br = $id("branches"); if (!br) return;
-  var list = Array.prototype.slice.call(br.querySelectorAll(".branch"));
-  if (!body.classList.contains("fxL")) { if (treeKey) { list.forEach(function(el){ el.style.zoom = ""; }); treeKey = ""; } return; }
+  if (!body.classList.contains("fxL")) { if (treeKey) { br.style.removeProperty("--fxTreeZ"); treeKey = ""; } return; }
+  if (!treeObs) {
+    // The game rebuilds the tree on every change. Refit before the next paint so the size never blinks.
+    treeObs = new MutationObserver(function(){ treeVer++; fitZooms(); });
+    treeObs.observe(br, {childList:true});
+  }
   if (!br.offsetParent) return;           // hidden (Active tab or closed): keep the last zoom
-  if (!treeObs) { treeObs = new MutationObserver(function(){ treeVer++; }); treeObs.observe(br, {childList:true, subtree:true}); }
   var H = br.clientHeight, key = H + "|" + br.clientWidth + "|" + treeVer;
   if (key === treeKey || H < 40) return;
-  list.forEach(function(el){ el.style.zoom = ""; });
+  var list = Array.prototype.slice.call(br.querySelectorAll(".branch"));
+  var prev = br.style.getPropertyValue("--fxTreeZ");
+  br.style.setProperty("--fxTreeZ", "1");
   var need = 0; list.forEach(function(el){ need = Math.max(need, el.scrollHeight); });
-  var z = need > H + 1 ? Math.max(0.55, (H - 2) / need).toFixed(3) : "";
-  list.forEach(function(el){ el.style.zoom = z; });
+  var z = need > H + 1 ? Math.max(0.55, (H - 2) / need).toFixed(3) : "1";
+  if (prev && Math.abs(parseFloat(prev) - parseFloat(z)) < 0.02) z = prev;   // ignore tiny changes
+  br.style.setProperty("--fxTreeZ", z);
   treeKey = key;
 }
+// after any tap the tree may have appeared: fit it before the next paint
+document.addEventListener("click", function(){ requestAnimationFrame(fitZooms); }, true);
 function repaginateAll(){
   fitZooms();
   if (body.classList.contains("fxL")) markGrow();

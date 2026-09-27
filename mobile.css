@@ -82,3 +82,5 @@ input,select,textarea{user-select:auto;-webkit-user-select:auto}
 #fxInfo.fxCmp .fxb .bbtns{display:flex;gap:6px;margin-top:6px}
 #fxInfo.fxCmp .fxb .bbtns button{font-size:11px!important;padding:5px 8px!important}
 #fxInfo.fxCmp .fxn{margin-top:6px}
+.touchhint{display:none}
+@media(hover:none){.touchhint{display:inline}}

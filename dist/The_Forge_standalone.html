@@ -3204,6 +3204,8 @@ input,select,textarea{user-select:auto;-webkit-user-select:auto}
 #fxInfo.fxCmp .fxb .bbtns{display:flex;gap:6px;margin-top:6px}
 #fxInfo.fxCmp .fxb .bbtns button{font-size:11px!important;padding:5px 8px!important}
 #fxInfo.fxCmp .fxn{margin-top:6px}
+.touchhint{display:none}
+@media(hover:none){.touchhint{display:inline}}
 /* The Forge landscape phone layout. Active only when body has .fxL
    (phone held sideways: landscape and at most 520px tall). */
 
@@ -3375,7 +3377,7 @@ body.fxL .skcardv111{padding:6px 8px!important}
 body.fxL #shop>.shopscene{width:100%!important;height:100%!important;max-width:none!important;position:relative;margin:0!important}
 body.fxL #shop .shopbox{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;overflow:hidden!important;display:flex!important;flex-direction:column;padding:6px 10px!important;margin:0!important}
 body.fxL #shop .shopbox>*{flex-shrink:0}
-body.fxL #shop .skhead{padding-left:44px;padding-right:70px;margin-bottom:4px!important}
+body.fxL #shop .skhead{padding-left:0;padding-right:70px;margin-bottom:4px!important}
 body.fxL #shop .shopbody{flex:1 1 0!important;min-height:0;display:flex!important;flex-direction:column}
 body.fxL #shop .shopcatalog{flex:1 1 0;min-height:0;display:flex!important;flex-direction:column;max-height:none!important;overflow:hidden!important}
 body.fxL #shopgrid{flex:1 1 0;min-height:0;overflow:hidden!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;align-content:start}
@@ -3526,7 +3528,6 @@ body.fxL .questtoastv74.on{transform:translate(-50%,-50%) scale(1)!important}
 /* Shop: cards as tall as they need, keeper beside the title */
 body.fxL #shopgrid{grid-auto-rows:auto!important}
 body.fxL #shopgrid .shopcard{height:auto!important;min-height:0!important;overflow:visible!important}
-body.fxL #shopkeeperbubble{top:4px!important;left:calc(100% + 8px)!important;bottom:auto!important;width:180px!important;zoom:1.3}
 
 /* Guild: bounty and multiplier use the full card width */
 body.fxL .contractv70 .cv99rew{display:flex!important;flex-direction:column;gap:6px;justify-content:space-around}
@@ -3612,19 +3613,6 @@ body.fxL .contractv70 .cv99row{display:flex!important;flex-direction:column;just
 body.fxL .contractv70 .cv99row+.cv99row{border-top:1px solid #ffffff14}
 body.fxL .contractv70 .cv99row .val{text-align:center!important;font-size:11px!important}
 body.fxL .contractv70 .cv99row.bounty .val{font-size:13px!important}
-/* round 4: Rocky gets his own column on the left of the shop */
-body.fxL #shop>.shopscene{display:grid!important;grid-template-columns:150px minmax(0,1fr);gap:6px;align-items:stretch}
-body.fxL #shop #rockkeeper{position:relative!important;left:auto!important;top:auto!important;zoom:.8;grid-column:1;align-self:end;justify-self:center;margin:0 0 30px!important}
-body.fxL #shop .shopbox{grid-column:2}
-body.fxL #shopkeeperbubble{position:absolute!important;zoom:1.25!important;left:50%!important;top:auto!important;bottom:calc(100% + 10px)!important;transform:translateX(-50%)!important;width:150px!important;max-width:none!important;font-size:10px!important;line-height:1.3!important}
-body.fxL #shop>.shopscene{background:radial-gradient(circle at 12% 70%,#2a1d14 0,#130e0c 55%,#0c090a 100%);border:1px solid #5e4630;border-radius:12px;padding:0 4px 0 0;box-sizing:border-box}
-body.fxL #shop .shopbox{border:0!important;border-left:1px solid #5e463080!important;border-radius:0 12px 12px 0!important;background:transparent!important;box-shadow:none!important}
-body.fxL #shopkeeperbubble,body.fxL #shopkeeperbubble *{font-size:12.5px!important;line-height:1.3!important}
-body.fxL #shop #rockkeeper{zoom:.9!important}
-body.fxL #shopkeeperbubble{zoom:1!important;width:136px!important;min-width:136px!important;padding:6px 8px!important;box-sizing:border-box}
-body.fxL #shopkeeperbubble,body.fxL #shopkeeperbubble *{font-size:11.5px!important}
-body.fxL #shop #rockkeeper{transform:none!important;zoom:.62!important}
-body.fxL #shopkeeperbubble{zoom:1.45!important;width:132px!important;min-width:132px!important}
 /* round 4: section headers in the active tree get a real line box (emoji were bleeding into the cards) */
 body.fxL .acthdr111{line-height:1.5!important;margin:8px 0 5px!important;padding:0 0 2px!important;overflow:visible}
 /* small phones: item icon rows wrap instead of spilling out of the slot */
@@ -3642,6 +3630,24 @@ body.fxL #areas .atile.firstfighttargetv49{position:relative;overflow:visible!im
 body.fxL .firstfightarrowv49{top:-6px!important;font-size:18px!important}
 body.fxL #areas{overflow:visible!important}
 body.fxL #areas>.fxHidden{display:none!important}
+/* round 5: folded stats panel hides its content at every width (wider phones showed half the panel) */
+body.fxL .statpanel.folded .spbody,body.fxL .statpanel.folded .spttl{display:none!important}
+body.fxL .statpanel.folded{overflow:hidden!important}
+body.fxL #branches .branch{zoom:var(--fxTreeZ,1)}
+/* round 5: Rocky is parked (hidden) until further notice */
+.rockkeeper,#rockkeeper{display:none!important}
+/* round 5: Reforge window fits the screen, REFORGE button at the bottom right like STRIKE */
+body.fxL #reforgegame{overflow:hidden!important}
+body.fxL #reforgegame h2{font-size:14px!important;margin:0!important}
+body.fxL #reforgegame .reforgeworkv43{grid-template-columns:170px minmax(0,1fr)!important;width:100%!important;gap:10px!important;margin:2px 0 4px!important}
+body.fxL #reforgegame .reforgearena{zoom:.72}
+body.fxL #reforgegame .reforgecompare,body.fxL #reforgegame .reforgecompare *{font-size:10px!important}
+body.fxL #reforgegame .reforgecompare .lockrowv43{padding:2px 6px!important;min-height:0!important}
+body.fxL #reforgegame .reforgemsg{font-size:11px!important;margin:2px 0!important;margin-right:290px!important}
+body.fxL #reforgegame .reforgeguide{font-size:9.5px!important;margin:0!important;margin-right:290px!important}
+body.fxL #reforgegame div:has(>#reforgehit){position:absolute!important;right:10px;bottom:8px;margin:0!important;justify-content:flex-end!important;z-index:3}
+body.fxL #reforgegame #reforgecancel{order:-1}
+body.fxL #reforgegame #reforgehit{width:200px!important;padding:12px 8px!important;font-size:13px!important}
 </style></head>
 <body>
 <div class="flash" id="flash"></div>
@@ -3678,7 +3684,7 @@ body.fxL #areas>.fxHidden{display:none!important}
       <div class="runbtns"><button class="go" id="healbtn" style="flex:0 0 auto;display:none">✚ Heal</button><button class="ghost" id="retreat" style="flex:1">⤴ RETREAT (keep loot, no clear)</button></div>
       <div class="msg" id="rmsg"></div>
       <div class="over" id="strike"><div class="forgecost" id="forgecost"></div><h2 id="strikehd" style="color:var(--fire)">⚒ STRIKE THE ANVIL</h2><div class="forgegrid"><div class="forgecol"><div class="forgelevels"><div class="flv"><small>CURRENT</small><b id="forgecur">+0</b></div></div><div class="forgestats" id="forgecurrentstats"></div></div><div class="smith"><div class="anvil"></div><div class="forgeitem" id="forgeitem">⚔️</div><div class="hammer" id="hammer">🔨</div><div class="sparks" id="sparks"></div></div><div class="forgecol"><div class="forgelevels"><div class="flv"><small>NEXT</small><b id="forgenext">+1</b></div></div><div class="forgestats" id="forgenextstats"></div></div></div><div class="forgecompare" id="forgecompare"><div class="rfcomparecol"><h4>PREVIOUS STATS</h4><div id="forgebefore"></div></div><div class="rfarrow">➜</div><div class="rfcomparecol after"><h4>UPGRADED STATS</h4><div id="forgeafter"></div></div></div><div class="ptrack"><div class="pzone" id="pzone"></div><div class="pcrit" id="pcrit"></div><div class="pmark" id="pmark"></div></div><div id="corehint" style="display:none!important"></div><div class="forgeodds"><b id="baseodds"></b></div><div class="guardrow" id="guardrow"></div><div style="display:flex;gap:8px;justify-content:center"><button class="up" id="strikebtn" style="width:190px">STRIKE ⚒ <span class="keyhint" style="opacity:.7">(space)</span></button><button class="ghost" id="strikedone">✕ Done</button></div></div>
-      <div class="over reforgegame" id="reforgegame"><div class="forgecost" id="reforgecost"></div><h2 style="color:var(--epic);margin-bottom:2px">✦ REFORGE ALIGNMENT ✦</h2><div id="reforgeitemname" style="font-size:12px;color:var(--ink);font-weight:800"></div><div class="reforgearena" id="reforgearena"><div class="reforgering" id="reforgering"></div><div class="reforgecenter" id="reforgecenter"></div></div><div class="reforgecompare" id="reforgecompare"><div class="rfcomparecol"><h4>PREVIOUS STATS</h4><div id="reforgebefore"></div></div><div class="rfarrow">➜</div><div class="rfcomparecol after"><h4>REROLLED STATS</h4><div id="reforgeafter"></div></div></div><div class="reforgemsg" id="reforgemsg">ALIGN THE RING WITH THE STARS</div><div class="reforgeguide">Press Space while the moving ring overlaps the ten stars</div><div style="display:flex;gap:8px;justify-content:center"><button class="rf" id="reforgehit" style="width:205px">REFORGE ✦ <span style="opacity:.7">(Space)</span></button><button class="ghost" id="reforgecancel">✕ Done</button></div></div>
+      <div class="over reforgegame" id="reforgegame"><div class="forgecost" id="reforgecost"></div><h2 style="color:var(--epic);margin-bottom:2px">✦ REFORGE ALIGNMENT ✦</h2><div id="reforgeitemname" style="font-size:12px;color:var(--ink);font-weight:800"></div><div class="reforgearena" id="reforgearena"><div class="reforgering" id="reforgering"></div><div class="reforgecenter" id="reforgecenter"></div></div><div class="reforgecompare" id="reforgecompare"><div class="rfcomparecol"><h4>PREVIOUS STATS</h4><div id="reforgebefore"></div></div><div class="rfarrow">➜</div><div class="rfcomparecol after"><h4>REROLLED STATS</h4><div id="reforgeafter"></div></div></div><div class="reforgemsg" id="reforgemsg">ALIGN THE RING WITH THE STARS</div><div class="reforgeguide"><span class="keyhint">Press Space</span><span class="touchhint">Tap REFORGE</span> while the moving ring overlaps the ten stars</div><div style="display:flex;gap:8px;justify-content:center"><button class="rf" id="reforgehit" style="width:205px">REFORGE ✦ <span class="keyhint" style="opacity:.7">(Space)</span></button><button class="ghost" id="reforgecancel">✕ Done</button></div></div>
       <div class="over" id="clear"><h2 style="color:var(--gold)">★ AREA CLEARED ★</h2><div class="msg big" id="cleartext"></div><div style="color:var(--dim);font-size:11px;margin:4px 0 12px">Choose a permanent boon:</div><div class="boon" id="boons"></div></div>
       <div class="over" id="stageclear"><div class="scban">★ STAGE CLEAR ★</div></div>
       <div class="over" id="dead"><h2 style="color:#ff6b6b">✖ YOUR HERO FELL</h2><div class="msg" id="deadtext"></div><button class="go" id="deadok" style="width:200px;margin-top:12px">Open your loot →</button></div>
@@ -33598,18 +33604,26 @@ function markGrow(){
 var treeKey = "", treeVer = 0, treeObs = null;
 function fitZooms(){
   var br = $id("branches"); if (!br) return;
-  var list = Array.prototype.slice.call(br.querySelectorAll(".branch"));
-  if (!body.classList.contains("fxL")) { if (treeKey) { list.forEach(function(el){ el.style.zoom = ""; }); treeKey = ""; } return; }
+  if (!body.classList.contains("fxL")) { if (treeKey) { br.style.removeProperty("--fxTreeZ"); treeKey = ""; } return; }
+  if (!treeObs) {
+    // The game rebuilds the tree on every change. Refit before the next paint so the size never blinks.
+    treeObs = new MutationObserver(function(){ treeVer++; fitZooms(); });
+    treeObs.observe(br, {childList:true});
+  }
   if (!br.offsetParent) return;           // hidden (Active tab or closed): keep the last zoom
-  if (!treeObs) { treeObs = new MutationObserver(function(){ treeVer++; }); treeObs.observe(br, {childList:true, subtree:true}); }
   var H = br.clientHeight, key = H + "|" + br.clientWidth + "|" + treeVer;
   if (key === treeKey || H < 40) return;
-  list.forEach(function(el){ el.style.zoom = ""; });
+  var list = Array.prototype.slice.call(br.querySelectorAll(".branch"));
+  var prev = br.style.getPropertyValue("--fxTreeZ");
+  br.style.setProperty("--fxTreeZ", "1");
   var need = 0; list.forEach(function(el){ need = Math.max(need, el.scrollHeight); });
-  var z = need > H + 1 ? Math.max(0.55, (H - 2) / need).toFixed(3) : "";
-  list.forEach(function(el){ el.style.zoom = z; });
+  var z = need > H + 1 ? Math.max(0.55, (H - 2) / need).toFixed(3) : "1";
+  if (prev && Math.abs(parseFloat(prev) - parseFloat(z)) < 0.02) z = prev;   // ignore tiny changes
+  br.style.setProperty("--fxTreeZ", z);
   treeKey = key;
 }
+// after any tap the tree may have appeared: fit it before the next paint
+document.addEventListener("click", function(){ requestAnimationFrame(fitZooms); }, true);
 function repaginateAll(){
   fitZooms();
   if (body.classList.contains("fxL")) markGrow();

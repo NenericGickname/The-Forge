@@ -169,7 +169,7 @@ body.fxL .skcardv111{padding:6px 8px!important}
 body.fxL #shop>.shopscene{width:100%!important;height:100%!important;max-width:none!important;position:relative;margin:0!important}
 body.fxL #shop .shopbox{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;overflow:hidden!important;display:flex!important;flex-direction:column;padding:6px 10px!important;margin:0!important}
 body.fxL #shop .shopbox>*{flex-shrink:0}
-body.fxL #shop .skhead{padding-left:44px;padding-right:70px;margin-bottom:4px!important}
+body.fxL #shop .skhead{padding-left:0;padding-right:70px;margin-bottom:4px!important}
 body.fxL #shop .shopbody{flex:1 1 0!important;min-height:0;display:flex!important;flex-direction:column}
 body.fxL #shop .shopcatalog{flex:1 1 0;min-height:0;display:flex!important;flex-direction:column;max-height:none!important;overflow:hidden!important}
 body.fxL #shopgrid{flex:1 1 0;min-height:0;overflow:hidden!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;align-content:start}
@@ -320,7 +320,6 @@ body.fxL .questtoastv74.on{transform:translate(-50%,-50%) scale(1)!important}
 /* Shop: cards as tall as they need, keeper beside the title */
 body.fxL #shopgrid{grid-auto-rows:auto!important}
 body.fxL #shopgrid .shopcard{height:auto!important;min-height:0!important;overflow:visible!important}
-body.fxL #shopkeeperbubble{top:4px!important;left:calc(100% + 8px)!important;bottom:auto!important;width:180px!important;zoom:1.3}
 
 /* Guild: bounty and multiplier use the full card width */
 body.fxL .contractv70 .cv99rew{display:flex!important;flex-direction:column;gap:6px;justify-content:space-around}
@@ -406,19 +405,6 @@ body.fxL .contractv70 .cv99row{display:flex!important;flex-direction:column;just
 body.fxL .contractv70 .cv99row+.cv99row{border-top:1px solid #ffffff14}
 body.fxL .contractv70 .cv99row .val{text-align:center!important;font-size:11px!important}
 body.fxL .contractv70 .cv99row.bounty .val{font-size:13px!important}
-/* round 4: Rocky gets his own column on the left of the shop */
-body.fxL #shop>.shopscene{display:grid!important;grid-template-columns:150px minmax(0,1fr);gap:6px;align-items:stretch}
-body.fxL #shop #rockkeeper{position:relative!important;left:auto!important;top:auto!important;zoom:.8;grid-column:1;align-self:end;justify-self:center;margin:0 0 30px!important}
-body.fxL #shop .shopbox{grid-column:2}
-body.fxL #shopkeeperbubble{position:absolute!important;zoom:1.25!important;left:50%!important;top:auto!important;bottom:calc(100% + 10px)!important;transform:translateX(-50%)!important;width:150px!important;max-width:none!important;font-size:10px!important;line-height:1.3!important}
-body.fxL #shop>.shopscene{background:radial-gradient(circle at 12% 70%,#2a1d14 0,#130e0c 55%,#0c090a 100%);border:1px solid #5e4630;border-radius:12px;padding:0 4px 0 0;box-sizing:border-box}
-body.fxL #shop .shopbox{border:0!important;border-left:1px solid #5e463080!important;border-radius:0 12px 12px 0!important;background:transparent!important;box-shadow:none!important}
-body.fxL #shopkeeperbubble,body.fxL #shopkeeperbubble *{font-size:12.5px!important;line-height:1.3!important}
-body.fxL #shop #rockkeeper{zoom:.9!important}
-body.fxL #shopkeeperbubble{zoom:1!important;width:136px!important;min-width:136px!important;padding:6px 8px!important;box-sizing:border-box}
-body.fxL #shopkeeperbubble,body.fxL #shopkeeperbubble *{font-size:11.5px!important}
-body.fxL #shop #rockkeeper{transform:none!important;zoom:.62!important}
-body.fxL #shopkeeperbubble{zoom:1.45!important;width:132px!important;min-width:132px!important}
 /* round 4: section headers in the active tree get a real line box (emoji were bleeding into the cards) */
 body.fxL .acthdr111{line-height:1.5!important;margin:8px 0 5px!important;padding:0 0 2px!important;overflow:visible}
 /* small phones: item icon rows wrap instead of spilling out of the slot */
@@ -436,3 +422,21 @@ body.fxL #areas .atile.firstfighttargetv49{position:relative;overflow:visible!im
 body.fxL .firstfightarrowv49{top:-6px!important;font-size:18px!important}
 body.fxL #areas{overflow:visible!important}
 body.fxL #areas>.fxHidden{display:none!important}
+/* round 5: folded stats panel hides its content at every width (wider phones showed half the panel) */
+body.fxL .statpanel.folded .spbody,body.fxL .statpanel.folded .spttl{display:none!important}
+body.fxL .statpanel.folded{overflow:hidden!important}
+body.fxL #branches .branch{zoom:var(--fxTreeZ,1)}
+/* round 5: Rocky is parked (hidden) until further notice */
+.rockkeeper,#rockkeeper{display:none!important}
+/* round 5: Reforge window fits the screen, REFORGE button at the bottom right like STRIKE */
+body.fxL #reforgegame{overflow:hidden!important}
+body.fxL #reforgegame h2{font-size:14px!important;margin:0!important}
+body.fxL #reforgegame .reforgeworkv43{grid-template-columns:170px minmax(0,1fr)!important;width:100%!important;gap:10px!important;margin:2px 0 4px!important}
+body.fxL #reforgegame .reforgearena{zoom:.72}
+body.fxL #reforgegame .reforgecompare,body.fxL #reforgegame .reforgecompare *{font-size:10px!important}
+body.fxL #reforgegame .reforgecompare .lockrowv43{padding:2px 6px!important;min-height:0!important}
+body.fxL #reforgegame .reforgemsg{font-size:11px!important;margin:2px 0!important;margin-right:290px!important}
+body.fxL #reforgegame .reforgeguide{font-size:9.5px!important;margin:0!important;margin-right:290px!important}
+body.fxL #reforgegame div:has(>#reforgehit){position:absolute!important;right:10px;bottom:8px;margin:0!important;justify-content:flex-end!important;z-index:3}
+body.fxL #reforgegame #reforgecancel{order:-1}
+body.fxL #reforgegame #reforgehit{width:200px!important;padding:12px 8px!important;font-size:13px!important}
