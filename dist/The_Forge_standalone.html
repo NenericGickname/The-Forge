@@ -3194,7 +3194,7 @@ input,select,textarea{user-select:auto;-webkit-user-select:auto}
 #fxInfo.fxRight{left:auto;right:calc(26px + env(safe-area-inset-right));transform:translate(calc(100% + 80px),-50%)}
 #fxInfo.fxLeft.on,#fxInfo.fxRight.on{transform:translate(0,-50%)}
 /* Loot bag compare sheet: compact, two columns */
-#fxInfo.fxCmp{width:min(470px,55vw)!important;padding:10px 12px!important}
+#fxInfo.fxCmp{padding:10px 12px!important}
 #fxInfo.fxCmp .fxh{margin-bottom:4px}
 #fxInfo.fxCmp .fxb{font-size:11.5px;line-height:1.4}
 #fxInfo .fxcmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -3206,6 +3206,8 @@ input,select,textarea{user-select:auto;-webkit-user-select:auto}
 #fxInfo.fxCmp .fxn{margin-top:6px}
 .touchhint{display:none}
 @media(hover:none){.touchhint{display:inline}}
+#fxInfo:not(.on){visibility:hidden;pointer-events:none;transition:transform .18s ease-out,visibility 0s linear .18s}
+#fxInfo.on{visibility:visible;transition:transform .18s ease-out,visibility 0s}
 /* The Forge landscape phone layout. Active only when body has .fxL
    (phone held sideways: landscape and at most 520px tall). */
 
@@ -3422,13 +3424,17 @@ body.fxL .compbox>.fxGrow{flex:1 1 0!important;min-height:0!important;overflow:h
 body.fxL .compbox .skhead{margin:0!important}
 body.fxL #bestiarygridv70{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important;align-content:start}
 
-/* Options: two columns */
-body.fxL #optionsmodalv95 .skbox{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto 1fr auto auto;column-gap:16px;row-gap:5px;align-content:start}
+/* Options: one centred card with two tidy columns (round 6) */
+body.fxL #optionsmodalv95{align-items:center!important;justify-content:center!important}
+body.fxL #optionsmodalv95>.skbox{width:min(660px,100%)!important;height:auto!important;max-height:100%!important;margin:auto!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto auto auto;column-gap:18px;row-gap:6px;align-content:start;padding:10px 14px 12px!important}
 body.fxL #optionsmodalv95 .skhead{grid-column:1 / -1;grid-row:1}
 body.fxL #optionsmodalv95 .optsectitlev95{grid-column:1;grid-row:2;margin:0!important}
+body.fxL #optionsmodalv95 .skbox::after{content:"SAVES";grid-column:2;grid-row:2;font-size:9px;letter-spacing:2px;color:#a8977f;font-weight:700;align-self:end}
 body.fxL #optaudiosecv95{grid-column:1;grid-row:3 / span 3;align-self:start;margin:0!important}
-body.fxL .optcolv95{grid-column:2;grid-row:2 / span 2;margin:0!important;gap:5px!important}
-body.fxL .optcolv95 button,body.fxL #fxPlaytest,body.fxL #creditsbtnv95{height:34px!important;margin:0!important}
+body.fxL #optaudiosecv95{border:0!important;padding-bottom:0!important}
+body.fxL #optaudiosecv95 hr,body.fxL #optaudiosecv95>div:last-child:empty{display:none}
+body.fxL .optcolv95{grid-column:2;grid-row:3;margin:0!important;gap:6px!important;display:flex!important;flex-direction:column}
+body.fxL .optcolv95 button,body.fxL #fxPlaytest,body.fxL #creditsbtnv95{height:32px!important;margin:0!important;flex:0 0 auto!important}
 body.fxL #fxPlaytest{grid-column:2;grid-row:4}
 body.fxL #creditsbtnv95{grid-column:2;grid-row:5}
 
@@ -3648,6 +3654,33 @@ body.fxL #reforgegame .reforgeguide{font-size:9.5px!important;margin:0!important
 body.fxL #reforgegame div:has(>#reforgehit){position:absolute!important;right:10px;bottom:8px;margin:0!important;justify-content:flex-end!important;z-index:3}
 body.fxL #reforgegame #reforgecancel{order:-1}
 body.fxL #reforgegame #reforgehit{width:200px!important;padding:12px 8px!important;font-size:13px!important}
+/* round 6: fixed enemy slots. Nothing in the bottom band ever changes height */
+body.fxL #battle #foehps{display:grid!important;grid-template-columns:minmax(0,1fr);grid-auto-rows:26px;row-gap:2px;column-gap:8px;align-content:start;overflow:hidden!important;zoom:1!important}
+body.fxL #battle #foehps.fxFoes2{grid-template-columns:repeat(2,minmax(0,1fr))}
+body.fxL #battle .fxFoe{position:relative;display:grid;grid-template-rows:11px 11px 3px;row-gap:0;min-width:0;overflow:hidden}
+body.fxL #battle .fxFoe .hplabel{height:11px!important;min-height:0!important;margin:0!important;overflow:hidden;white-space:nowrap;display:flex;justify-content:space-between;gap:4px;font-size:9px!important;line-height:11px!important}
+body.fxL #battle .fxFoe .hplabel *{font-size:9px!important;line-height:11px!important;white-space:nowrap}
+body.fxL #battle .fxFoe .hplabel>span:first-child{overflow:hidden;text-overflow:ellipsis;min-width:0}
+body.fxL #battle .fxFoe .res-tags{flex:0 1 auto;overflow:hidden;min-width:0;display:flex;gap:3px;justify-content:flex-end}
+body.fxL #battle .fxFoe .fxrow{display:inline-flex!important;gap:1px;flex-wrap:nowrap;overflow:hidden}
+body.fxL #battle .fxFoe .fxrow *{max-height:11px}
+body.fxL #battle .fxFoe .hpbar{height:11px!important;min-height:0!important;margin:0!important}
+body.fxL #battle .fxFoe .hptxt{font-size:8.5px!important;line-height:11px!important}
+body.fxL #battle .fxFoe .specialname{position:absolute;right:0;top:12px;height:11px;line-height:11px!important;font-size:8px!important;margin:0!important;padding:0 3px;z-index:2;pointer-events:none}
+body.fxL #battle .fxFoe .specialcast{height:3px!important;margin:0!important;border:0!important}
+/* hero side: fixed heights too */
+body.fxL #battle .hprow>.hpwrap:first-child .hplabel{height:11px!important;overflow:hidden;white-space:nowrap}
+body.fxL #battle .hprow>.hpwrap:first-child .hplabel *{white-space:nowrap}
+/* round 6: folded stats is exactly the 18px tab, whatever the panel width or phone */
+body.fxL .statpanel.folded{width:18px!important;min-width:0!important;padding:0!important;transform:translateY(-50%)!important;right:var(--safeR)!important;border-radius:8px 0 0 8px!important}
+body.fxL .statpanel.folded:after{left:0!important;width:18px!important}
+body.fxL .compbox,body.fxL .compbox>*{overflow:hidden!important;scrollbar-width:none}
+/* round 6: conversion cards (Shard Refinement, Celestial Exchange) keep their full height */
+body.fxL #shopgrid{grid-auto-rows:max-content!important}
+body.fxL #shopgrid .shopcard>*{flex-shrink:0!important}
+body.fxL #shopgrid .conversionsliderv67 .cel{font-size:11px!important;padding:6px 4px!important;line-height:1.2!important;height:auto!important}
+body.fxL #shopgrid .conversionsliderv67 .sd{font-size:9px!important}
+body.fxL #shopgrid .conversionsliderv67 .conversionreadoutv67{font-size:10px!important}
 </style></head>
 <body>
 <div class="flash" id="flash"></div>
@@ -33009,7 +33042,18 @@ function showSheet(el, note){
   // keep the sheet away from the thing that was tapped, so a second tap can reach it
   var r = el.getBoundingClientRect(), wide = innerWidth > innerHeight;
   sheet.classList.remove("fxTop", "fxLeft", "fxRight");
-  if (wide) sheet.classList.add(r.left + r.width / 2 > innerWidth / 2 ? "fxLeft" : "fxRight");
+  sheet.style.left = sheet.style.right = sheet.style.width = "";
+  if (wide) {
+    // put the sheet on the side with more room and never over the tapped item
+    var railW = 60, gap = 12, want = c.cmp ? 470 : 340;
+    var freeL = r.left - railW - gap * 2, freeR = innerWidth - r.right - 30 - gap * 2;
+    var leftSide = freeL >= freeR;
+    var w = Math.max(200, Math.min(want, leftSide ? freeL : freeR));
+    sheet.classList.add(leftSide ? "fxLeft" : "fxRight");
+    sheet.style.width = w + "px";
+    if (leftSide) sheet.style.left = Math.max(railW, r.left - gap - w) + "px";
+    else { sheet.style.left = (r.right + gap) + "px"; sheet.style.right = "auto"; }
+  }
   else if (r.top + r.height / 2 > innerHeight / 2) sheet.classList.add("fxTop");
   sheet.classList.add("on");
   return true;
@@ -33127,6 +33171,11 @@ document.addEventListener("pointerdown", function(e){
 }, true);
 
 /* ================= 3. AUDIO WHEN APP IS BACKGROUNDED ================= */
+// Sound effects: iPhone can leave the audio engine suspended after rotating, a call or
+// switching apps. Every tap wakes it up again (a resume only works inside a tap).
+function wakeSfx(){ try { if (typeof AC !== "undefined" && AC && AC.state !== "running") { var p = AC.resume(); if (p && p.catch) p.catch(function(){}); } } catch(_){} }
+["touchend","pointerup","click"].forEach(function(t){ document.addEventListener(t, wakeSfx, true); });
+addEventListener("orientationchange", function(){ setTimeout(wakeSfx, 300); });
 var pausedByUs = [];
 document.addEventListener("visibilitychange", function(){
   var auds = document.querySelectorAll("audio");
@@ -33441,7 +33490,7 @@ function setPage(p){
 
 function closeOverlays(except){
   document.querySelectorAll(".skover.on").forEach(function(o){
-    if (o.id === except || o.id === "tipmodal") return;
+    if (o.id === except || o.id === "tipmodal" || o.id === "lootopen") return;
     // Use the popup's own close button when it has one, so the game can tidy up
     var c = o.querySelector("#closeshop,#closeguildv70,#closeminev83,#closecompendium,#closequestsv74,#optdonev95,#closetree,.skclose");
     if (c) c.click(); if (o.classList.contains("on")) o.classList.remove("on");
@@ -33450,7 +33499,15 @@ function closeOverlays(except){
 }
 
 rail.addEventListener("click", function(e){
-  var b = e.target.closest("button[data-k]"); if (!b || b.classList.contains("off")) return;
+  var b = e.target.closest("button[data-k]"); if (!b) return;
+  // Leaving the Spoils of War screen through the rail takes the loot (same as Leave), then navigates
+  var lo = $id("lootopen");
+  if (lo && lo.classList.contains("on")) {
+    var lv = $id("lootleave"); if (lv) lv.click();
+    setTimeout(function(){ syncRail(); if (!b.classList.contains("off")) b.click(); }, 120);
+    return;
+  }
+  if (b.classList.contains("off")) return;
   var it = ITEMS.filter(function(x){ return x.k === b.dataset.k; })[0];
   if (it.page) { closeOverlays(); if (!inRun()) setPage(it.page); return; }
   if (it.stats) {
@@ -33623,7 +33680,16 @@ function fitZooms(){
   treeKey = key;
 }
 // after any tap the tree may have appeared: fit it before the next paint
-document.addEventListener("click", function(){ requestAnimationFrame(fitZooms); }, true);
+document.addEventListener("click", function(){
+  if (!body.classList.contains("fxL")) return;
+  // new lists (compendium tabs, menus) are split into pages before they are ever painted
+  requestAnimationFrame(function(){ fitZooms(); markGrow(); flushPaging(); });
+  setTimeout(function(){ requestAnimationFrame(function(){ repaginateAll(); flushPaging(); }); }, 80);
+}, true);
+function flushPaging(){
+  PAGED.forEach(function(sel){ document.querySelectorAll(sel).forEach(function(l){ if (l.offsetParent) paginate(l); }); });
+  document.querySelectorAll(".compbox>.fxGrow").forEach(function(l){ if (l.offsetParent && l.id !== "areamasteryv117") paginate(l); });
+}
 function repaginateAll(){
   fitZooms();
   if (body.classList.contains("fxL")) markGrow();
@@ -33635,7 +33701,25 @@ setInterval(function(){ if (body.classList.contains("fxL")) repaginateAll(); }, 
 /* ---------- battle scene height ----------
    Safari sizes a canvas in a grid by its own pixel height, which pushes the
    scene over the health bars. So the scene gets an explicit height here. */
-var foeKey = "";
+var foeKey = "", foeObs = null, grouping = false;
+/* Enemy bars: each enemy gets one fixed-size slot (name line, bar, cast line),
+   so the band never changes height when debuffs, casts or enemy counts change. */
+function groupFoes(foes){
+  if (!foeObs) { foeObs = new MutationObserver(function(){ if (!grouping && body.classList.contains("fxL")) groupFoes(foes); }); foeObs.observe(foes, {childList:true}); }
+  if (!body.classList.contains("fxL")) return;
+  var kids = Array.prototype.slice.call(foes.children);
+  if (!kids.some(function(k){ return !k.classList.contains("fxFoe"); })) return;
+  grouping = true;
+  var cur = null;
+  kids.forEach(function(k){
+    if (k.classList.contains("fxFoe")) { cur = null; return; }
+    if (k.classList.contains("hplabel") || !cur) { cur = document.createElement("div"); cur.className = "fxFoe"; foes.insertBefore(cur, k); }
+    cur.appendChild(k);
+  });
+  var n = foes.querySelectorAll(".fxFoe").length;
+  foes.classList.toggle("fxFoes2", n > 3);
+  grouping = false;
+}
 function sizeBattle(){
   var bat = $id("battle"); if (!bat) return;
   var foes = $id("foehps");
@@ -33646,15 +33730,7 @@ function sizeBattle(){
   // The bottom band has one fixed height. The enemy bars shrink to fit it,
   // so the scene never changes size when the number of enemies changes.
   var bottom = Math.max(80, h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"));
-  if (foes) {
-    var key = foes.querySelectorAll(".hpbar").length + "|" + bottom + "|" + foes.clientWidth;
-    if (key !== foeKey || foes.scrollHeight > foes.clientHeight + 2) {
-      foes.style.zoom = "";
-      var need = foes.scrollHeight;
-      foes.style.zoom = need > bottom ? Math.max(0.45, bottom / need).toFixed(3) : "";
-      foeKey = key;
-    }
-  }
+  if (foes) { foes.style.zoom = ""; groupFoes(foes); }
   var cv = Math.max(60, Math.floor(inner - 23 - 13 - bottom - gap * 4));
   bat.style.setProperty("--fxCvH", cv + "px");
 }

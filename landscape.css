@@ -214,13 +214,17 @@ body.fxL .compbox>.fxGrow{flex:1 1 0!important;min-height:0!important;overflow:h
 body.fxL .compbox .skhead{margin:0!important}
 body.fxL #bestiarygridv70{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important;align-content:start}
 
-/* Options: two columns */
-body.fxL #optionsmodalv95 .skbox{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto 1fr auto auto;column-gap:16px;row-gap:5px;align-content:start}
+/* Options: one centred card with two tidy columns (round 6) */
+body.fxL #optionsmodalv95{align-items:center!important;justify-content:center!important}
+body.fxL #optionsmodalv95>.skbox{width:min(660px,100%)!important;height:auto!important;max-height:100%!important;margin:auto!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto auto auto;column-gap:18px;row-gap:6px;align-content:start;padding:10px 14px 12px!important}
 body.fxL #optionsmodalv95 .skhead{grid-column:1 / -1;grid-row:1}
 body.fxL #optionsmodalv95 .optsectitlev95{grid-column:1;grid-row:2;margin:0!important}
+body.fxL #optionsmodalv95 .skbox::after{content:"SAVES";grid-column:2;grid-row:2;font-size:9px;letter-spacing:2px;color:#a8977f;font-weight:700;align-self:end}
 body.fxL #optaudiosecv95{grid-column:1;grid-row:3 / span 3;align-self:start;margin:0!important}
-body.fxL .optcolv95{grid-column:2;grid-row:2 / span 2;margin:0!important;gap:5px!important}
-body.fxL .optcolv95 button,body.fxL #fxPlaytest,body.fxL #creditsbtnv95{height:34px!important;margin:0!important}
+body.fxL #optaudiosecv95{border:0!important;padding-bottom:0!important}
+body.fxL #optaudiosecv95 hr,body.fxL #optaudiosecv95>div:last-child:empty{display:none}
+body.fxL .optcolv95{grid-column:2;grid-row:3;margin:0!important;gap:6px!important;display:flex!important;flex-direction:column}
+body.fxL .optcolv95 button,body.fxL #fxPlaytest,body.fxL #creditsbtnv95{height:32px!important;margin:0!important;flex:0 0 auto!important}
 body.fxL #fxPlaytest{grid-column:2;grid-row:4}
 body.fxL #creditsbtnv95{grid-column:2;grid-row:5}
 
@@ -440,3 +444,30 @@ body.fxL #reforgegame .reforgeguide{font-size:9.5px!important;margin:0!important
 body.fxL #reforgegame div:has(>#reforgehit){position:absolute!important;right:10px;bottom:8px;margin:0!important;justify-content:flex-end!important;z-index:3}
 body.fxL #reforgegame #reforgecancel{order:-1}
 body.fxL #reforgegame #reforgehit{width:200px!important;padding:12px 8px!important;font-size:13px!important}
+/* round 6: fixed enemy slots. Nothing in the bottom band ever changes height */
+body.fxL #battle #foehps{display:grid!important;grid-template-columns:minmax(0,1fr);grid-auto-rows:26px;row-gap:2px;column-gap:8px;align-content:start;overflow:hidden!important;zoom:1!important}
+body.fxL #battle #foehps.fxFoes2{grid-template-columns:repeat(2,minmax(0,1fr))}
+body.fxL #battle .fxFoe{position:relative;display:grid;grid-template-rows:11px 11px 3px;row-gap:0;min-width:0;overflow:hidden}
+body.fxL #battle .fxFoe .hplabel{height:11px!important;min-height:0!important;margin:0!important;overflow:hidden;white-space:nowrap;display:flex;justify-content:space-between;gap:4px;font-size:9px!important;line-height:11px!important}
+body.fxL #battle .fxFoe .hplabel *{font-size:9px!important;line-height:11px!important;white-space:nowrap}
+body.fxL #battle .fxFoe .hplabel>span:first-child{overflow:hidden;text-overflow:ellipsis;min-width:0}
+body.fxL #battle .fxFoe .res-tags{flex:0 1 auto;overflow:hidden;min-width:0;display:flex;gap:3px;justify-content:flex-end}
+body.fxL #battle .fxFoe .fxrow{display:inline-flex!important;gap:1px;flex-wrap:nowrap;overflow:hidden}
+body.fxL #battle .fxFoe .fxrow *{max-height:11px}
+body.fxL #battle .fxFoe .hpbar{height:11px!important;min-height:0!important;margin:0!important}
+body.fxL #battle .fxFoe .hptxt{font-size:8.5px!important;line-height:11px!important}
+body.fxL #battle .fxFoe .specialname{position:absolute;right:0;top:12px;height:11px;line-height:11px!important;font-size:8px!important;margin:0!important;padding:0 3px;z-index:2;pointer-events:none}
+body.fxL #battle .fxFoe .specialcast{height:3px!important;margin:0!important;border:0!important}
+/* hero side: fixed heights too */
+body.fxL #battle .hprow>.hpwrap:first-child .hplabel{height:11px!important;overflow:hidden;white-space:nowrap}
+body.fxL #battle .hprow>.hpwrap:first-child .hplabel *{white-space:nowrap}
+/* round 6: folded stats is exactly the 18px tab, whatever the panel width or phone */
+body.fxL .statpanel.folded{width:18px!important;min-width:0!important;padding:0!important;transform:translateY(-50%)!important;right:var(--safeR)!important;border-radius:8px 0 0 8px!important}
+body.fxL .statpanel.folded:after{left:0!important;width:18px!important}
+body.fxL .compbox,body.fxL .compbox>*{overflow:hidden!important;scrollbar-width:none}
+/* round 6: conversion cards (Shard Refinement, Celestial Exchange) keep their full height */
+body.fxL #shopgrid{grid-auto-rows:max-content!important}
+body.fxL #shopgrid .shopcard>*{flex-shrink:0!important}
+body.fxL #shopgrid .conversionsliderv67 .cel{font-size:11px!important;padding:6px 4px!important;line-height:1.2!important;height:auto!important}
+body.fxL #shopgrid .conversionsliderv67 .sd{font-size:9px!important}
+body.fxL #shopgrid .conversionsliderv67 .conversionreadoutv67{font-size:10px!important}

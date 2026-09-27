@@ -58,7 +58,7 @@ function setPage(p){
 
 function closeOverlays(except){
   document.querySelectorAll(".skover.on").forEach(function(o){
-    if (o.id === except || o.id === "tipmodal") return;
+    if (o.id === except || o.id === "tipmodal" || o.id === "lootopen") return;
     // Use the popup's own close button when it has one, so the game can tidy up
     var c = o.querySelector("#closeshop,#closeguildv70,#closeminev83,#closecompendium,#closequestsv74,#optdonev95,#closetree,.skclose");
     if (c) c.click(); if (o.classList.contains("on")) o.classList.remove("on");
@@ -67,7 +67,15 @@ function closeOverlays(except){
 }
 
 rail.addEventListener("click", function(e){
-  var b = e.target.closest("button[data-k]"); if (!b || b.classList.contains("off")) return;
+  var b = e.target.closest("button[data-k]"); if (!b) return;
+  // Leaving the Spoils of War screen through the rail takes the loot (same as Leave), then navigates
+  var lo = $id("lootopen");
+  if (lo && lo.classList.contains("on")) {
+    var lv = $id("lootleave"); if (lv) lv.click();
+    setTimeout(function(){ syncRail(); if (!b.classList.contains("off")) b.click(); }, 120);
+    return;
+  }
+  if (b.classList.contains("off")) return;
   var it = ITEMS.filter(function(x){ return x.k === b.dataset.k; })[0];
   if (it.page) { closeOverlays(); if (!inRun()) setPage(it.page); return; }
   if (it.stats) {
@@ -240,7 +248,16 @@ function fitZooms(){
   treeKey = key;
 }
 // after any tap the tree may have appeared: fit it before the next paint
-document.addEventListener("click", function(){ requestAnimationFrame(fitZooms); }, true);
+document.addEventListener("click", function(){
+  if (!body.classList.contains("fxL")) return;
+  // new lists (compendium tabs, menus) are split into pages before they are ever painted
+  requestAnimationFrame(function(){ fitZooms(); markGrow(); flushPaging(); });
+  setTimeout(function(){ requestAnimationFrame(function(){ repaginateAll(); flushPaging(); }); }, 80);
+}, true);
+function flushPaging(){
+  PAGED.forEach(function(sel){ document.querySelectorAll(sel).forEach(function(l){ if (l.offsetParent) paginate(l); }); });
+  document.querySelectorAll(".compbox>.fxGrow").forEach(function(l){ if (l.offsetParent && l.id !== "areamasteryv117") paginate(l); });
+}
 function repaginateAll(){
   fitZooms();
   if (body.classList.contains("fxL")) markGrow();
@@ -252,7 +269,25 @@ setInterval(function(){ if (body.classList.contains("fxL")) repaginateAll(); }, 
 /* ---------- battle scene height ----------
    Safari sizes a canvas in a grid by its own pixel height, which pushes the
    scene over the health bars. So the scene gets an explicit height here. */
-var foeKey = "";
+var foeKey = "", foeObs = null, grouping = false;
+/* Enemy bars: each enemy gets one fixed-size slot (name line, bar, cast line),
+   so the band never changes height when debuffs, casts or enemy counts change. */
+function groupFoes(foes){
+  if (!foeObs) { foeObs = new MutationObserver(function(){ if (!grouping && body.classList.contains("fxL")) groupFoes(foes); }); foeObs.observe(foes, {childList:true}); }
+  if (!body.classList.contains("fxL")) return;
+  var kids = Array.prototype.slice.call(foes.children);
+  if (!kids.some(function(k){ return !k.classList.contains("fxFoe"); })) return;
+  grouping = true;
+  var cur = null;
+  kids.forEach(function(k){
+    if (k.classList.contains("fxFoe")) { cur = null; return; }
+    if (k.classList.contains("hplabel") || !cur) { cur = document.createElement("div"); cur.className = "fxFoe"; foes.insertBefore(cur, k); }
+    cur.appendChild(k);
+  });
+  var n = foes.querySelectorAll(".fxFoe").length;
+  foes.classList.toggle("fxFoes2", n > 3);
+  grouping = false;
+}
 function sizeBattle(){
   var bat = $id("battle"); if (!bat) return;
   var foes = $id("foehps");
@@ -263,15 +298,7 @@ function sizeBattle(){
   // The bottom band has one fixed height. The enemy bars shrink to fit it,
   // so the scene never changes size when the number of enemies changes.
   var bottom = Math.max(80, h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"));
-  if (foes) {
-    var key = foes.querySelectorAll(".hpbar").length + "|" + bottom + "|" + foes.clientWidth;
-    if (key !== foeKey || foes.scrollHeight > foes.clientHeight + 2) {
-      foes.style.zoom = "";
-      var need = foes.scrollHeight;
-      foes.style.zoom = need > bottom ? Math.max(0.45, bottom / need).toFixed(3) : "";
-      foeKey = key;
-    }
-  }
+  if (foes) { foes.style.zoom = ""; groupFoes(foes); }
   var cv = Math.max(60, Math.floor(inner - 23 - 13 - bottom - gap * 4));
   bat.style.setProperty("--fxCvH", cv + "px");
 }

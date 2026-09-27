@@ -58,7 +58,18 @@ function showSheet(el, note){
   // keep the sheet away from the thing that was tapped, so a second tap can reach it
   var r = el.getBoundingClientRect(), wide = innerWidth > innerHeight;
   sheet.classList.remove("fxTop", "fxLeft", "fxRight");
-  if (wide) sheet.classList.add(r.left + r.width / 2 > innerWidth / 2 ? "fxLeft" : "fxRight");
+  sheet.style.left = sheet.style.right = sheet.style.width = "";
+  if (wide) {
+    // put the sheet on the side with more room and never over the tapped item
+    var railW = 60, gap = 12, want = c.cmp ? 470 : 340;
+    var freeL = r.left - railW - gap * 2, freeR = innerWidth - r.right - 30 - gap * 2;
+    var leftSide = freeL >= freeR;
+    var w = Math.max(200, Math.min(want, leftSide ? freeL : freeR));
+    sheet.classList.add(leftSide ? "fxLeft" : "fxRight");
+    sheet.style.width = w + "px";
+    if (leftSide) sheet.style.left = Math.max(railW, r.left - gap - w) + "px";
+    else { sheet.style.left = (r.right + gap) + "px"; sheet.style.right = "auto"; }
+  }
   else if (r.top + r.height / 2 > innerHeight / 2) sheet.classList.add("fxTop");
   sheet.classList.add("on");
   return true;
@@ -176,6 +187,11 @@ document.addEventListener("pointerdown", function(e){
 }, true);
 
 /* ================= 3. AUDIO WHEN APP IS BACKGROUNDED ================= */
+// Sound effects: iPhone can leave the audio engine suspended after rotating, a call or
+// switching apps. Every tap wakes it up again (a resume only works inside a tap).
+function wakeSfx(){ try { if (typeof AC !== "undefined" && AC && AC.state !== "running") { var p = AC.resume(); if (p && p.catch) p.catch(function(){}); } } catch(_){} }
+["touchend","pointerup","click"].forEach(function(t){ document.addEventListener(t, wakeSfx, true); });
+addEventListener("orientationchange", function(){ setTimeout(wakeSfx, 300); });
 var pausedByUs = [];
 document.addEventListener("visibilitychange", function(){
   var auds = document.querySelectorAll("audio");

@@ -72,7 +72,7 @@ input,select,textarea{user-select:auto;-webkit-user-select:auto}
 #fxInfo.fxRight{left:auto;right:calc(26px + env(safe-area-inset-right));transform:translate(calc(100% + 80px),-50%)}
 #fxInfo.fxLeft.on,#fxInfo.fxRight.on{transform:translate(0,-50%)}
 /* Loot bag compare sheet: compact, two columns */
-#fxInfo.fxCmp{width:min(470px,55vw)!important;padding:10px 12px!important}
+#fxInfo.fxCmp{padding:10px 12px!important}
 #fxInfo.fxCmp .fxh{margin-bottom:4px}
 #fxInfo.fxCmp .fxb{font-size:11.5px;line-height:1.4}
 #fxInfo .fxcmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -84,3 +84,5 @@ input,select,textarea{user-select:auto;-webkit-user-select:auto}
 #fxInfo.fxCmp .fxn{margin-top:6px}
 .touchhint{display:none}
 @media(hover:none){.touchhint{display:inline}}
+#fxInfo:not(.on){visibility:hidden;pointer-events:none;transition:transform .18s ease-out,visibility 0s linear .18s}
+#fxInfo.on{visibility:visible;transition:transform .18s ease-out,visibility 0s}
