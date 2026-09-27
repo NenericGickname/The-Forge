@@ -30,8 +30,25 @@ function headFor(el){
   if (el.classList.contains("slot")) return "Equipped";
   return "Info";
 }
+/* Loot bag item: show it next to what is equipped in the same slot */
+function compareFor(el){
+  if (!el.classList.contains("bchip") || !el.closest("#inv")) return null;
+  try {
+    var chips = Array.prototype.slice.call(document.querySelectorAll("#inv .bchip"));
+    var g = S.bag[chips.indexOf(el)]; if (!g) return null;
+    var tip = el.querySelector(".btip"); if (!tip) return null;
+    var cur = S.gear[g.slot];
+    var newHtml = tip.innerHTML.replace(/<div[^>]*>\s*(click chip to equip|Drag onto[^<]*)\s*<\/div>/i, "");
+    var curHtml = cur
+      ? '<div class="bn" style="color:' + cvar(RAR[cur.rar].col) + '">' + cur.name + " +" + cur.plus + '</div><div class="bs">ilvl ' + cur.ilvl + "<br>" + gearDesc(cur) + "</div>"
+      : '<div class="bs">Nothing equipped</div>';
+    return { head: "Loot vs equipped", cmp: true,
+      html: '<div class="fxcmp"><div class="fxcmpNew"><div class="fxcmpT">IN BAG</div>' + newHtml + '</div><div class="fxcmpCur"><div class="fxcmpT">EQUIPPED</div>' + curHtml + "</div></div>" };
+  } catch (_) { return null; }
+}
 function showSheet(el, note){
-  var c = contentFor(el); if (!c) return false;
+  var c = compareFor(el) || contentFor(el); if (!c) return false;
+  sheet.classList.toggle("fxCmp", !!c.cmp);
   sheet.querySelector(".fxh").textContent = c.head;
   var b = sheet.querySelector(".fxb");
   if (c.html != null) b.innerHTML = c.html; else b.textContent = c.text;
@@ -85,7 +102,20 @@ document.addEventListener("contextmenu", function(e){ if (lastPointer === "touch
 document.addEventListener("click", function(e){
   if (lastPointer !== "touch") return;
   if (suppressClick) { suppressClick = false; e.preventDefault(); e.stopImmediatePropagation(); return; }
-  if (sheet.contains(e.target)) { hideSheet(); return; }
+  if (sheet.contains(e.target)) {
+    // a button in the sheet presses the same button on the real item
+    var sb = e.target.closest(".fxb button");
+    if (sb && selEl) {
+      var mine = Array.prototype.slice.call(sheet.querySelectorAll(".fxb .fxcmpNew button, .fxb > * button")), i = mine.indexOf(sb);
+      var real = selEl.querySelectorAll(TIP_SEL.split(",").map(function(t){ return t + " button"; }).join(","))[i];
+      e.preventDefault(); e.stopImmediatePropagation();
+      var target = selEl;
+      hideSheet();
+      if (real && !real.disabled) real.click();
+      return;
+    }
+    hideSheet(); return;
+  }
   var node = e.target.closest(".node");
   if (node) {
     var k = nodeKey(node);

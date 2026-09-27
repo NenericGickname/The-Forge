@@ -3193,6 +3193,17 @@ input,select,textarea{user-select:auto;-webkit-user-select:auto}
 #fxInfo.fxLeft{left:calc(60px + env(safe-area-inset-left));transform:translate(calc(-100% - 80px),-50%)}
 #fxInfo.fxRight{left:auto;right:calc(26px + env(safe-area-inset-right));transform:translate(calc(100% + 80px),-50%)}
 #fxInfo.fxLeft.on,#fxInfo.fxRight.on{transform:translate(0,-50%)}
+/* Loot bag compare sheet: compact, two columns */
+#fxInfo.fxCmp{width:min(470px,55vw)!important;padding:10px 12px!important}
+#fxInfo.fxCmp .fxh{margin-bottom:4px}
+#fxInfo.fxCmp .fxb{font-size:11.5px;line-height:1.4}
+#fxInfo .fxcmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#fxInfo .fxcmp>div{min-width:0}
+#fxInfo .fxcmpCur{border-left:1px solid #ffffff1a;padding-left:10px;opacity:.9}
+#fxInfo .fxcmpT{font-size:9px!important;letter-spacing:2px;color:#a8977f;margin-bottom:3px}
+#fxInfo.fxCmp .fxb .bbtns{display:flex;gap:6px;margin-top:6px}
+#fxInfo.fxCmp .fxb .bbtns button{font-size:11px!important;padding:5px 8px!important}
+#fxInfo.fxCmp .fxn{margin-top:6px}
 /* The Forge landscape phone layout. Active only when body has .fxL
    (phone held sideways: landscape and at most 520px tall). */
 
@@ -3464,13 +3475,9 @@ body.fxL.fxPageForge .slot .wt{display:block!important;font-size:8px!important}
 
 /* Anvil page: pick an item on the left, forge it on the right */
 body.fxL.fxPageAnvil #town>.fxAreas,body.fxL.fxPageAnvil #goalrailv70,body.fxL.fxPageAnvil #huntpanel,body.fxL.fxPageAnvil .fxBagCol{display:none!important}
-body.fxL.fxPageAnvil #town{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
 body.fxL.fxPageAnvil .fxHeroCol{grid-column:2!important}
 body.fxL.fxPageAnvil .fxHeroCol>.panel:first-child{display:none!important}
 body.fxL.fxPageAnvil .fxHeroCol>.panel{justify-content:flex-start!important;gap:6px}
-body.fxL.fxPageAnvil #slots{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important}
-body.fxL.fxPageAnvil .slot .slstats,body.fxL.fxPageAnvil .slot .wt{display:none!important}
-body.fxL.fxPageAnvil .slot .in{font-size:15px!important}
 body.fxL.fxPageAnvil .fsel{font-size:11px!important}
 body.fxL.fxPageAnvil .fbtns button{font-size:12px!important;padding:8px 4px!important}
 #fxAnvilItem{display:none}
@@ -3558,6 +3565,83 @@ body.fxL .amrowv117{padding:5px 7px}
 body.fxL .amstepv117{font-size:9px;line-height:1.25}
 /* Paged-out items must stay hidden even where a tile rule sets display with an id selector */
 body.fxL :is(#wrap,#areas,#inv,#shopgrid,.skover,.compbox) .fxHidden.fxHidden{display:none!important}
+/* round 4: fixed battle band heights */
+body.fxL #battle #wave{height:23px!important;min-height:23px;max-height:23px;overflow:hidden;box-sizing:border-box}
+body.fxL #battle .hprow>.hpwrap:first-child,body.fxL #battle .runbtns{align-self:start}
+body.fxL #battle #foehps{overflow:hidden!important}
+body.fxL #loottray{height:26px!important;min-height:26px!important;max-height:26px!important;box-sizing:border-box;display:flex;align-items:center}
+/* round 4: Spoils of War fits the screen, buttons always reachable */
+body.fxL #lootopen>.skbox{display:flex!important;flex-direction:column!important;padding:6px 10px!important}
+body.fxL #lootopen h2{font-size:15px!important;margin:0!important}
+body.fxL #lootopen .skbox>div:nth-of-type(1){margin:0 0 2px!important;font-size:10px!important}
+body.fxL #lootprotecthintv42{font-size:9.5px!important;margin:0 0 3px!important}
+body.fxL #lootbags{flex:0 0 auto!important;margin:0!important;min-height:0!important}
+body.fxL #lootbags:empty{display:none!important}
+body.fxL #lootresults{flex:1 1 0!important;min-height:0!important;overflow:hidden!important;margin:0!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;align-content:start}
+body.fxL #lootresults>*{margin:0!important;padding:4px 8px!important;min-height:0!important}
+body.fxL #lootopen .skbox>div:last-child{margin-top:4px!important;flex:0 0 auto}
+body.fxL #lootopen .skbox>div:last-child button{padding:6px!important;font-size:11px!important}
+body.fxL #lootbags{gap:8px!important;min-height:0!important}
+body.fxL #lootbags .lbag{width:38px!important;height:38px!important;font-size:19px!important}
+body.fxL #lootbags:not(:has(.lbag:not([data-o]))){display:none!important}
+body.fxL #battle #foehps{align-self:stretch!important}
+/* round 4: the Anvil page keeps the loadout exactly where the Gear page has it */
+body.fxL.fxPageAnvil #town{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr)!important}
+body.fxL.fxPageAnvil .slot .slstats{-webkit-mask-image:none!important;mask-image:none!important;font-size:9px!important;line-height:1.3!important}
+body.fxL.fxPageAnvil .slot .wt{display:block!important;font-size:8px!important}
+#fxAnvilItem .sloff,#fxAnvilItem .sldef,#fxAnvilItem .slutil{font-size:10px;line-height:1.45}
+#fxAnvilItem .sloff{color:#ffb59a}#fxAnvilItem .sldef{color:#9fc4e8}#fxAnvilItem .slutil{color:#9fe0c0}
+/* round 4: Strike the Anvil. Smaller stat lists in two columns, STRIKE at the bottom right under the thumb */
+body.fxL #strike .forgestats{font-size:9.5px!important;line-height:1.3!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:10px;padding:4px 8px!important;overflow:hidden}
+body.fxL #strike .forgestats *{font-size:inherit!important;line-height:inherit!important}
+body.fxL #strike .forgelevels b{font-size:18px!important}
+body.fxL #strike .forgelevels small{font-size:8px!important}
+body.fxL #strike #strikebtn{order:0}
+body.fxL #strike #strikebtn~#strikedone{order:-1}
+body.fxL #strike div:has(>#strikebtn){position:absolute!important;right:10px;bottom:8px;margin:0!important;justify-content:flex-end!important;z-index:3}
+body.fxL #strike #strikebtn{width:200px!important;padding:12px 8px!important;font-size:13px!important}
+body.fxL #strike .rfcomparecol,body.fxL #strike .rfcomparecol *{font-size:10px!important}
+body.fxL #strike .forgestats{align-content:start!important;row-gap:1px}
+body.fxL #strike .guardrow{margin-right:290px!important;justify-content:flex-start!important;flex-wrap:wrap;font-size:9px!important;text-align:left}
+body.fxL #strike .guardrow *{font-size:9px!important}
+/* round 4: guild cards line up. Challenge text has a fixed block height, rewards sit in two even halves */
+body.fxL .contractv70 .contractriskv88{width:100%!important;max-width:none!important;min-height:calc(4 * 1.3em)!important;line-height:1.3!important;margin:3px 0!important}
+body.fxL .contractv70 .contractriskv88 *{line-height:1.3!important}
+body.fxL .contractv70 .cv99rew{display:grid!important;grid-template-rows:1fr 1fr;gap:0!important;padding:0!important;align-content:stretch}
+body.fxL .contractv70 .cv99row{display:flex!important;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:4px 6px!important;margin:0!important}
+body.fxL .contractv70 .cv99row+.cv99row{border-top:1px solid #ffffff14}
+body.fxL .contractv70 .cv99row .val{text-align:center!important;font-size:11px!important}
+body.fxL .contractv70 .cv99row.bounty .val{font-size:13px!important}
+/* round 4: Rocky gets his own column on the left of the shop */
+body.fxL #shop>.shopscene{display:grid!important;grid-template-columns:150px minmax(0,1fr);gap:6px;align-items:stretch}
+body.fxL #shop #rockkeeper{position:relative!important;left:auto!important;top:auto!important;zoom:.8;grid-column:1;align-self:end;justify-self:center;margin:0 0 30px!important}
+body.fxL #shop .shopbox{grid-column:2}
+body.fxL #shopkeeperbubble{position:absolute!important;zoom:1.25!important;left:50%!important;top:auto!important;bottom:calc(100% + 10px)!important;transform:translateX(-50%)!important;width:150px!important;max-width:none!important;font-size:10px!important;line-height:1.3!important}
+body.fxL #shop>.shopscene{background:radial-gradient(circle at 12% 70%,#2a1d14 0,#130e0c 55%,#0c090a 100%);border:1px solid #5e4630;border-radius:12px;padding:0 4px 0 0;box-sizing:border-box}
+body.fxL #shop .shopbox{border:0!important;border-left:1px solid #5e463080!important;border-radius:0 12px 12px 0!important;background:transparent!important;box-shadow:none!important}
+body.fxL #shopkeeperbubble,body.fxL #shopkeeperbubble *{font-size:12.5px!important;line-height:1.3!important}
+body.fxL #shop #rockkeeper{zoom:.9!important}
+body.fxL #shopkeeperbubble{zoom:1!important;width:136px!important;min-width:136px!important;padding:6px 8px!important;box-sizing:border-box}
+body.fxL #shopkeeperbubble,body.fxL #shopkeeperbubble *{font-size:11.5px!important}
+body.fxL #shop #rockkeeper{transform:none!important;zoom:.62!important}
+body.fxL #shopkeeperbubble{zoom:1.45!important;width:132px!important;min-width:132px!important}
+/* round 4: section headers in the active tree get a real line box (emoji were bleeding into the cards) */
+body.fxL .acthdr111{line-height:1.5!important;margin:8px 0 5px!important;padding:0 0 2px!important;overflow:visible}
+/* small phones: item icon rows wrap instead of spilling out of the slot */
+body.fxL .slot .in{display:flex!important;flex-wrap:wrap;align-items:center;column-gap:3px;row-gap:0;min-width:0}
+@media (max-width:720px){body.fxL .slot .in{font-size:12px!important}}
+body.fxL #sktabsv111 button{position:relative;overflow:visible!important}
+body.fxL #sktabsv111 .skbadgeV112{position:absolute!important;top:-7px!important;right:-7px!important;left:auto!important;bottom:auto!important;transform:none!important;font-size:9px!important;min-width:16px;height:16px;line-height:16px!important;padding:0 4px!important;box-sizing:border-box}
+/* round 4: tutorial arrows in landscape */
+#fxRail button{position:relative}
+#fxRail button.fxCoach{box-shadow:0 0 0 2px #ffcf5c,0 0 14px #ffcf5c88!important;border-radius:10px}
+#fxRail button.fxCoach::after{content:"◀";position:absolute;left:calc(100% + 4px);top:50%;color:#ffcf5c;font-size:22px;line-height:1;text-shadow:0 0 6px #000,0 0 12px #ffcf5c;animation:fxCoachBob .8s ease-in-out infinite alternate;pointer-events:none;z-index:80}
+@keyframes fxCoachBob{from{transform:translate(0,-50%)}to{transform:translate(8px,-50%)}}
+body.fxL .coacharrowv79{z-index:80!important}
+body.fxL #areas .atile.firstfighttargetv49{position:relative;overflow:visible!important}
+body.fxL .firstfightarrowv49{top:-6px!important;font-size:18px!important}
+body.fxL #areas{overflow:visible!important}
+body.fxL #areas>.fxHidden{display:none!important}
 </style></head>
 <body>
 <div class="flash" id="flash"></div>
@@ -18849,7 +18933,7 @@ function powText(id) {
     case "heal":
       return "restores " + nf(v) + "% HP";
     case "miracle":
-      return "regen " + nf(v) + "%/2s for 20s";
+      return "regen " + +(v / 4).toFixed(2) + "%/0.5s for 20s";
   }
   return "";
 }
@@ -32452,9 +32536,10 @@ try {
           var rt = run.actRT;
           if (rt && rt.miracleUntil > nowT()) {
             rt.miracleAcc = (rt.miracleAcc || 0) + 150;
-            if (rt.miracleAcc >= 2000) {
-              rt.miracleAcc -= 2000;
-              var pct = rt.miraclePct || 3;
+            // heals a quarter as much, four times as often (every 0.5 s)
+            if (rt.miracleAcc >= 500) {
+              rt.miracleAcc -= 500;
+              var pct = (rt.miraclePct || 3) / 4;
               run.hero.hp = Math.min(run.hero.max, run.hero.hp + (run.hero.max * pct) / 100);
               try {
                 floatDmg("hero", "🌟 +" + Math.round((run.hero.max * pct) / 100), 0, "#ffd76a");
@@ -32890,8 +32975,25 @@ function headFor(el){
   if (el.classList.contains("slot")) return "Equipped";
   return "Info";
 }
+/* Loot bag item: show it next to what is equipped in the same slot */
+function compareFor(el){
+  if (!el.classList.contains("bchip") || !el.closest("#inv")) return null;
+  try {
+    var chips = Array.prototype.slice.call(document.querySelectorAll("#inv .bchip"));
+    var g = S.bag[chips.indexOf(el)]; if (!g) return null;
+    var tip = el.querySelector(".btip"); if (!tip) return null;
+    var cur = S.gear[g.slot];
+    var newHtml = tip.innerHTML.replace(/<div[^>]*>\s*(click chip to equip|Drag onto[^<]*)\s*<\/div>/i, "");
+    var curHtml = cur
+      ? '<div class="bn" style="color:' + cvar(RAR[cur.rar].col) + '">' + cur.name + " +" + cur.plus + '</div><div class="bs">ilvl ' + cur.ilvl + "<br>" + gearDesc(cur) + "</div>"
+      : '<div class="bs">Nothing equipped</div>';
+    return { head: "Loot vs equipped", cmp: true,
+      html: '<div class="fxcmp"><div class="fxcmpNew"><div class="fxcmpT">IN BAG</div>' + newHtml + '</div><div class="fxcmpCur"><div class="fxcmpT">EQUIPPED</div>' + curHtml + "</div></div>" };
+  } catch (_) { return null; }
+}
 function showSheet(el, note){
-  var c = contentFor(el); if (!c) return false;
+  var c = compareFor(el) || contentFor(el); if (!c) return false;
+  sheet.classList.toggle("fxCmp", !!c.cmp);
   sheet.querySelector(".fxh").textContent = c.head;
   var b = sheet.querySelector(".fxb");
   if (c.html != null) b.innerHTML = c.html; else b.textContent = c.text;
@@ -32945,7 +33047,20 @@ document.addEventListener("contextmenu", function(e){ if (lastPointer === "touch
 document.addEventListener("click", function(e){
   if (lastPointer !== "touch") return;
   if (suppressClick) { suppressClick = false; e.preventDefault(); e.stopImmediatePropagation(); return; }
-  if (sheet.contains(e.target)) { hideSheet(); return; }
+  if (sheet.contains(e.target)) {
+    // a button in the sheet presses the same button on the real item
+    var sb = e.target.closest(".fxb button");
+    if (sb && selEl) {
+      var mine = Array.prototype.slice.call(sheet.querySelectorAll(".fxb .fxcmpNew button, .fxb > * button")), i = mine.indexOf(sb);
+      var real = selEl.querySelectorAll(TIP_SEL.split(",").map(function(t){ return t + " button"; }).join(","))[i];
+      e.preventDefault(); e.stopImmediatePropagation();
+      var target = selEl;
+      hideSheet();
+      if (real && !real.disabled) real.click();
+      return;
+    }
+    hideSheet(); return;
+  }
   var node = e.target.closest(".node");
   if (node) {
     var k = nodeKey(node);
@@ -33369,6 +33484,12 @@ function syncRail(){
       var sp = $id("statpanel"); active = !!(sp && !sp.classList.contains("folded"));
     }
     if (it.town) b.classList.toggle("off", run);
+    // tutorial arrows: the game points at buttons that the rail replaces, so the rail shows the arrow
+    var coach = false;
+    if (it.btn) { var cs0 = $id(it.btn); coach = !!(cs0 && cs0.classList.contains("coachmarkv79")) && !active; }
+    else if (it.k === "anvil") { var ub = $id("upbtn"); coach = !!(ub && ub.classList.contains("coachmarkv79")) && page !== "anvil"; }
+    else if (it.k === "forge") { var sl = document.querySelector("#slots .coachmarkv79"); coach = !!sl && page === "adv"; }
+    b.classList.toggle("fxCoach", coach && !run);
     b.style.display = vis ? "" : "none";
     b.classList.toggle("on", active);
     b.classList.toggle("badge", badge);
@@ -33379,7 +33500,7 @@ setInterval(function(){ if (body.classList.contains("fxL")) syncRail(); }, 400);
 /* ---------- paged lists (no scrolling) ---------- */
 var PAGED = [
   "#inv", "#areas", ".questgridv74", ".contractgridv70", ".bestiarygridv70", ".compgrid", ".amgridv117",
-  "#shopgrid", ".questtrackergridv74"
+  "#shopgrid", ".questtrackergridv74", "#lootresults"
 ];
 var pagers = new WeakMap();
 
@@ -33413,45 +33534,47 @@ function paginate(list){
   var st = pagerFor(list);
   st.busy = true;
   var kids = Array.prototype.filter.call(list.children, function(c){ return !c.classList.contains("fxPager"); });
-  kids.forEach(function(c){ c.classList.remove("fxHidden"); });
   if (!body.classList.contains("fxL") || !list.offsetParent) {
+    kids.forEach(function(c){ c.classList.remove("fxHidden"); });
     if (st.bar.parentNode) st.bar.remove();
-    st.busy = false; return;
+    st.key = ""; st.busy = false; return;
   }
   // Put the pager bar right after the list so the list's own height excludes it
   if (st.bar.parentNode !== list.parentNode || st.bar.previousElementSibling !== list) list.parentNode.insertBefore(st.bar, list.nextSibling);
   st.bar.style.display = "flex";
   var H = list.clientHeight;
-  if (list.scrollHeight <= H + 2 || H < 20) {
-    st.bar.style.display = "none"; st.pages = 1; st.page = 0; st.busy = false; return;
+  // Recompute the split only when the list or its space changed
+  var key = kids.length + "|" + H + "|" + list.clientWidth + "|" + list.textContent.length;
+  if (key !== st.key || !st.split) {
+    kids.forEach(function(c){ c.classList.remove("fxHidden"); });
+    H = list.clientHeight;
+    if (list.scrollHeight <= H + 2 || H < 20) {
+      st.split = [kids.length];
+    } else {
+      // Fill each page item by item with the real layout, so every item lands on exactly one page
+      kids.forEach(function(c){ c.classList.add("fxHidden"); });
+      var split = [], start = 0;
+      while (start < kids.length) {
+        var end = start;
+        while (end < kids.length) {
+          kids[end].classList.remove("fxHidden");
+          if (end > start && list.scrollHeight > list.clientHeight + 2) { kids[end].classList.add("fxHidden"); break; }
+          end++;
+        }
+        // A short heading at the bottom of a page moves to the next page, next to what it labels
+        if (end < kids.length && end - start > 1 && kids[end - 1].getBoundingClientRect().height < 26) end--;
+        for (var i = start; i < end; i++) kids[i].classList.add("fxHidden");
+        split.push(end); start = end;
+      }
+      st.split = split;
+    }
+    st.key = key;
   }
-  // Group children into pages by their row position
-  var top0 = list.getBoundingClientRect().top + (parseFloat(getComputedStyle(list).paddingTop) || 0);
-  var pageOf = [], pageStart = 0, p = 0;
-  kids.forEach(function(c){
-    var r = c.getBoundingClientRect();
-    if (r.height === 0 && r.width === 0) { pageOf.push(p); return; }
-    var t = r.top - top0, b = r.bottom - top0;
-    if (b - pageStart > H - 1 && t > pageStart + 1) { p++; pageStart = t; }
-    pageOf.push(p);
-  });
-  // A short heading at the bottom of a page moves to the next page, next to what it labels
-  for (var i = kids.length - 2; i >= 0; i--) {
-    if (pageOf[i] !== pageOf[i+1] && kids[i].getBoundingClientRect().height < 26) pageOf[i] = pageOf[i+1];
-  }
-  st.pages = p + 1;
+  st.pages = st.split.length;
   if (st.page >= st.pages) st.page = st.pages - 1;
-  kids.forEach(function(c, i){ if (pageOf[i] !== st.page) c.classList.add("fxHidden"); });
-  // Safety pass: anything still sticking out at the bottom moves to the next page
-  var guard = 0;
-  while (list.scrollHeight > list.clientHeight + 2 && guard++ < 20) {
-    var vis = kids.filter(function(c, i){ return pageOf[i] === st.page; });
-    if (vis.length < 2) break;
-    var last = vis[vis.length - 1], li = kids.indexOf(last);
-    for (var j = li; j < kids.length; j++) if (pageOf[j] === st.page) pageOf[j] = st.page + 1;
-    last.classList.add("fxHidden");
-    st.pages = Math.max(st.pages, st.page + 2);
-  }
+  var from = st.page ? st.split[st.page - 1] : 0, to = st.split[st.page];
+  kids.forEach(function(c, i){ c.classList.toggle("fxHidden", i < from || i >= to); });
+  if (st.pages <= 1) { st.bar.style.display = "none"; st.page = 0; st.busy = false; return; }
   st.bar.querySelector(".pn").textContent = (st.page + 1) + " / " + st.pages;
   st.bar.querySelector(".pp").disabled = st.page === 0;
   st.bar.querySelector(".np").disabled = st.page >= st.pages - 1;
@@ -33469,18 +33592,23 @@ function markGrow(){
     if (best) { best.classList.add("fxGrow"); if (best.id !== "areamasteryv117") { pagerFor(best); schedule(best); } }
   });
 }
-/* Shrink-to-fit for things that should stay whole (skill tree branches) */
-var ZOOMFIT = ["#branches .branch"];
+/* Shrink-to-fit for the passive skill tree. One zoom for all three branches,
+   recomputed only when the space or the tree content changes, so switching
+   tabs never changes the text size. */
+var treeKey = "", treeVer = 0, treeObs = null;
 function fitZooms(){
-  var on = body.classList.contains("fxL");
-  ZOOMFIT.forEach(function(sel){
-    document.querySelectorAll(sel).forEach(function(el){
-      el.style.zoom = "";
-      if (!on || !el.offsetParent) return;
-      var avail = el.parentNode.clientHeight, need = el.scrollHeight;
-      if (need > avail + 1 && avail > 40) el.style.zoom = Math.max(0.55, (avail - 2) / need).toFixed(3);
-    });
-  });
+  var br = $id("branches"); if (!br) return;
+  var list = Array.prototype.slice.call(br.querySelectorAll(".branch"));
+  if (!body.classList.contains("fxL")) { if (treeKey) { list.forEach(function(el){ el.style.zoom = ""; }); treeKey = ""; } return; }
+  if (!br.offsetParent) return;           // hidden (Active tab or closed): keep the last zoom
+  if (!treeObs) { treeObs = new MutationObserver(function(){ treeVer++; }); treeObs.observe(br, {childList:true, subtree:true}); }
+  var H = br.clientHeight, key = H + "|" + br.clientWidth + "|" + treeVer;
+  if (key === treeKey || H < 40) return;
+  list.forEach(function(el){ el.style.zoom = ""; });
+  var need = 0; list.forEach(function(el){ need = Math.max(need, el.scrollHeight); });
+  var z = need > H + 1 ? Math.max(0.55, (H - 2) / need).toFixed(3) : "";
+  list.forEach(function(el){ el.style.zoom = z; });
+  treeKey = key;
 }
 function repaginateAll(){
   fitZooms();
@@ -33493,14 +33621,27 @@ setInterval(function(){ if (body.classList.contains("fxL")) repaginateAll(); }, 
 /* ---------- battle scene height ----------
    Safari sizes a canvas in a grid by its own pixel height, which pushes the
    scene over the health bars. So the scene gets an explicit height here. */
+var foeKey = "";
 function sizeBattle(){
   var bat = $id("battle"); if (!bat) return;
-  if (!body.classList.contains("fxL") || !bat.offsetHeight) { bat.style.removeProperty("--fxCvH"); return; }
+  var foes = $id("foehps");
+  if (!body.classList.contains("fxL") || !bat.offsetHeight) { bat.style.removeProperty("--fxCvH"); if (foes) foes.style.zoom = ""; foeKey = ""; return; }
   var cs = getComputedStyle(bat), gap = parseFloat(cs.rowGap) || 3;
   var inner = bat.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
   var h = function(sel){ var e = bat.querySelector(sel); return e ? e.offsetHeight : 0; };
-  var bottom = Math.max(h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"), h("#foehps"));
-  var cv = Math.max(60, Math.floor(inner - h("#wave") - h("#rmsg") - bottom - gap * 4));
+  // The bottom band has one fixed height. The enemy bars shrink to fit it,
+  // so the scene never changes size when the number of enemies changes.
+  var bottom = Math.max(80, h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"));
+  if (foes) {
+    var key = foes.querySelectorAll(".hpbar").length + "|" + bottom + "|" + foes.clientWidth;
+    if (key !== foeKey || foes.scrollHeight > foes.clientHeight + 2) {
+      foes.style.zoom = "";
+      var need = foes.scrollHeight;
+      foes.style.zoom = need > bottom ? Math.max(0.45, bottom / need).toFixed(3) : "";
+      foeKey = key;
+    }
+  }
+  var cv = Math.max(60, Math.floor(inner - 23 - 13 - bottom - gap * 4));
   bat.style.setProperty("--fxCvH", cv + "px");
 }
 setInterval(sizeBattle, 300);

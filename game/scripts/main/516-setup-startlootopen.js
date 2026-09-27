@@ -405,9 +405,10 @@ try {
           var rt = run.actRT;
           if (rt && rt.miracleUntil > nowT()) {
             rt.miracleAcc = (rt.miracleAcc || 0) + 150;
-            if (rt.miracleAcc >= 2000) {
-              rt.miracleAcc -= 2000;
-              var pct = rt.miraclePct || 3;
+            // heals a quarter as much, four times as often (every 0.5 s)
+            if (rt.miracleAcc >= 500) {
+              rt.miracleAcc -= 500;
+              var pct = (rt.miraclePct || 3) / 4;
               run.hero.hp = Math.min(run.hero.max, run.hero.hp + (run.hero.max * pct) / 100);
               try {
                 floatDmg("hero", "🌟 +" + Math.round((run.hero.max * pct) / 100), 0, "#ffd76a");

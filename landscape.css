@@ -269,13 +269,9 @@ body.fxL.fxPageForge .slot .wt{display:block!important;font-size:8px!important}
 
 /* Anvil page: pick an item on the left, forge it on the right */
 body.fxL.fxPageAnvil #town>.fxAreas,body.fxL.fxPageAnvil #goalrailv70,body.fxL.fxPageAnvil #huntpanel,body.fxL.fxPageAnvil .fxBagCol{display:none!important}
-body.fxL.fxPageAnvil #town{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
 body.fxL.fxPageAnvil .fxHeroCol{grid-column:2!important}
 body.fxL.fxPageAnvil .fxHeroCol>.panel:first-child{display:none!important}
 body.fxL.fxPageAnvil .fxHeroCol>.panel{justify-content:flex-start!important;gap:6px}
-body.fxL.fxPageAnvil #slots{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important}
-body.fxL.fxPageAnvil .slot .slstats,body.fxL.fxPageAnvil .slot .wt{display:none!important}
-body.fxL.fxPageAnvil .slot .in{font-size:15px!important}
 body.fxL.fxPageAnvil .fsel{font-size:11px!important}
 body.fxL.fxPageAnvil .fbtns button{font-size:12px!important;padding:8px 4px!important}
 #fxAnvilItem{display:none}
@@ -363,3 +359,80 @@ body.fxL .amrowv117{padding:5px 7px}
 body.fxL .amstepv117{font-size:9px;line-height:1.25}
 /* Paged-out items must stay hidden even where a tile rule sets display with an id selector */
 body.fxL :is(#wrap,#areas,#inv,#shopgrid,.skover,.compbox) .fxHidden.fxHidden{display:none!important}
+/* round 4: fixed battle band heights */
+body.fxL #battle #wave{height:23px!important;min-height:23px;max-height:23px;overflow:hidden;box-sizing:border-box}
+body.fxL #battle .hprow>.hpwrap:first-child,body.fxL #battle .runbtns{align-self:start}
+body.fxL #battle #foehps{overflow:hidden!important}
+body.fxL #loottray{height:26px!important;min-height:26px!important;max-height:26px!important;box-sizing:border-box;display:flex;align-items:center}
+/* round 4: Spoils of War fits the screen, buttons always reachable */
+body.fxL #lootopen>.skbox{display:flex!important;flex-direction:column!important;padding:6px 10px!important}
+body.fxL #lootopen h2{font-size:15px!important;margin:0!important}
+body.fxL #lootopen .skbox>div:nth-of-type(1){margin:0 0 2px!important;font-size:10px!important}
+body.fxL #lootprotecthintv42{font-size:9.5px!important;margin:0 0 3px!important}
+body.fxL #lootbags{flex:0 0 auto!important;margin:0!important;min-height:0!important}
+body.fxL #lootbags:empty{display:none!important}
+body.fxL #lootresults{flex:1 1 0!important;min-height:0!important;overflow:hidden!important;margin:0!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;align-content:start}
+body.fxL #lootresults>*{margin:0!important;padding:4px 8px!important;min-height:0!important}
+body.fxL #lootopen .skbox>div:last-child{margin-top:4px!important;flex:0 0 auto}
+body.fxL #lootopen .skbox>div:last-child button{padding:6px!important;font-size:11px!important}
+body.fxL #lootbags{gap:8px!important;min-height:0!important}
+body.fxL #lootbags .lbag{width:38px!important;height:38px!important;font-size:19px!important}
+body.fxL #lootbags:not(:has(.lbag:not([data-o]))){display:none!important}
+body.fxL #battle #foehps{align-self:stretch!important}
+/* round 4: the Anvil page keeps the loadout exactly where the Gear page has it */
+body.fxL.fxPageAnvil #town{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr)!important}
+body.fxL.fxPageAnvil .slot .slstats{-webkit-mask-image:none!important;mask-image:none!important;font-size:9px!important;line-height:1.3!important}
+body.fxL.fxPageAnvil .slot .wt{display:block!important;font-size:8px!important}
+#fxAnvilItem .sloff,#fxAnvilItem .sldef,#fxAnvilItem .slutil{font-size:10px;line-height:1.45}
+#fxAnvilItem .sloff{color:#ffb59a}#fxAnvilItem .sldef{color:#9fc4e8}#fxAnvilItem .slutil{color:#9fe0c0}
+/* round 4: Strike the Anvil. Smaller stat lists in two columns, STRIKE at the bottom right under the thumb */
+body.fxL #strike .forgestats{font-size:9.5px!important;line-height:1.3!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:10px;padding:4px 8px!important;overflow:hidden}
+body.fxL #strike .forgestats *{font-size:inherit!important;line-height:inherit!important}
+body.fxL #strike .forgelevels b{font-size:18px!important}
+body.fxL #strike .forgelevels small{font-size:8px!important}
+body.fxL #strike #strikebtn{order:0}
+body.fxL #strike #strikebtn~#strikedone{order:-1}
+body.fxL #strike div:has(>#strikebtn){position:absolute!important;right:10px;bottom:8px;margin:0!important;justify-content:flex-end!important;z-index:3}
+body.fxL #strike #strikebtn{width:200px!important;padding:12px 8px!important;font-size:13px!important}
+body.fxL #strike .rfcomparecol,body.fxL #strike .rfcomparecol *{font-size:10px!important}
+body.fxL #strike .forgestats{align-content:start!important;row-gap:1px}
+body.fxL #strike .guardrow{margin-right:290px!important;justify-content:flex-start!important;flex-wrap:wrap;font-size:9px!important;text-align:left}
+body.fxL #strike .guardrow *{font-size:9px!important}
+/* round 4: guild cards line up. Challenge text has a fixed block height, rewards sit in two even halves */
+body.fxL .contractv70 .contractriskv88{width:100%!important;max-width:none!important;min-height:calc(4 * 1.3em)!important;line-height:1.3!important;margin:3px 0!important}
+body.fxL .contractv70 .contractriskv88 *{line-height:1.3!important}
+body.fxL .contractv70 .cv99rew{display:grid!important;grid-template-rows:1fr 1fr;gap:0!important;padding:0!important;align-content:stretch}
+body.fxL .contractv70 .cv99row{display:flex!important;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:4px 6px!important;margin:0!important}
+body.fxL .contractv70 .cv99row+.cv99row{border-top:1px solid #ffffff14}
+body.fxL .contractv70 .cv99row .val{text-align:center!important;font-size:11px!important}
+body.fxL .contractv70 .cv99row.bounty .val{font-size:13px!important}
+/* round 4: Rocky gets his own column on the left of the shop */
+body.fxL #shop>.shopscene{display:grid!important;grid-template-columns:150px minmax(0,1fr);gap:6px;align-items:stretch}
+body.fxL #shop #rockkeeper{position:relative!important;left:auto!important;top:auto!important;zoom:.8;grid-column:1;align-self:end;justify-self:center;margin:0 0 30px!important}
+body.fxL #shop .shopbox{grid-column:2}
+body.fxL #shopkeeperbubble{position:absolute!important;zoom:1.25!important;left:50%!important;top:auto!important;bottom:calc(100% + 10px)!important;transform:translateX(-50%)!important;width:150px!important;max-width:none!important;font-size:10px!important;line-height:1.3!important}
+body.fxL #shop>.shopscene{background:radial-gradient(circle at 12% 70%,#2a1d14 0,#130e0c 55%,#0c090a 100%);border:1px solid #5e4630;border-radius:12px;padding:0 4px 0 0;box-sizing:border-box}
+body.fxL #shop .shopbox{border:0!important;border-left:1px solid #5e463080!important;border-radius:0 12px 12px 0!important;background:transparent!important;box-shadow:none!important}
+body.fxL #shopkeeperbubble,body.fxL #shopkeeperbubble *{font-size:12.5px!important;line-height:1.3!important}
+body.fxL #shop #rockkeeper{zoom:.9!important}
+body.fxL #shopkeeperbubble{zoom:1!important;width:136px!important;min-width:136px!important;padding:6px 8px!important;box-sizing:border-box}
+body.fxL #shopkeeperbubble,body.fxL #shopkeeperbubble *{font-size:11.5px!important}
+body.fxL #shop #rockkeeper{transform:none!important;zoom:.62!important}
+body.fxL #shopkeeperbubble{zoom:1.45!important;width:132px!important;min-width:132px!important}
+/* round 4: section headers in the active tree get a real line box (emoji were bleeding into the cards) */
+body.fxL .acthdr111{line-height:1.5!important;margin:8px 0 5px!important;padding:0 0 2px!important;overflow:visible}
+/* small phones: item icon rows wrap instead of spilling out of the slot */
+body.fxL .slot .in{display:flex!important;flex-wrap:wrap;align-items:center;column-gap:3px;row-gap:0;min-width:0}
+@media (max-width:720px){body.fxL .slot .in{font-size:12px!important}}
+body.fxL #sktabsv111 button{position:relative;overflow:visible!important}
+body.fxL #sktabsv111 .skbadgeV112{position:absolute!important;top:-7px!important;right:-7px!important;left:auto!important;bottom:auto!important;transform:none!important;font-size:9px!important;min-width:16px;height:16px;line-height:16px!important;padding:0 4px!important;box-sizing:border-box}
+/* round 4: tutorial arrows in landscape */
+#fxRail button{position:relative}
+#fxRail button.fxCoach{box-shadow:0 0 0 2px #ffcf5c,0 0 14px #ffcf5c88!important;border-radius:10px}
+#fxRail button.fxCoach::after{content:"◀";position:absolute;left:calc(100% + 4px);top:50%;color:#ffcf5c;font-size:22px;line-height:1;text-shadow:0 0 6px #000,0 0 12px #ffcf5c;animation:fxCoachBob .8s ease-in-out infinite alternate;pointer-events:none;z-index:80}
+@keyframes fxCoachBob{from{transform:translate(0,-50%)}to{transform:translate(8px,-50%)}}
+body.fxL .coacharrowv79{z-index:80!important}
+body.fxL #areas .atile.firstfighttargetv49{position:relative;overflow:visible!important}
+body.fxL .firstfightarrowv49{top:-6px!important;font-size:18px!important}
+body.fxL #areas{overflow:visible!important}
+body.fxL #areas>.fxHidden{display:none!important}

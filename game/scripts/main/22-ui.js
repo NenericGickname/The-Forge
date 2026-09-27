@@ -2169,7 +2169,7 @@ function powText(id) {
     case "heal":
       return "restores " + nf(v) + "% HP";
     case "miracle":
-      return "regen " + nf(v) + "%/2s for 20s";
+      return "regen " + +(v / 4).toFixed(2) + "%/0.5s for 20s";
   }
   return "";
 }

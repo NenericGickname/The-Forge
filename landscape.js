@@ -107,6 +107,12 @@ function syncRail(){
       var sp = $id("statpanel"); active = !!(sp && !sp.classList.contains("folded"));
     }
     if (it.town) b.classList.toggle("off", run);
+    // tutorial arrows: the game points at buttons that the rail replaces, so the rail shows the arrow
+    var coach = false;
+    if (it.btn) { var cs0 = $id(it.btn); coach = !!(cs0 && cs0.classList.contains("coachmarkv79")) && !active; }
+    else if (it.k === "anvil") { var ub = $id("upbtn"); coach = !!(ub && ub.classList.contains("coachmarkv79")) && page !== "anvil"; }
+    else if (it.k === "forge") { var sl = document.querySelector("#slots .coachmarkv79"); coach = !!sl && page === "adv"; }
+    b.classList.toggle("fxCoach", coach && !run);
     b.style.display = vis ? "" : "none";
     b.classList.toggle("on", active);
     b.classList.toggle("badge", badge);
@@ -117,7 +123,7 @@ setInterval(function(){ if (body.classList.contains("fxL")) syncRail(); }, 400);
 /* ---------- paged lists (no scrolling) ---------- */
 var PAGED = [
   "#inv", "#areas", ".questgridv74", ".contractgridv70", ".bestiarygridv70", ".compgrid", ".amgridv117",
-  "#shopgrid", ".questtrackergridv74"
+  "#shopgrid", ".questtrackergridv74", "#lootresults"
 ];
 var pagers = new WeakMap();
 
@@ -151,45 +157,47 @@ function paginate(list){
   var st = pagerFor(list);
   st.busy = true;
   var kids = Array.prototype.filter.call(list.children, function(c){ return !c.classList.contains("fxPager"); });
-  kids.forEach(function(c){ c.classList.remove("fxHidden"); });
   if (!body.classList.contains("fxL") || !list.offsetParent) {
+    kids.forEach(function(c){ c.classList.remove("fxHidden"); });
     if (st.bar.parentNode) st.bar.remove();
-    st.busy = false; return;
+    st.key = ""; st.busy = false; return;
   }
   // Put the pager bar right after the list so the list's own height excludes it
   if (st.bar.parentNode !== list.parentNode || st.bar.previousElementSibling !== list) list.parentNode.insertBefore(st.bar, list.nextSibling);
   st.bar.style.display = "flex";
   var H = list.clientHeight;
-  if (list.scrollHeight <= H + 2 || H < 20) {
-    st.bar.style.display = "none"; st.pages = 1; st.page = 0; st.busy = false; return;
+  // Recompute the split only when the list or its space changed
+  var key = kids.length + "|" + H + "|" + list.clientWidth + "|" + list.textContent.length;
+  if (key !== st.key || !st.split) {
+    kids.forEach(function(c){ c.classList.remove("fxHidden"); });
+    H = list.clientHeight;
+    if (list.scrollHeight <= H + 2 || H < 20) {
+      st.split = [kids.length];
+    } else {
+      // Fill each page item by item with the real layout, so every item lands on exactly one page
+      kids.forEach(function(c){ c.classList.add("fxHidden"); });
+      var split = [], start = 0;
+      while (start < kids.length) {
+        var end = start;
+        while (end < kids.length) {
+          kids[end].classList.remove("fxHidden");
+          if (end > start && list.scrollHeight > list.clientHeight + 2) { kids[end].classList.add("fxHidden"); break; }
+          end++;
+        }
+        // A short heading at the bottom of a page moves to the next page, next to what it labels
+        if (end < kids.length && end - start > 1 && kids[end - 1].getBoundingClientRect().height < 26) end--;
+        for (var i = start; i < end; i++) kids[i].classList.add("fxHidden");
+        split.push(end); start = end;
+      }
+      st.split = split;
+    }
+    st.key = key;
   }
-  // Group children into pages by their row position
-  var top0 = list.getBoundingClientRect().top + (parseFloat(getComputedStyle(list).paddingTop) || 0);
-  var pageOf = [], pageStart = 0, p = 0;
-  kids.forEach(function(c){
-    var r = c.getBoundingClientRect();
-    if (r.height === 0 && r.width === 0) { pageOf.push(p); return; }
-    var t = r.top - top0, b = r.bottom - top0;
-    if (b - pageStart > H - 1 && t > pageStart + 1) { p++; pageStart = t; }
-    pageOf.push(p);
-  });
-  // A short heading at the bottom of a page moves to the next page, next to what it labels
-  for (var i = kids.length - 2; i >= 0; i--) {
-    if (pageOf[i] !== pageOf[i+1] && kids[i].getBoundingClientRect().height < 26) pageOf[i] = pageOf[i+1];
-  }
-  st.pages = p + 1;
+  st.pages = st.split.length;
   if (st.page >= st.pages) st.page = st.pages - 1;
-  kids.forEach(function(c, i){ if (pageOf[i] !== st.page) c.classList.add("fxHidden"); });
-  // Safety pass: anything still sticking out at the bottom moves to the next page
-  var guard = 0;
-  while (list.scrollHeight > list.clientHeight + 2 && guard++ < 20) {
-    var vis = kids.filter(function(c, i){ return pageOf[i] === st.page; });
-    if (vis.length < 2) break;
-    var last = vis[vis.length - 1], li = kids.indexOf(last);
-    for (var j = li; j < kids.length; j++) if (pageOf[j] === st.page) pageOf[j] = st.page + 1;
-    last.classList.add("fxHidden");
-    st.pages = Math.max(st.pages, st.page + 2);
-  }
+  var from = st.page ? st.split[st.page - 1] : 0, to = st.split[st.page];
+  kids.forEach(function(c, i){ c.classList.toggle("fxHidden", i < from || i >= to); });
+  if (st.pages <= 1) { st.bar.style.display = "none"; st.page = 0; st.busy = false; return; }
   st.bar.querySelector(".pn").textContent = (st.page + 1) + " / " + st.pages;
   st.bar.querySelector(".pp").disabled = st.page === 0;
   st.bar.querySelector(".np").disabled = st.page >= st.pages - 1;
@@ -207,18 +215,23 @@ function markGrow(){
     if (best) { best.classList.add("fxGrow"); if (best.id !== "areamasteryv117") { pagerFor(best); schedule(best); } }
   });
 }
-/* Shrink-to-fit for things that should stay whole (skill tree branches) */
-var ZOOMFIT = ["#branches .branch"];
+/* Shrink-to-fit for the passive skill tree. One zoom for all three branches,
+   recomputed only when the space or the tree content changes, so switching
+   tabs never changes the text size. */
+var treeKey = "", treeVer = 0, treeObs = null;
 function fitZooms(){
-  var on = body.classList.contains("fxL");
-  ZOOMFIT.forEach(function(sel){
-    document.querySelectorAll(sel).forEach(function(el){
-      el.style.zoom = "";
-      if (!on || !el.offsetParent) return;
-      var avail = el.parentNode.clientHeight, need = el.scrollHeight;
-      if (need > avail + 1 && avail > 40) el.style.zoom = Math.max(0.55, (avail - 2) / need).toFixed(3);
-    });
-  });
+  var br = $id("branches"); if (!br) return;
+  var list = Array.prototype.slice.call(br.querySelectorAll(".branch"));
+  if (!body.classList.contains("fxL")) { if (treeKey) { list.forEach(function(el){ el.style.zoom = ""; }); treeKey = ""; } return; }
+  if (!br.offsetParent) return;           // hidden (Active tab or closed): keep the last zoom
+  if (!treeObs) { treeObs = new MutationObserver(function(){ treeVer++; }); treeObs.observe(br, {childList:true, subtree:true}); }
+  var H = br.clientHeight, key = H + "|" + br.clientWidth + "|" + treeVer;
+  if (key === treeKey || H < 40) return;
+  list.forEach(function(el){ el.style.zoom = ""; });
+  var need = 0; list.forEach(function(el){ need = Math.max(need, el.scrollHeight); });
+  var z = need > H + 1 ? Math.max(0.55, (H - 2) / need).toFixed(3) : "";
+  list.forEach(function(el){ el.style.zoom = z; });
+  treeKey = key;
 }
 function repaginateAll(){
   fitZooms();
@@ -231,14 +244,27 @@ setInterval(function(){ if (body.classList.contains("fxL")) repaginateAll(); }, 
 /* ---------- battle scene height ----------
    Safari sizes a canvas in a grid by its own pixel height, which pushes the
    scene over the health bars. So the scene gets an explicit height here. */
+var foeKey = "";
 function sizeBattle(){
   var bat = $id("battle"); if (!bat) return;
-  if (!body.classList.contains("fxL") || !bat.offsetHeight) { bat.style.removeProperty("--fxCvH"); return; }
+  var foes = $id("foehps");
+  if (!body.classList.contains("fxL") || !bat.offsetHeight) { bat.style.removeProperty("--fxCvH"); if (foes) foes.style.zoom = ""; foeKey = ""; return; }
   var cs = getComputedStyle(bat), gap = parseFloat(cs.rowGap) || 3;
   var inner = bat.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
   var h = function(sel){ var e = bat.querySelector(sel); return e ? e.offsetHeight : 0; };
-  var bottom = Math.max(h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"), h("#foehps"));
-  var cv = Math.max(60, Math.floor(inner - h("#wave") - h("#rmsg") - bottom - gap * 4));
+  // The bottom band has one fixed height. The enemy bars shrink to fit it,
+  // so the scene never changes size when the number of enemies changes.
+  var bottom = Math.max(80, h(".hprow>.hpwrap:first-child") + gap + h(".runbtns"));
+  if (foes) {
+    var key = foes.querySelectorAll(".hpbar").length + "|" + bottom + "|" + foes.clientWidth;
+    if (key !== foeKey || foes.scrollHeight > foes.clientHeight + 2) {
+      foes.style.zoom = "";
+      var need = foes.scrollHeight;
+      foes.style.zoom = need > bottom ? Math.max(0.45, bottom / need).toFixed(3) : "";
+      foeKey = key;
+    }
+  }
+  var cv = Math.max(60, Math.floor(inner - 23 - 13 - bottom - gap * 4));
   bat.style.setProperty("--fxCvH", cv + "px");
 }
 setInterval(sizeBattle, 300);
