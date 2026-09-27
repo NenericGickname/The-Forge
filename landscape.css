@@ -1,0 +1,365 @@
+/* The Forge landscape phone layout. Active only when body has .fxL
+   (phone held sideways: landscape and at most 520px tall). */
+
+#fxRail,#fxRotate{display:none}
+.fxPager{display:none}
+body.fxL{--railW:calc(54px + env(safe-area-inset-left));--safeR:env(safe-area-inset-right);--safeB:env(safe-area-inset-bottom)}
+
+/* ================= rail ================= */
+body.fxL #fxRail{display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;width:var(--railW);
+  padding:4px 3px calc(4px + var(--safeB)) calc(3px + env(safe-area-inset-left));z-index:50;
+  background:linear-gradient(90deg,#120c10,#1a1116);border-right:1px solid #3a2a1c;box-shadow:4px 0 14px #0008}
+#fxRail button{flex:1 1 0;min-height:0!important;max-height:52px;margin:1px 0;padding:0;border:1px solid transparent;border-radius:9px;
+  background:none;color:#b8a78c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;cursor:pointer}
+#fxRail .ri{font-size:17px;line-height:1}
+#fxRail .rl{font:600 8px/1 "Trebuchet MS",Arial,sans-serif;letter-spacing:.3px;text-transform:uppercase}
+#fxRail button.on{background:linear-gradient(180deg,#3a2716,#24170e);border-color:#8a6330;color:#ffd98f;box-shadow:inset 0 0 10px #ffb34722}
+#fxRail button.off{opacity:.3}
+#fxRail .rb{display:none;position:absolute;top:4px;right:7px;width:8px;height:8px;border-radius:50%;background:#ff5a4a;box-shadow:0 0 6px #ff5a4a}
+#fxRail button.badge .rb{display:block}
+@media (max-height:330px){#fxRail .rl{display:none}#fxRail .ri{font-size:16px}}
+
+/* ================= frame ================= */
+body.fxL{overflow:hidden!important;padding:0!important;display:block!important;height:100%}
+body.fxL #wrap{position:fixed!important;left:var(--railW);top:0;right:var(--safeR);bottom:var(--safeB);width:auto!important;max-width:none!important;
+  margin:0!important;padding:3px 6px 4px!important;display:flex!important;flex-direction:column;overflow:hidden;transform:none!important}
+body.fxL #wrap>h1{display:none!important}
+body.fxL .res{position:static!important;left:auto!important;transform:none!important;width:100%!important;max-width:none!important;
+  flex:0 0 auto;height:20px;margin:0 0 3px!important;padding:0 4px!important;font-size:11px!important;justify-content:flex-start!important;gap:6px;
+  overflow:hidden;white-space:nowrap;background:none!important;border:0!important}
+body.fxL .res>button,body.fxL .res>#optionsbtnv95{position:absolute!important;left:-9999px!important;top:0!important}
+body.fxL .statpanel{z-index:48;max-height:calc(100% - 8px)!important}
+
+/* ================= town pages ================= */
+body.fxL #town{align-items:stretch!important;flex:1 1 auto;min-height:0;width:100%!important;max-width:none!important;margin:0!important;display:grid!important;gap:5px;
+  grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+body.fxL #town>*{margin:0!important;min-height:0;min-width:0;overflow:hidden}
+body.fxL #town .panel{padding:5px 6px!important;margin:0!important}
+body.fxL #town .ttl{font-size:9px!important;margin-bottom:3px!important;letter-spacing:2px!important}
+body.fxL button{min-height:0}
+
+/* Forge page */
+body.fxL.fxPageForge #town>.fxAreas,body.fxL.fxPageForge #goalrailv70,body.fxL.fxPageForge #huntpanel{display:none!important}
+body.fxL .fxLoadout{grid-column:1!important;grid-row:1!important;display:flex!important;flex-direction:column}
+body.fxL .fxLoadout .loadoutrow{flex:1 1 auto;min-height:0;display:flex!important;gap:5px;align-items:stretch}
+body.fxL #setbtn{width:30px!important;min-width:0!important;height:auto!important;padding:2px!important;font-size:8px!important;flex:0 0 30px}
+body.fxL #slots{flex:1 1 auto;min-width:0;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(0,1fr)!important;gap:4px!important;height:100%}
+body.fxL .slot{min-height:0!important;height:auto!important;overflow:hidden!important;padding:4px 5px!important;font-size:8.5px!important;line-height:1.25!important}
+body.fxL .slot *{max-width:100%}
+body.fxL #boonbar{flex:0 0 auto;max-height:18px;overflow:hidden;font-size:9px!important;margin-top:3px!important}
+body.fxL .fxHeroCol{grid-column:2!important;grid-row:1!important}
+body.fxL .fxBagCol{grid-column:3!important;grid-row:1!important}
+body.fxL .fxHeroCol,body.fxL .fxBagCol{display:flex!important;flex-direction:column;gap:5px}
+body.fxL .fxHeroCol>.panel{flex:1 1 0;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+body.fxL #opentree{height:auto!important;padding:6px 4px!important;font-size:11px!important}
+body.fxL .fbtns{gap:4px!important}
+body.fxL .fbtns button{height:auto!important;padding:5px 2px!important;font-size:10px!important}
+body.fxL .fsel{font-size:9px!important;line-height:1.25!important;height:auto!important}
+body.fxL .fxBagCol>.panel{flex:1 1 auto;min-height:0;display:flex!important;flex-direction:column}
+body.fxL .bagtitle{height:auto!important;display:flex!important;flex-wrap:wrap;justify-content:center;gap:3px;align-items:center}
+body.fxL .bagtitle button{height:auto!important;padding:3px 6px!important;font-size:9px!important;margin:0!important}
+body.fxL #inv{flex:1 1 auto;min-height:0;overflow:hidden!important;height:auto!important;max-height:none!important;align-content:flex-start}
+
+/* Areas page */
+body.fxL.fxPageAdv #town{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,auto)}
+body.fxL.fxPageAdv .fxLoadout,body.fxL.fxPageAdv .fxHeroCol,body.fxL.fxPageAdv .fxBagCol{display:none!important}
+body.fxL.fxPageAdv .fxAreas{grid-column:1 / -1!important;grid-row:1!important;display:flex!important;flex-direction:column}
+body.fxL #areas{flex:1 1 auto;min-height:0;overflow:hidden!important;grid-template-columns:repeat(auto-fill,minmax(66px,1fr))!important;grid-auto-rows:minmax(50px,1fr)!important;gap:4px!important;align-content:stretch}
+body.fxL #areas .atile{min-height:0!important;height:auto!important;padding:2px!important;grid-column:auto!important}
+body.fxL #areas .atile .as{font-size:20px!important;height:auto!important;line-height:1.1!important}
+body.fxL #areas .atile .anm{font-size:8.5px!important;height:auto!important;line-height:1.15!important}
+body.fxL.fxPageAdv #goalrailv70{grid-column:1!important;grid-row:2!important;display:flex!important;flex-direction:column;padding:5px 8px!important}
+body.fxL.fxPageAdv #huntpanel{grid-column:2!important;grid-row:2!important;display:flex!important;flex-direction:column;justify-content:space-between}
+body.fxL.fxPageAdv #huntpanel:not(.on){display:none!important}
+body.fxL.fxPageAdv #huntpanel:not(.on)~*,body.fxL.fxPageAdv #town:not(:has(#huntpanel.on)) #goalrailv70{grid-column:1 / -1!important}
+body.fxL .questtrackerheadv74{min-height:0!important;height:auto!important;margin:0 0 3px!important}
+body.fxL .questtrackerheadv74 button{height:auto!important;padding:3px 8px!important;font-size:9px!important}
+body.fxL .questtrackergridv74{flex:1 1 auto;min-height:0;overflow:hidden!important;grid-auto-rows:min-content}
+body.fxL .trackedquestv74{padding:4px 6px!important}
+body.fxL .huntinfo{font-size:9px!important;line-height:1.3!important}
+body.fxL #huntstart{width:100%!important;height:auto!important;padding:6px!important;font-size:10px!important}
+
+/* ================= battle =================
+   Scene across the top. Under it: hero bars, skills and retreat on the left
+   (under the hero), enemy bars on the right (under the monsters). */
+body.fxL #run{flex:1 1 auto;min-height:0;width:100%!important;max-width:none!important;flex-direction:column;gap:4px}
+body.fxL #run[style*="display: none"],body.fxL #run[style*="display:none"]{display:none!important}
+body.fxL #battle{flex:1 1 auto;min-height:0;margin:0!important;padding:4px 6px!important;display:grid!important;position:relative;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto var(--fxCvH,minmax(0,1fr)) auto auto;column-gap:10px;row-gap:3px;align-content:start;
+  grid-template-areas:"wave wave" "cv cv" "hero foes" "btns foes"}
+body.fxL #wave{grid-area:wave;margin:0!important;font-size:10px!important}
+body.fxL #battle canvas#cv{grid-area:cv;width:100%!important;height:var(--fxCvH,100%)!important;max-height:var(--fxCvH,none)!important;min-height:0;aspect-ratio:auto!important;object-fit:cover!important;object-position:50% 80%!important;align-self:stretch;border-radius:8px}
+body.fxL #rmsg{grid-area:cv;align-self:end;justify-self:center;z-index:2;pointer-events:none;margin:0 0 3px!important;padding:1px 8px!important;
+  font-size:10px!important;min-height:0!important;background:#0009;border-radius:6px}
+body.fxL #battle .hprow{display:contents!important}
+body.fxL #battle .hprow>.hpwrap:first-child{grid-area:hero;width:auto!important;margin:0!important}
+body.fxL #battle #foehps{grid-area:foes;width:auto!important;min-height:0!important;margin:0!important;align-self:start;
+  display:block!important}
+body.fxL #battle .hpwrap .hplabel{font-size:9.5px!important;margin-bottom:1px!important}
+body.fxL #battle .hpwrap .hpbar{height:12px!important;font-size:8.5px!important}
+body.fxL #battle .runbtns{grid-area:btns;margin:0!important;height:auto!important;align-items:stretch;gap:6px}
+body.fxL #battle .actbtnsv111{height:auto!important}
+body.fxL #battle .actwrapv112{height:auto!important}
+body.fxL #battle .actbtnsv111 .lslot,body.fxL #battle .actbtnsv111 button{width:38px!important;height:38px!important;min-height:0!important}
+body.fxL #retreat{height:auto!important;min-height:38px!important;font-size:10px!important;padding:3px!important;flex:1 1 auto}
+body.fxL #loottray{flex:0 0 auto;margin:0!important;padding:2px 8px!important;min-height:0!important;max-height:34px;overflow:hidden}
+body.fxL #battle .dpsbox{position:static!important;grid-area:wave;justify-self:end;align-self:center;transform:none!important;margin:0!important;padding:1px 6px!important;height:auto!important}
+body.fxL #battle .dpsbox .dpsbar{display:none}
+body.fxL #bossbubble{z-index:3}
+
+/* ================= full-screen panels (popups) ================= */
+body.fxL .skover{left:var(--railW)!important;right:calc(var(--safeR) + 30px)!important;bottom:var(--safeB)!important;top:0!important;padding:4px 5px!important;align-items:stretch!important;justify-content:stretch!important}
+body.fxL .skover>.skbox{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;overflow:hidden!important;
+  margin:0!important;padding:6px 10px!important;display:flex!important;flex-direction:column;position:relative}
+body.fxL .skover>.skbox>*{flex-shrink:0}
+body.fxL .skover .skhead{margin-bottom:4px!important;padding-right:70px}
+body.fxL .skover .skhead h2{font-size:14px!important}
+/* Close buttons become a small pill in the top-right corner */
+body.fxL #closeshop,body.fxL #closeguildv70,body.fxL #closeminev83,body.fxL #closecompendium,body.fxL #closequestsv74,body.fxL #optdonev95,body.fxL .fxCloseBtn{
+  position:absolute!important;top:5px!important;right:8px!important;width:auto!important;height:auto!important;min-height:0!important;margin:0!important;
+  padding:4px 12px!important;font-size:10px!important;z-index:6;border-radius:8px!important}
+/* Small popups (messages, confirmations) stay centered */
+body.fxL #tipmodal{left:var(--railW)!important;align-items:center!important;justify-content:center!important}
+body.fxL #tipmodal>.skbox{width:min(460px,100%)!important;height:auto!important;max-height:100%!important;display:block!important}
+body.fxL #tipmodal #tipbody{max-height:calc(100vh - 110px);overflow:hidden}
+body.fxL .questtoastv74{top:8px!important;width:min(360px,70vw)!important;padding:8px 12px!important;left:calc(50% + 27px)!important}
+body.fxL .questtoastv74 .burst{font-size:18px!important}
+body.fxL .questtoastv74 h2{font-size:13px!important}
+
+/* Pager */
+body.fxL .fxPager{display:flex;align-items:center;justify-content:center;gap:10px;flex:0 0 auto;height:22px;margin-top:2px;font:600 10px/1 "Trebuchet MS",Arial,sans-serif;color:#b8a78c}
+body.fxL .fxPager button{width:34px;height:20px!important;min-height:0!important;padding:0!important;margin:0!important;border:1px solid #6a4d2a;border-radius:6px;background:#1d1510;color:#ffd98f;font-size:14px;line-height:1}
+body.fxL .fxPager button:disabled{opacity:.25}
+body.fxL .fxHidden{display:none!important}
+
+/* ================= portrait phones: gentle hint ================= */
+body.fxPortraitPhone #fxRotate{display:flex;align-items:center;gap:8px;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 10px);transform:translateX(-50%);
+  z-index:9000;background:#1b131ef2;border:1px solid #6a4d2a;border-radius:12px;padding:8px 10px 8px 12px;color:#eadfcc;font-size:12px;
+  box-shadow:0 10px 30px #000;width:max-content;max-width:calc(100vw - 20px)}
+#fxRotate .ph{display:inline-block;animation:fxTurn 2.4s ease-in-out infinite}
+#fxRotate button{background:none;border:0;color:#a8977f;font-size:14px;padding:2px 4px;min-height:0}
+@keyframes fxTurn{0%,35%{transform:rotate(0)}55%,90%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+
+/* Gear bag (reserve storage) shares the bag column */
+body.fxL .fxBagCol>.gearbagpanelv82{flex:0 1 auto;max-height:45%;min-height:0;overflow:hidden;padding:4px 6px!important}
+body.fxL .fxBagCol .fpreview{display:none!important}
+
+/* Compact equipment cards: name row, icon row, a few stat lines (hold for full details) */
+body.fxL .slot .st{font-size:8px!important;margin:0 0 2px!important;white-space:nowrap;overflow:hidden}
+body.fxL .slot .in{font-size:13px!important;margin:0!important;display:flex;align-items:center;gap:3px;flex-wrap:nowrap;white-space:nowrap;overflow:hidden}
+body.fxL .slot .emb{width:24px!important;height:24px!important;flex:0 0 24px;padding:1px!important}
+body.fxL .slot .emb svg{width:100%!important;height:100%!important}
+body.fxL .slot .wt{display:none!important}
+body.fxL .slot .slstats{font-size:8px!important;line-height:1.25!important;margin-top:2px!important;padding-top:2px!important;
+  overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+
+/* ================= per-panel layouts ================= */
+/* Skill tree */
+body.fxL #sktree .skbox>div:last-child{position:absolute!important;top:5px;right:8px;width:auto!important;gap:5px;margin:0!important;z-index:6}
+body.fxL #sktree .skbox>div:last-child button{width:auto!important;height:auto!important;padding:4px 10px!important;font-size:10px!important;margin:0!important}
+body.fxL #sktree .skhead{padding-right:190px}
+body.fxL #sktabsv111{margin:0 0 4px!important;height:auto!important}
+body.fxL #sktabsv111 button{height:24px!important;padding:0 14px!important;font-size:10px!important}
+body.fxL #branches{flex:1 1 0;min-height:0;overflow:hidden!important;gap:6px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}
+body.fxL #branches .branch{min-height:0;overflow:hidden;padding:4px!important;align-self:start}
+body.fxL #actpanelv111{flex:1 1 0;min-height:0;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;zoom:.82;padding-right:4px}
+body.fxL .skcardv111{padding:6px 8px!important}
+
+/* Shop */
+body.fxL #shop>.shopscene{width:100%!important;height:100%!important;max-width:none!important;position:relative;margin:0!important}
+body.fxL #shop .shopbox{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;overflow:hidden!important;display:flex!important;flex-direction:column;padding:6px 10px!important;margin:0!important}
+body.fxL #shop .shopbox>*{flex-shrink:0}
+body.fxL #shop .skhead{padding-left:44px;padding-right:70px;margin-bottom:4px!important}
+body.fxL #shop .shopbody{flex:1 1 0!important;min-height:0;display:flex!important;flex-direction:column}
+body.fxL #shop .shopcatalog{flex:1 1 0;min-height:0;display:flex!important;flex-direction:column;max-height:none!important;overflow:hidden!important}
+body.fxL #shopgrid{flex:1 1 0;min-height:0;overflow:hidden!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;align-content:start}
+body.fxL #shopgrid .shopcard{padding:6px 8px!important}
+body.fxL #rockkeeper{position:absolute!important;left:6px!important;top:4px!important;zoom:.5;z-index:7}
+body.fxL #shopkeeperbubble{zoom:1.6}
+
+/* Guild */
+body.fxL .guildheadv70 h2{font-size:14px!important;margin:0!important}
+body.fxL .guildheadv70 p{font-size:9px!important;margin:2px 0 4px!important;line-height:1.3!important;padding-right:60px}
+body.fxL #contractgridv70{flex:1 1 0;min-height:0;overflow:hidden!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+body.fxL .contractv70{padding:6px!important;min-height:0!important;height:auto!important;display:flex!important;flex-direction:column;font-size:9px}
+body.fxL .contractv70 .cv99sym{height:22px!important;min-height:0!important;margin:0!important}
+body.fxL .contractv70 h3{font-size:11px!important;margin:2px 0!important}
+body.fxL .contractv70 p,body.fxL .contractv70 .contractareav75{font-size:9px!important;margin:2px 0!important;width:auto!important}
+body.fxL .contractv70 .cv99rew{font-size:9px!important;padding:4px!important;margin:3px 0!important;flex:1 1 auto}
+body.fxL .contractv70 .cv99rew *{font-size:9px!important}
+body.fxL .contractv70>button{height:auto!important;padding:6px 2px!important;font-size:10px!important;margin-top:auto!important}
+
+/* Mine: two columns */
+body.fxL #minev83 .mineboxv83{display:grid!important;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto 22px;
+  grid-template-areas:"head qp" "scene ups" "grid ups" "grid pg";gap:5px 8px}
+body.fxL #minev83 .fxPager{grid-area:pg;margin:0!important}
+body.fxL .mineheadv83{grid-area:head}
+body.fxL .mineheadv83 h2{font-size:14px!important;height:auto!important;margin:0!important;text-align:left!important}
+body.fxL #mineqpv84{grid-area:qp;align-self:center;padding-right:64px}
+body.fxL .minescenev83{grid-area:scene;height:auto!important;min-height:0}
+body.fxL .minegridv83{grid-area:grid;gap:5px!important}
+body.fxL .minecardv83{padding:5px 7px!important;font-size:9px}
+body.fxL .minelevelv83{font-size:16px!important;height:auto!important}
+body.fxL .mineratesv83{font-size:8.5px!important;line-height:1.3!important}
+body.fxL #mineupgradesv84{grid-area:ups;min-height:0;overflow:hidden!important;grid-template-columns:1fr!important;gap:4px!important;align-content:start}
+body.fxL .mineupgradev84{padding:4px 7px!important;display:grid!important;grid-template-columns:1fr auto;column-gap:6px;align-items:center}
+body.fxL .mineupgradev84 b{grid-column:1}
+body.fxL .mineupgradev84 small{grid-column:1;font-size:8.5px!important;line-height:1.25!important}
+body.fxL .mineupgradev84 button{grid-column:2;grid-row:1 / span 2;width:auto!important;height:auto!important;padding:5px 8px!important;font-size:9px!important}
+
+/* Compendium */
+body.fxL .comptabsv72{margin:0 0 4px!important;height:auto!important}
+body.fxL .comptabsv72 button{height:24px!important;font-size:9.5px!important}
+body.fxL .compbox>.fxGrow{flex:1 1 0!important;min-height:0!important;overflow:hidden!important;align-content:start}
+body.fxL .compbox .skhead{margin:0!important}
+body.fxL #bestiarygridv70{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important;align-content:start}
+
+/* Options: two columns */
+body.fxL #optionsmodalv95 .skbox{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto 1fr auto auto;column-gap:16px;row-gap:5px;align-content:start}
+body.fxL #optionsmodalv95 .skhead{grid-column:1 / -1;grid-row:1}
+body.fxL #optionsmodalv95 .optsectitlev95{grid-column:1;grid-row:2;margin:0!important}
+body.fxL #optaudiosecv95{grid-column:1;grid-row:3 / span 3;align-self:start;margin:0!important}
+body.fxL .optcolv95{grid-column:2;grid-row:2 / span 2;margin:0!important;gap:5px!important}
+body.fxL .optcolv95 button,body.fxL #fxPlaytest,body.fxL #creditsbtnv95{height:34px!important;margin:0!important}
+body.fxL #fxPlaytest{grid-column:2;grid-row:4}
+body.fxL #creditsbtnv95{grid-column:2;grid-row:5}
+
+body.fxL .loadbarv112 .lslot{width:40px!important;height:40px!important}
+body.fxL .loadbarv112{height:auto!important;margin:2px 0!important}
+body.fxL .actinfo111,body.fxL .acthdr111{margin:2px 0!important}
+body.fxL .actgrid111{gap:5px!important}
+body.fxL .skcardv111{font-size:9px!important}
+body.fxL #shopkeeperbubble{top:calc(100% + 6px)!important;bottom:auto!important;left:0!important}
+
+body.fxL .questtoastv74{padding:6px 12px!important}
+body.fxL .questtoastv74 p{font-size:9px!important;margin:1px 0!important}
+
+/* Respect the game hiding the town during a run */
+body.fxL #town[style*="display: none"],body.fxL #town[style*="display:none"]{display:none!important}
+body.fxL #run[style*="block"],body.fxL #run[style*="flex"]{display:flex!important}
+body.fxL #huntpanel button{width:100%!important;height:auto!important;font-size:9.5px!important;padding:5px 4px!important;white-space:normal!important;margin:2px 0 0!important}
+body.fxL .questtoastv74{zoom:.72}
+body.fxL #areas{grid-template-columns:repeat(auto-fill,minmax(60px,1fr))!important;grid-auto-rows:minmax(48px,auto)!important;align-content:start!important}
+
+/* "Install for full screen" hint (iPhone Safari only, landscape) */
+#fxInstall{display:none}
+body.fxL #fxInstall{display:flex;align-items:center;gap:8px;position:fixed;left:calc(var(--railW) + 8px);right:calc(var(--safeR) + 8px);bottom:calc(var(--safeB) + 6px);
+  z-index:9000;background:#1b131ef5;border:1px solid #6a4d2a;border-radius:10px;padding:6px 8px 6px 12px;color:#eadfcc;font-size:11px;box-shadow:0 8px 24px #000}
+#fxInstall b{color:#ffd98f}
+#fxInstall button{margin-left:auto;background:none;border:0;color:#a8977f;font-size:14px;padding:2px 6px;min-height:0}
+
+/* Stats: the folded "Stats" tab stays on the right edge, like in portrait */
+body.fxL #wrap{right:calc(var(--safeR) + 30px)}
+body.fxL .statpanel.folded{right:var(--safeR)!important}
+
+
+/* ================= round 3 fixes ================= */
+/* Stats tab: slim when folded */
+body.fxL #wrap{right:calc(var(--safeR) + 20px)}
+body.fxL .skover{right:calc(var(--safeR) + 20px)!important}
+body.fxL .statpanel.folded{transform:translateY(-50%) translateX(144px)!important;height:64px!important}
+body.fxL .statpanel.folded:after{width:18px!important;height:64px!important;font-size:9px!important}
+
+/* Gear page: loadout with full item stats + bags */
+body.fxL.fxPageForge .fxHeroCol{display:none!important}
+body.fxL.fxPageForge #town{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr)}
+body.fxL.fxPageForge .fxBagCol{grid-column:2!important}
+body.fxL.fxPageForge .slot .slstats{-webkit-mask-image:none!important;mask-image:none!important;font-size:9px!important;line-height:1.3!important}
+body.fxL.fxPageForge .slot .wt{display:block!important;font-size:8px!important}
+
+/* Anvil page: pick an item on the left, forge it on the right */
+body.fxL.fxPageAnvil #town>.fxAreas,body.fxL.fxPageAnvil #goalrailv70,body.fxL.fxPageAnvil #huntpanel,body.fxL.fxPageAnvil .fxBagCol{display:none!important}
+body.fxL.fxPageAnvil #town{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
+body.fxL.fxPageAnvil .fxHeroCol{grid-column:2!important}
+body.fxL.fxPageAnvil .fxHeroCol>.panel:first-child{display:none!important}
+body.fxL.fxPageAnvil .fxHeroCol>.panel{justify-content:flex-start!important;gap:6px}
+body.fxL.fxPageAnvil #slots{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important}
+body.fxL.fxPageAnvil .slot .slstats,body.fxL.fxPageAnvil .slot .wt{display:none!important}
+body.fxL.fxPageAnvil .slot .in{font-size:15px!important}
+body.fxL.fxPageAnvil .fsel{font-size:11px!important}
+body.fxL.fxPageAnvil .fbtns button{font-size:12px!important;padding:8px 4px!important}
+#fxAnvilItem{display:none}
+body.fxL.fxPageAnvil #fxAnvilItem{display:block;flex:1 1 auto;min-height:0;overflow:auto;border:1px solid #3a2a1c;border-radius:8px;padding:6px 8px;background:#0e0a0c80;font-size:10px;line-height:1.4}
+#fxAnvilItem .fxai-h{font-size:16px;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+#fxAnvilItem .fxai-h .emb{width:28px;height:28px}
+#fxAnvilItem .fxai-empty{color:#a8977f;text-align:center;margin-top:20px}
+
+/* Hero level shown in the Skills screen */
+#fxHeroInfo{display:none}
+body.fxL #fxHeroInfo{display:flex;align-items:center;gap:8px;margin-left:auto;margin-right:12px;font-size:11px;color:#eadfcc}
+body.fxL #fxHeroInfo .hx{display:block;width:120px;height:6px;border-radius:3px;background:#2a2033;overflow:hidden}
+body.fxL #fxHeroInfo .hx i{display:block;height:100%;background:linear-gradient(90deg,#8a5cff,#c9a6ff)}
+body.fxL #sktree .skhead{display:flex!important;align-items:center}
+
+/* Battle: message on its own line under the scene; readable bar numbers; small retreat */
+body.fxL #battle{grid-template-rows:auto var(--fxCvH,minmax(0,1fr)) auto auto auto!important;grid-template-areas:"wave wave" "cv cv" "msg msg" "hero foes" "btns foes"!important}
+body.fxL #rmsg{grid-area:msg!important;align-self:center!important;justify-self:center!important;background:none!important;margin:0!important;padding:0!important;font-size:10px!important;line-height:13px!important;min-height:13px!important;pointer-events:auto}
+body.fxL #battle .hpwrap .hpbar{height:14px!important;margin-bottom:3px!important}
+body.fxL #battle .hpbar .hptxt{font-size:9px!important;line-height:14px!important}
+body.fxL #battle .runbtns{justify-content:flex-start!important}
+body.fxL #retreat{flex:0 1 200px!important;min-height:30px!important;height:30px!important;font-size:9.5px!important;padding:2px 8px!important}
+body.fxL #battle .actbtnsv111 .lslot,body.fxL #battle .actbtnsv111 button{width:32px!important;height:32px!important}
+
+/* Areas: tiles share the whole panel */
+body.fxL.fxPageAdv #town{grid-template-rows:minmax(0,1.5fr) minmax(0,1fr)!important}
+body.fxL #areas{grid-auto-rows:minmax(52px,1fr)!important;align-content:stretch!important}
+body.fxL #areas .atile{display:flex!important;flex-direction:column;align-items:center;justify-content:center}
+body.fxL #areas .atile .as{font-size:24px!important}
+body.fxL #areas .atile .anm{font-size:9px!important}
+
+/* Tracked quests: tidy cards */
+body.fxL .questtrackergridv74{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))!important;gap:5px!important;align-content:start}
+body.fxL .trackedquestv74{display:grid!important;grid-template-columns:26px minmax(0,1fr) auto;grid-template-rows:auto 4px;column-gap:6px;row-gap:3px;align-items:center;height:auto!important;min-height:0!important;padding:5px 7px!important;position:relative}
+body.fxL .trackedquestv74 .qi{width:26px!important;height:26px!important;font-size:14px!important}
+body.fxL .trackedquestv74>div:not(.qb){min-width:0;font-size:10px!important;line-height:1.2}
+body.fxL .trackedquestv74>div:not(.qb) b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.fxL .trackedquestv74 small{display:block;font-size:8.5px!important}
+body.fxL .trackedquestv74 button{position:static!important;height:auto!important;padding:4px 8px!important;font-size:9px!important;margin:0!important}
+body.fxL .trackedquestv74 .qb{grid-column:1 / -1;position:static!important;height:4px!important;margin:0!important;width:auto!important}
+
+/* Quest-complete message: centred on screen */
+body.fxL .questtoastv74{top:50%!important;left:calc(50% + 27px)!important;transform:translate(-50%,calc(-50% - 14px)) scale(.94)!important}
+body.fxL .questtoastv74.on{transform:translate(-50%,-50%) scale(1)!important}
+
+/* Shop: cards as tall as they need, keeper beside the title */
+body.fxL #shopgrid{grid-auto-rows:auto!important}
+body.fxL #shopgrid .shopcard{height:auto!important;min-height:0!important;overflow:visible!important}
+body.fxL #shopkeeperbubble{top:4px!important;left:calc(100% + 8px)!important;bottom:auto!important;width:180px!important;zoom:1.3}
+
+/* Guild: bounty and multiplier use the full card width */
+body.fxL .contractv70 .cv99rew{display:flex!important;flex-direction:column;gap:6px;justify-content:space-around}
+body.fxL .contractv70 .cv99row{display:block!important;width:100%!important}
+body.fxL .contractv70 .cv99row .lbl{display:block!important;width:auto!important;font-size:8px!important;letter-spacing:1px;text-transform:uppercase;opacity:.75;margin-bottom:1px}
+body.fxL .contractv70 .cv99row .val{display:block!important;width:auto!important;font-size:10px!important;line-height:1.3!important;text-align:left!important}
+
+/* Mine: all upgrades on screen, two columns, no page arrows */
+body.fxL #mineupgradesv84{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-content:stretch!important;grid-auto-rows:minmax(0,1fr)!important}
+body.fxL .mineupgradev84{grid-template-columns:1fr!important;grid-template-rows:auto 1fr auto;align-items:start!important;padding:4px 6px!important;min-height:0}
+body.fxL .mineupgradev84 b{font-size:9.5px!important}
+body.fxL .mineupgradev84 small{display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:8px!important}
+body.fxL .mineupgradev84 button{grid-column:1!important;grid-row:auto!important;width:100%!important;padding:3px 4px!important;font-size:9px!important}
+body.fxL #minev83 .mineboxv83{grid-template-rows:auto minmax(0,1fr) auto!important;grid-template-areas:"head qp" "scene ups" "grid ups"!important}
+
+body.fxL .trackedquestv74{width:auto!important;max-width:none!important;margin:0!important}
+body.fxL #fxHeroInfo .hl{white-space:nowrap}
+
+body.fxL .questtrackergridv74{width:100%!important;max-width:none!important;align-self:stretch!important;justify-content:stretch!important}
+
+/* Skill tree header: title, points, hero level and buttons in one tidy row */
+body.fxL #sktree .skbox{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"head btns" "tabs tabs" "body body";column-gap:10px}
+body.fxL #sktree .skhead{grid-area:head;padding-right:0!important;flex-wrap:nowrap;gap:12px;min-width:0}
+body.fxL #sktree .skhead h2{white-space:nowrap}
+body.fxL #sktree .skhead .pts{white-space:nowrap;font-size:11px!important}
+body.fxL #sktree .skbox>div:last-child{grid-area:btns;position:static!important;display:flex!important;align-self:center}
+body.fxL #sktabsv111{grid-area:tabs}
+body.fxL #sktree #branches,body.fxL #sktree #actpanelv111{grid-area:body}
+body.fxL #sktree .skbox>#disciplinev70{display:none}
+/* Area mastery tab: section is a column, its card grid is paged */
+body.fxL #areamasteryv117{display:flex;flex-direction:column}
+body.fxL #areamasteryv117.compsectionv72hidden{display:none!important}
+body.fxL .amintrov117{margin:0 0 4px;font-size:9.5px}
+body.fxL .amgridv117{flex:1 1 0;min-height:0;overflow:hidden;align-content:start;grid-template-columns:repeat(3,1fr);gap:5px}
+body.fxL .amrowv117{padding:5px 7px}
+body.fxL .amstepv117{font-size:9px;line-height:1.25}
+/* Paged-out items must stay hidden even where a tile rule sets display with an id selector */
+body.fxL :is(#wrap,#areas,#inv,#shopgrid,.skover,.compbox) .fxHidden.fxHidden{display:none!important}

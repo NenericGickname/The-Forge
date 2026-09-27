@@ -1,0 +1,46 @@
+/* V113 · quest accepted/available/ready visual states */
+.questcardv74.tracked {
+  border-left: 3px solid #69c7ff;
+}
+.questcardv74.ready {
+  border-left: 3px solid #ffd76a;
+}
+.questcardv74:not(.tracked):not(.done):not(.ready) {
+  opacity: 0.8;
+}
+.questactivepill113 {
+  display: inline-block;
+  margin-left: 7px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #1c3a52;
+  color: #7fd0ff;
+  vertical-align: middle;
+}
+.questreadypill113 {
+  display: inline-block;
+  margin-left: 7px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #4a3c12;
+  color: #ffd76a;
+  vertical-align: middle;
+}
+.questtrackv74:not(.on) {
+  background: linear-gradient(#2f6fb0, #255c95);
+  color: #fff;
+  border-color: #5aa9e6;
+  font-weight: 800;
+  box-shadow: 0 0 10px -3px #69c7ff;
+}
+.questnextv113 {
+  color: #7fd0ff;
+  margin-top: 6px;
+  font-size: 12px;
+}

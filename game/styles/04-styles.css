@@ -1,0 +1,43 @@
+.actbtnv111 .akeyv115 {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 7px;
+  background: #0d0a12;
+  border: 1px solid currentColor;
+  color: #e7ddf2;
+  font:
+    800 9px/14px "Trebuchet MS",
+    Arial;
+  text-align: center;
+  z-index: 3;
+}
+
+/* Area mastery: clear count on the tile, medal as the border; details in Compendium → Area Mastery */
+.atile.medal-bronze { border-color: #b8743a !important; box-shadow: inset 0 0 0 1px #b8743a55, 0 0 8px #b8743a44; }
+.atile.medal-silver { border-color: #c9d2dc !important; box-shadow: inset 0 0 0 1px #c9d2dc55, 0 0 9px #c9d2dc44; }
+.atile.medal-gold { border-color: #ffcf4a !important; box-shadow: inset 0 0 0 1px #ffcf4a66, 0 0 12px #ffcf4a55; }
+.atip .masterylinev51 { display: none !important; }
+#areamasteryv117 { font-size: 11px; color: #e8dcc8; }
+#areamasteryv117.compsectionv72hidden { display: none !important; }
+.amintrov117 { color: #a8977f; margin: 4px 0 8px; font-size: 10.5px; }
+.amtitlev117 { color: var(--gold); letter-spacing: 2px; font-size: 12px; margin: 6px 0 0; grid-column: 1 / -1; }
+.amgridv117 { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px; }
+.amrowv117 { border: 1px solid #3a2f24; border-radius: 9px; padding: 7px 9px; background: #120d10; }
+.amrowv117.medal-bronze { border-color: #b8743a; }
+.amrowv117.medal-silver { border-color: #c9d2dc; }
+.amrowv117.medal-gold { border-color: #ffcf4a; }
+.amheadv117 { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.amsymv117 { font-size: 16px; }
+.amnamev117 { flex: 1; }
+.amcountv117 { color: var(--gold); }
+.ambarv117 { height: 4px; border-radius: 2px; background: #2a2118; margin: 5px 0 3px; overflow: hidden; }
+.ambarv117 i { display: block; height: 100%; background: linear-gradient(90deg, #b8743a, #ffcf4a); }
+.amnextv117 { font-size: 9.5px; color: #a8977f; margin-bottom: 4px; }
+.amstepv117 { font-size: 10px; color: #8e8272; line-height: 1.35; }
+.amstepv117.done { color: #9fe0a0; }
+.amemptyv117 { color: #a8977f; }
+.atile .masterybadgev51.zero { display: none !important; }

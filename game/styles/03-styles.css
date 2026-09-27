@@ -1,0 +1,26 @@
+#v114arrow {
+  position: absolute;
+  z-index: 9999;
+  font-size: 24px;
+  color: #ffd24a;
+  text-shadow:
+    0 0 8px #ffb02e,
+    0 0 2px #000;
+  pointer-events: none;
+  animation: v114bounce 0.9s ease-in-out infinite;
+}
+@keyframes v114bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+#opentree.v114glow {
+  box-shadow:
+    0 0 0 2px #ffd24a,
+    0 0 12px 2px #ffb02e;
+  border-radius: 8px;
+}
