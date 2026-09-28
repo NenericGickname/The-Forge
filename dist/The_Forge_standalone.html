@@ -3708,6 +3708,58 @@ body.fxL .trackedquestv74 .questclaimtrackv84{flex:0 0 auto}
 body.fxL .res{justify-content:flex-end!important;text-align:right;padding:0 8px 0 4px!important}
 /* round 9: no weapon-type line under the weapon icon */
 body.fxL .slot .wt,body.fxL.fxPageForge .slot .wt,body.fxL.fxPageAnvil .slot .wt{display:none!important}
+/* ================= round 9: Anvil workbench ================= */
+body.fxL.fxPageAnvil #town{grid-template-columns:150px minmax(0,1fr)!important}
+body.fxL.fxPageAnvil #slots{grid-template-columns:1fr!important;grid-template-rows:repeat(6,minmax(0,1fr))!important;gap:4px!important}
+body.fxL.fxPageAnvil .slot{padding:3px 6px!important;min-height:0!important;display:grid!important;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:5px;align-content:center}
+body.fxL.fxPageAnvil .slot .slstats,body.fxL.fxPageAnvil .slot .wt{display:none!important}
+body.fxL.fxPageAnvil .slot .st{grid-column:1 / -1;font-size:8px!important;margin:0!important;display:flex;justify-content:space-between}
+body.fxL.fxPageAnvil .slot .st .ilvl{font-size:9px!important}
+body.fxL.fxPageAnvil .slot .in{grid-column:1 / -1;font-size:12px!important;flex-wrap:nowrap!important;overflow:hidden;white-space:nowrap}
+body.fxL.fxPageAnvil .slot .in .emb{width:22px!important;height:22px!important}
+body.fxL.fxPageAnvil #fsel{display:none!important}
+body.fxL.fxPageAnvil .fxHeroCol>.panel{padding:6px 8px!important}
+body.fxL.fxPageAnvil #fxAnvilItem{border:0!important;background:none!important;padding:0!important;overflow:hidden!important;display:block}
+.fxwb{height:100%;display:grid;grid-template-columns:150px minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto auto;grid-template-areas:"scene stats" "odds odds" "log log";gap:5px 10px}
+.fxscene{grid-area:scene;position:relative;border-radius:10px;background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--rc) 30%,transparent) 0,#0d0a0c 70%);border:1px solid color-mix(in srgb,var(--rc) 45%,#2a2018);overflow:hidden;min-height:120px}
+.fxglow{position:absolute;left:50%;top:34%;width:80px;height:80px;transform:translate(-50%,-50%);border-radius:50%;background:var(--rc);filter:blur(22px);opacity:.45;animation:fxPulse 2.4s ease-in-out infinite}
+@keyframes fxPulse{50%{opacity:.25}}
+.fxitem{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);width:46px;height:46px;display:grid;place-items:center}
+.fxitem .emb,.fxitem svg{width:46px!important;height:46px!important;border-color:var(--rc)!important;box-shadow:0 0 14px var(--rc)}
+.fxanvil{position:absolute;left:50%;bottom:22px;width:110px;transform:translateX(-50%)}
+.fxlv{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-weight:800;font-size:13px;color:var(--rc)}
+.fxlv span{color:#9fe0a0;font-size:11px}
+.fxscene .sp{position:absolute;left:50%;top:58%;width:3px;height:3px;border-radius:50%;background:#ffd76a;box-shadow:0 0 6px #ffb040;opacity:0}
+.fxscene.spark .sp{animation:fxSpark .9s ease-out forwards}
+.fxscene.spark .s1{--dx:-40px;--dy:-38px}.fxscene.spark .s2{--dx:34px;--dy:-44px;animation-delay:.05s}.fxscene.spark .s3{--dx:-18px;--dy:-58px;animation-delay:.1s}.fxscene.spark .s4{--dx:46px;--dy:-18px}.fxscene.spark .s5{--dx:-50px;--dy:-10px;animation-delay:.08s}
+@keyframes fxSpark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+.fxscene.spark .fxglow{animation:fxFlash .9s ease-out}
+@keyframes fxFlash{0%{opacity:1;transform:translate(-50%,-50%) scale(1.6)}100%{opacity:.45}}
+.fxstats{grid-area:stats;overflow:hidden;font-size:10px;line-height:1.35;align-self:start}
+.fxwr{display:grid;grid-template-columns:minmax(0,1fr) 62px 62px 52px;gap:4px;padding:1px 4px;border-radius:4px}
+.fxwr:nth-child(even){background:#ffffff08}
+.fxwr span{color:#a8977f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fxwr b{text-align:right;color:#eadfcc;font-weight:700}
+.fxwr b.nx{color:#fff}
+.fxwr i{font-style:normal;text-align:right;font-weight:800}
+.fxwr i.fxgain{color:#6fe08a;background:none}.fxwr i.eq{color:#5a5048}
+.fxwh{background:none!important;font-size:8.5px;letter-spacing:1px}
+.fxwh b{color:#a8977f!important}.fxwh b.nx{color:#9fe0a0!important}
+.fxodds{grid-area:odds;font-size:10px;line-height:1.5;color:#c9bca8;border-top:1px solid #ffffff12;padding-top:4px}
+.fxodds .og{color:#ffcf5c;font-weight:700}.fxodds .os{color:#dcecff;font-weight:700}.fxodds .om{color:#ff8b7d}
+.fxodds .gon{color:#8fe0a8}.fxodds .goff{color:#a8977f}.fxodds .gsafe{color:#8fe0a8}
+.fxlog{grid-area:log;display:flex;align-items:center;gap:4px;overflow:hidden;white-space:nowrap;font-size:9.5px}
+.fxlog b{font-size:8px;letter-spacing:1.5px;color:#a8977f;margin-right:2px}
+.fxlog .fl{padding:2px 6px;border-radius:9px;background:#ffffff0d;border:1px solid #ffffff14}
+.fxlog .fl.ok{color:#8fe0a8;border-color:#3f7a50}.fxlog .fl.crit{color:#d9a0ff;border-color:#7a4a9a}.fxlog .fl.cel{color:#9fd8ff;border-color:#3f6a8a}
+.fxlog .fl.down{color:#ffb07c;border-color:#8a5a3a}.fxlog .fl.bad{color:#ff6b5b;border-color:#8a3a30}.fxlog .fl.guard{color:#8fe0a8}.fxlog .fl.miss{color:#a8977f}.fxlog .fl.none{color:#6a6058}
+body.fxL.fxPageAnvil #setbtn,body.fxL.fxPageAnvil #boonbar,body.fxL.fxPageAnvil #slots~*,body.fxL.fxPageAnvil .loadoutrow{column-gap:0}
+body.fxL.fxPageAnvil #setbtn,body.fxL.fxPageAnvil #boonbar{display:none!important}
+body.fxL.fxPageAnvil .loadoutrow{grid-template-columns:1fr!important;display:grid!important;flex:1 1 0;min-height:0}
+body.fxL.fxPageAnvil #slots .slot.sel{box-shadow:0 0 0 2px var(--gold,#e4c890),0 0 12px #e4c89055!important}
+.fxstats{align-self:center}
+body.fxL.fxPageAnvil .loadoutrow~.ttl,body.fxL.fxPageAnvil .panel:has(>.loadoutrow)>.ttl{display:none!important}
+body.fxL.fxPageAnvil .slot .in span[title]{display:none!important}
 </style></head>
 <body>
 <div class="flash" id="flash"></div>
@@ -33809,12 +33861,116 @@ function syncExtras(){
   if (anvil) {
     var box = $id("fxAnvilItem");
     if (!box) { box = document.createElement("div"); box.id = "fxAnvilItem"; anvil.insertBefore(box, $id("fsel").nextSibling); }
-    var sel = document.querySelector("#slots .slot.sel");
-    var st = sel && sel.querySelector(".slstats"), nm = sel && sel.querySelector(".st"), ic = sel && sel.querySelector(".in");
-    var html = sel ? '<div class="fxai-h">' + (ic ? ic.innerHTML : "") + '</div>' + (st ? st.innerHTML : "") : '<div class="fxai-empty">Tap an item on the left to forge it.</div>';
+    var html = workbenchHtml();
     if (box._h !== html) { box.innerHTML = html; box._h = html; }
   }
 }
+
+/* ---------- Anvil workbench (landscape): scene, now vs next, odds, forge log ---------- */
+var FLOG_KEY = "theForge.forgeLog", flog = [];
+try { flog = JSON.parse(localStorage.getItem(FLOG_KEY) || "[]") || []; } catch(_) { flog = []; }
+function fmtStat(st, v){
+  try {
+    if (CURVED.has(st) || st === "healCdr" || st === "lifesteal") return String(Math.round(v));
+    if (PERCENT.has(st)) return v.toFixed(1) + "%";
+  } catch(_) {}
+  return String(Math.round(v));
+}
+function esc(t){ return String(t).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+function curItem(){ try { return S.gear[S.sel] || null; } catch(_) { return null; } }
+function workbenchHtml(){
+  var g = curItem();
+  if (!g) return '<div class="fxai-empty">Tap an item on the left to forge it.</div>';
+  var col = "#c9a", icon = "";
+  try { col = cvar(RAR[g.rar].col); icon = itemIcon(g); } catch(_) {}
+  var cel = (g.plus || 0) >= 20;
+  var celMax = 10;
+  try { if (g.rar === 5 && S.abyssUnlocked) celMax = 13; } catch(_) {}
+  var maxed = cel && (g.celestial || 0) >= celMax;
+  var next = JSON.parse(JSON.stringify(g));
+  if (cel) next.celestial = Math.min(celMax, (g.celestial || 0) + 1); else next.plus = Math.min(20, (g.plus || 0) + 1);
+  var lvNow = cel ? "✦" + (g.celestial || 0) : "+" + (g.plus || 0);
+  var lvNext = maxed ? "MAX" : cel ? "✦" + next.celestial : "+" + next.plus;
+  // stats: now | next with the gain
+  var keys = Object.keys(g.stats || {});
+  if (g.growth) { if (keys.indexOf("atk") < 0) keys.unshift("atk"); if (keys.indexOf("hp") < 0) keys.push("hp"); }
+  var rows = "";
+  keys.forEach(function(st){
+    var a = 0, b = 0;
+    try { a = gStat(g, st); b = gStat(next, st); } catch(_) {}
+    var d = b - a, lbl = (typeof STAT_LABEL === "object" && STAT_LABEL[st]) || st;
+    var dTxt = fmtStat(st, Math.abs(d));
+    if (maxed) { rows += '<div class="fxwr fxmax"><span>' + lbl + '</span><b>' + fmtStat(st, a) + '</b><b class="nx"></b><i></i></div>'; return; }
+    var gain = d > 1e-6 && !/^0(\.0)?%?$/.test(dTxt) ? '<i class="fxgain">+' + dTxt + '</i>' : '<i class="eq">·</i>';
+    rows += '<div class="fxwr"><span>' + lbl + '</span><b>' + fmtStat(st, a) + '</b><b class="nx">' + fmtStat(st, b) + '</b>' + gain + '</div>';
+  });
+  // odds and guard
+  var odds = "";
+  try {
+    if (maxed) odds = '<span class="og">Fully forged.</span> This item is at its highest level. Reforge still rerolls its stats.';
+    else if (cel) {
+      var cp = celestialProfile(g);
+      odds = '<span class="og">Celestial ' + Math.round((cp.chance || 0) * 100) + '% final roll</span> · ' + (cp.hits || 1) + ' silver hit' + ((cp.hits || 1) > 1 ? "s" : "") + ' needed · a miss never lowers the level';
+    } else {
+      var go = forgeOutcomeProfile(g, "gold"), si = forgeOutcomeProfile(g, "silver"), mi = forgeOutcomeProfile(g, "miss");
+      odds = '<span class="og">Gold ' + Math.round(go.success * 100) + '%</span> · <span class="os">Silver ' + Math.round(si.success * 100) + '%</span> · <span class="om">Miss: ' +
+        Math.round(mi.downChance * 100) + '% down, ' + Math.round(mi.breakChance * 100) + '% break</span>';
+    }
+  } catch(_) {}
+  var guard = "";
+  try {
+    var gk = guardForItemV51(g), gd = gk && GUARDS[gk], n = gk ? Number((S.guards || {})[gk]) || 0 : 0;
+    if (cel) guard = "";
+    else if ((g.plus || 0) < 10) guard = '<span class="gsafe">Safe below +10: a miss changes nothing</span>';
+    else if (gd) guard = '<span class="' + (n ? "gon" : "goff") + '">🛡 ' + gd.n + ' ×' + n + (n ? ' · catches ' + Math.round((gd.save || 0) * 100) + '% of breaks' : ' · none owned (shop)') + '</span>';
+  } catch(_) {}
+  // forge log
+  var log = flog.length ? flog.map(function(e){ return '<span class="fl ' + e.k + '">' + esc(e.t) + '</span>'; }).join("") : '<span class="fl none">No strikes yet</span>';
+  var spark = Date.now() - (window.__fxSparkAt || 0) < 1400 ? " spark" : "";
+  return '<div class="fxwb" style="--rc:' + col + '">' +
+    '<div class="fxscene' + spark + '"><div class="fxglow"></div><div class="fxitem">' + icon + '</div>' +
+      '<svg class="fxanvil" viewBox="0 0 120 60" aria-hidden="true"><path d="M8 10h78c14 0 26 5 30 12H86v8c0 6-6 9-14 9H56l8 13H30l8-13h-6c-8 0-14-3-14-9v-8H8z" fill="#3a3440" stroke="#1c1920" stroke-width="2"/><path d="M8 10h78c14 0 26 5 30 12H86" fill="none" stroke="#6d6577" stroke-width="2"/></svg>' +
+      '<i class="sp s1"></i><i class="sp s2"></i><i class="sp s3"></i><i class="sp s4"></i><i class="sp s5"></i>' +
+      '<div class="fxlv">' + lvNow + (maxed ? ' <span>MAX</span>' : ' <span>→ ' + lvNext + '</span>') + '</div></div>' +
+    '<div class="fxstats"><div class="fxwr fxwh"><span></span><b>NOW ' + lvNow + '</b><b class="nx">' + (maxed ? "" : "NEXT " + lvNext) + '</b><i></i></div>' + rows + '</div>' +
+    '<div class="fxodds">' + odds + (guard ? '<br>' + guard : '') + '</div>' +
+    '<div class="fxlog"><b>LAST STRIKES</b>' + log + '</div>' +
+  '</div>';
+}
+/* Forge log: watch every strike and record what happened */
+var lastFloat = "";
+try {
+  var origFloat = window.floatForge;
+  if (typeof origFloat === "function") window.floatForge = function(t){ lastFloat = String(t || ""); return origFloat.apply(this, arguments); };
+} catch(_) {}
+function pushLog(k, t){
+  flog.unshift({k: k, t: t}); flog = flog.slice(0, 5);
+  try { localStorage.setItem(FLOG_KEY, JSON.stringify(flog)); } catch(_) {}
+  if (k === "ok" || k === "crit" || k === "cel") window.__fxSparkAt = Date.now();
+}
+document.addEventListener("click", function(e){
+  var btn = e.target.closest && e.target.closest("#strikebtn");
+  if (!btn || /CONTINUE/i.test(btn.textContent)) return;
+  var g = curItem(); if (!g) return;
+  var before = {plus: g.plus || 0, cel: g.celestial || 0, ref: g};
+  lastFloat = "";
+  var t0 = Date.now();
+  (function watch(){
+    var h = curItem() || before.ref;
+    var p = h.plus || 0, c = h.celestial || 0;
+    var done = /CONTINUE/i.test(($id("strikebtn") || {}).textContent || "") || p !== before.plus || c !== before.cel || /SHATTER|SLIPPED|ABSORBED|failed/i.test(lastFloat);
+    if (!done && Date.now() - t0 < 5000) { setTimeout(watch, 120); return; }
+    var f = lastFloat;
+    if (c > before.cel) pushLog("cel", "✦" + before.cel + " → ✦" + c);
+    else if (/SHATTER/i.test(f)) pushLog("bad", "Shattered +" + before.plus + " → +" + p);
+    else if (/ABSORBED/i.test(f)) pushLog("guard", "Guard held at +" + p);
+    else if (p > before.plus + 1 || /CRITICAL FORGE/i.test(f)) pushLog("crit", "Crit! +" + before.plus + " → +" + p);
+    else if (p > before.plus) pushLog("ok", "+" + before.plus + " → +" + p);
+    else if (p < before.plus) pushLog("down", "Slipped +" + before.plus + " → +" + p);
+    else if (/celestial attempt failed|MISS/i.test(f)) pushLog("miss", "Celestial miss");
+    else pushLog("miss", "Miss at +" + p);
+  })();
+}, true);
 setInterval(syncExtras, 400);
 
 /* ---------- portrait hint ---------- */

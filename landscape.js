@@ -341,12 +341,116 @@ function syncExtras(){
   if (anvil) {
     var box = $id("fxAnvilItem");
     if (!box) { box = document.createElement("div"); box.id = "fxAnvilItem"; anvil.insertBefore(box, $id("fsel").nextSibling); }
-    var sel = document.querySelector("#slots .slot.sel");
-    var st = sel && sel.querySelector(".slstats"), nm = sel && sel.querySelector(".st"), ic = sel && sel.querySelector(".in");
-    var html = sel ? '<div class="fxai-h">' + (ic ? ic.innerHTML : "") + '</div>' + (st ? st.innerHTML : "") : '<div class="fxai-empty">Tap an item on the left to forge it.</div>';
+    var html = workbenchHtml();
     if (box._h !== html) { box.innerHTML = html; box._h = html; }
   }
 }
+
+/* ---------- Anvil workbench (landscape): scene, now vs next, odds, forge log ---------- */
+var FLOG_KEY = "theForge.forgeLog", flog = [];
+try { flog = JSON.parse(localStorage.getItem(FLOG_KEY) || "[]") || []; } catch(_) { flog = []; }
+function fmtStat(st, v){
+  try {
+    if (CURVED.has(st) || st === "healCdr" || st === "lifesteal") return String(Math.round(v));
+    if (PERCENT.has(st)) return v.toFixed(1) + "%";
+  } catch(_) {}
+  return String(Math.round(v));
+}
+function esc(t){ return String(t).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+function curItem(){ try { return S.gear[S.sel] || null; } catch(_) { return null; } }
+function workbenchHtml(){
+  var g = curItem();
+  if (!g) return '<div class="fxai-empty">Tap an item on the left to forge it.</div>';
+  var col = "#c9a", icon = "";
+  try { col = cvar(RAR[g.rar].col); icon = itemIcon(g); } catch(_) {}
+  var cel = (g.plus || 0) >= 20;
+  var celMax = 10;
+  try { if (g.rar === 5 && S.abyssUnlocked) celMax = 13; } catch(_) {}
+  var maxed = cel && (g.celestial || 0) >= celMax;
+  var next = JSON.parse(JSON.stringify(g));
+  if (cel) next.celestial = Math.min(celMax, (g.celestial || 0) + 1); else next.plus = Math.min(20, (g.plus || 0) + 1);
+  var lvNow = cel ? "✦" + (g.celestial || 0) : "+" + (g.plus || 0);
+  var lvNext = maxed ? "MAX" : cel ? "✦" + next.celestial : "+" + next.plus;
+  // stats: now | next with the gain
+  var keys = Object.keys(g.stats || {});
+  if (g.growth) { if (keys.indexOf("atk") < 0) keys.unshift("atk"); if (keys.indexOf("hp") < 0) keys.push("hp"); }
+  var rows = "";
+  keys.forEach(function(st){
+    var a = 0, b = 0;
+    try { a = gStat(g, st); b = gStat(next, st); } catch(_) {}
+    var d = b - a, lbl = (typeof STAT_LABEL === "object" && STAT_LABEL[st]) || st;
+    var dTxt = fmtStat(st, Math.abs(d));
+    if (maxed) { rows += '<div class="fxwr fxmax"><span>' + lbl + '</span><b>' + fmtStat(st, a) + '</b><b class="nx"></b><i></i></div>'; return; }
+    var gain = d > 1e-6 && !/^0(\.0)?%?$/.test(dTxt) ? '<i class="fxgain">+' + dTxt + '</i>' : '<i class="eq">·</i>';
+    rows += '<div class="fxwr"><span>' + lbl + '</span><b>' + fmtStat(st, a) + '</b><b class="nx">' + fmtStat(st, b) + '</b>' + gain + '</div>';
+  });
+  // odds and guard
+  var odds = "";
+  try {
+    if (maxed) odds = '<span class="og">Fully forged.</span> This item is at its highest level. Reforge still rerolls its stats.';
+    else if (cel) {
+      var cp = celestialProfile(g);
+      odds = '<span class="og">Celestial ' + Math.round((cp.chance || 0) * 100) + '% final roll</span> · ' + (cp.hits || 1) + ' silver hit' + ((cp.hits || 1) > 1 ? "s" : "") + ' needed · a miss never lowers the level';
+    } else {
+      var go = forgeOutcomeProfile(g, "gold"), si = forgeOutcomeProfile(g, "silver"), mi = forgeOutcomeProfile(g, "miss");
+      odds = '<span class="og">Gold ' + Math.round(go.success * 100) + '%</span> · <span class="os">Silver ' + Math.round(si.success * 100) + '%</span> · <span class="om">Miss: ' +
+        Math.round(mi.downChance * 100) + '% down, ' + Math.round(mi.breakChance * 100) + '% break</span>';
+    }
+  } catch(_) {}
+  var guard = "";
+  try {
+    var gk = guardForItemV51(g), gd = gk && GUARDS[gk], n = gk ? Number((S.guards || {})[gk]) || 0 : 0;
+    if (cel) guard = "";
+    else if ((g.plus || 0) < 10) guard = '<span class="gsafe">Safe below +10: a miss changes nothing</span>';
+    else if (gd) guard = '<span class="' + (n ? "gon" : "goff") + '">🛡 ' + gd.n + ' ×' + n + (n ? ' · catches ' + Math.round((gd.save || 0) * 100) + '% of breaks' : ' · none owned (shop)') + '</span>';
+  } catch(_) {}
+  // forge log
+  var log = flog.length ? flog.map(function(e){ return '<span class="fl ' + e.k + '">' + esc(e.t) + '</span>'; }).join("") : '<span class="fl none">No strikes yet</span>';
+  var spark = Date.now() - (window.__fxSparkAt || 0) < 1400 ? " spark" : "";
+  return '<div class="fxwb" style="--rc:' + col + '">' +
+    '<div class="fxscene' + spark + '"><div class="fxglow"></div><div class="fxitem">' + icon + '</div>' +
+      '<svg class="fxanvil" viewBox="0 0 120 60" aria-hidden="true"><path d="M8 10h78c14 0 26 5 30 12H86v8c0 6-6 9-14 9H56l8 13H30l8-13h-6c-8 0-14-3-14-9v-8H8z" fill="#3a3440" stroke="#1c1920" stroke-width="2"/><path d="M8 10h78c14 0 26 5 30 12H86" fill="none" stroke="#6d6577" stroke-width="2"/></svg>' +
+      '<i class="sp s1"></i><i class="sp s2"></i><i class="sp s3"></i><i class="sp s4"></i><i class="sp s5"></i>' +
+      '<div class="fxlv">' + lvNow + (maxed ? ' <span>MAX</span>' : ' <span>→ ' + lvNext + '</span>') + '</div></div>' +
+    '<div class="fxstats"><div class="fxwr fxwh"><span></span><b>NOW ' + lvNow + '</b><b class="nx">' + (maxed ? "" : "NEXT " + lvNext) + '</b><i></i></div>' + rows + '</div>' +
+    '<div class="fxodds">' + odds + (guard ? '<br>' + guard : '') + '</div>' +
+    '<div class="fxlog"><b>LAST STRIKES</b>' + log + '</div>' +
+  '</div>';
+}
+/* Forge log: watch every strike and record what happened */
+var lastFloat = "";
+try {
+  var origFloat = window.floatForge;
+  if (typeof origFloat === "function") window.floatForge = function(t){ lastFloat = String(t || ""); return origFloat.apply(this, arguments); };
+} catch(_) {}
+function pushLog(k, t){
+  flog.unshift({k: k, t: t}); flog = flog.slice(0, 5);
+  try { localStorage.setItem(FLOG_KEY, JSON.stringify(flog)); } catch(_) {}
+  if (k === "ok" || k === "crit" || k === "cel") window.__fxSparkAt = Date.now();
+}
+document.addEventListener("click", function(e){
+  var btn = e.target.closest && e.target.closest("#strikebtn");
+  if (!btn || /CONTINUE/i.test(btn.textContent)) return;
+  var g = curItem(); if (!g) return;
+  var before = {plus: g.plus || 0, cel: g.celestial || 0, ref: g};
+  lastFloat = "";
+  var t0 = Date.now();
+  (function watch(){
+    var h = curItem() || before.ref;
+    var p = h.plus || 0, c = h.celestial || 0;
+    var done = /CONTINUE/i.test(($id("strikebtn") || {}).textContent || "") || p !== before.plus || c !== before.cel || /SHATTER|SLIPPED|ABSORBED|failed/i.test(lastFloat);
+    if (!done && Date.now() - t0 < 5000) { setTimeout(watch, 120); return; }
+    var f = lastFloat;
+    if (c > before.cel) pushLog("cel", "✦" + before.cel + " → ✦" + c);
+    else if (/SHATTER/i.test(f)) pushLog("bad", "Shattered +" + before.plus + " → +" + p);
+    else if (/ABSORBED/i.test(f)) pushLog("guard", "Guard held at +" + p);
+    else if (p > before.plus + 1 || /CRITICAL FORGE/i.test(f)) pushLog("crit", "Crit! +" + before.plus + " → +" + p);
+    else if (p > before.plus) pushLog("ok", "+" + before.plus + " → +" + p);
+    else if (p < before.plus) pushLog("down", "Slipped +" + before.plus + " → +" + p);
+    else if (/celestial attempt failed|MISS/i.test(f)) pushLog("miss", "Celestial miss");
+    else pushLog("miss", "Miss at +" + p);
+  })();
+}, true);
 setInterval(syncExtras, 400);
 
 /* ---------- portrait hint ---------- */
