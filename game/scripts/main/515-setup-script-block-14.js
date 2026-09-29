@@ -568,13 +568,15 @@ renderBoonBar();
             } catch (e) {}
           }
         }
-        // stage 5+: occasionally turn a normal spawn into a caster (all four types, so ice mages appear too)
-        if (run && !run.hunt && !(run.a && run.a.abyss) && run.ai >= 4 && run.wave <= run.total) {
+        // stage 5+ and every Abyss stage: occasionally turn a normal spawn into a caster (all four types).
+        // Abyss scaling lives inside buildFoe and abilityHitHero, so an Abyss caster is scaled like its neighbours.
+        var abyssRun = !!(run && run.a && run.a.abyss);
+        if (run && !run.hunt && (abyssRun || run.ai >= 4) && run.wave <= run.total) {
           var CK = ["firemage", "icemage", "chaosmage", "hag"],
             chg = false;
           for (var i = 0; i < run.foes.length; i++) {
             var ff = run.foes[i];
-            if (ff && !ff.boss && !CASTERS[ff.key] && Math.random() < 0.15) {
+            if (ff && !ff.boss && !ff.elite && !ff.abyssElite && !CASTERS[ff.key] && Math.random() < 0.15) {
               var c = buildFoe(CK[Math.floor(Math.random() * CK.length)], ff.lvl, 1, false);
               if (c) {
                 c._x = ff._x;
