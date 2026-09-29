@@ -10,6 +10,8 @@
 | `colocate.js` | Moves the layers of one function next to each other (only where that is provably safe). |
 | `merge.js` | Merges "call the old version, then add more" layers into one function. |
 | `codemap.js` | Writes `docs/CODE_MAP.md`. |
+| `../sim/run.js` | Pacing simulation. A bot plays the real game against a virtual clock (about 50x real time): `node tools/sim/run.js <hours> <out.json> [hitRate silverRate]`, `SEED=n` for another dice sequence. Serve the repo on port 8766 first. |
+| `../sim/analyze.js` | Milestone table from one or more simulation logs: when each area was first cleared and when all gear reached each forge level. |
 | `split.py` | One-time tool that cut the single HTML file into `game/`. |
 
 Intentional gameplay changes will show up as differences in `regress.sh`. That is expected. Check that only the things you meant to change moved.

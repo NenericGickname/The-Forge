@@ -41,3 +41,8 @@
 .amstepv117.done { color: #9fe0a0; }
 .amemptyv117 { color: #a8977f; }
 .atile .masterybadgev51.zero { display: none !important; }
+
+/* count-up pop on resource gains */
+.cuPop{display:inline-block;animation:cuPop .42s ease-out}
+@keyframes cuPop{0%{transform:scale(1);filter:none}35%{transform:scale(1.18);filter:brightness(1.6) drop-shadow(0 0 4px currentColor)}100%{transform:scale(1);filter:none}}
+@media (prefers-reduced-motion:reduce){.cuPop{animation:none}}
