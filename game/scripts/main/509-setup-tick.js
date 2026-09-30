@@ -424,7 +424,7 @@ if (typeof window.armGammaThornsV51 !== "function")
     buildFoeBars();
     drawBars();
     $("rmsg").className = "msg big";
-    $("rmsg").textContent = "✹ CROWN OF THORNS · melee damage is violently reflected · swap to a Bow";
+    $("rmsg").textContent = "✹ Gamma dons the Crown of Thorns";
     sayBoss("COME CLOSER. I INSIST.");
   };
 

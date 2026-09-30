@@ -16,13 +16,19 @@ const mkSeed = s => `(()=>{let a=${s};Math.random=function(){a|=0;a=a+0x6D2B79F5
   const c = await b.newContext({ viewport: { width: 1280, height: 800 } });
   const errs = {};
   const log = { events: [], samples: [], stuck: [] };
-  let state = null, t = 0;
+  let state = null, t = 0, snapped = false, restore = null;
+  if (process.env.FROM) {
+    const snap = JSON.parse(fs.readFileSync(process.env.FROM, 'utf8'));
+    state = snap.state; t = snap.t; restore = snap.storage; snapped = true;
+    log.events.push(...snap.events); log.samples.push(...snap.samples);
+  }
   const total = +hours * 3600e3, chunk = 60e3, t0 = Date.now();
   while (t < total) {
     const p = await c.newPage();
     p.on('pageerror', e => { const k = e.message.slice(0, 120); errs[k] = (errs[k] || 0) + 1; });
     p.on('dialog', d => d.accept());
     await p.addInitScript(`window.__simStart=${START + t};`);
+    if (restore) { await p.addInitScript(st => { if (!sessionStorage.getItem('__restored')) { localStorage.clear(); for (const k in st) localStorage.setItem(k, st[k]); sessionStorage.setItem('__restored', '1'); } }, restore); restore = null; }
     await p.addInitScript(CLOCK);
     await p.addInitScript(mkSeed(seed * 1000 + Math.round(t / chunk)));
     await p.addInitScript(BOT);
@@ -37,11 +43,17 @@ const mkSeed = s => `(()=>{let a=${s};Math.random=function(){a|=0;a=a+0x6D2B79F5
       if ((t / chunk) % 30 === 29) await p.evaluate(() => __bot.sample());
     }
     await p.evaluate(() => { __bot.sample(); try { saveGame(true); } catch (e) {} });
-    const seg = await p.evaluate(() => ({ log: __simLog, state: __bot.state(), terr: window.__timerErr || {}, s: { cleared: (S.clearedAreas || []).length, gear: Object.values(S.gear || {}).map(g => g && (g.plus || 0) + (g.celestial ? '*' + g.celestial : '')).join(',') } }));
+    const seg = await p.evaluate(() => ({ log: __simLog, state: __bot.state(), terr: window.__timerErr || {}, s: { cleared: (S.clearedAreas || []).length, abyss: (S.abyssCleared || []).length, lvl: S.heroLevel, gear: Object.values(S.gear || {}).map(g => g && (g.plus || 0) + (g.celestial ? '*' + g.celestial : '')).join(',') } }));
     // the page's log restarts every segment; seen milestones carry over so events are not duplicated
     log.events.push(...seg.log.events); log.samples.push(...seg.log.samples); log.stuck.push(...seg.log.stuck.slice(-20));
     Object.entries(seg.terr).forEach(([k, v]) => errs['timer: ' + k] = (errs['timer: ' + k] || 0) + v);
     state = seg.state;
+    if (!snapped && log.events.some(e => e.k === 'abyssOpen')) {
+      snapped = true;
+      const storage = await p.evaluate(() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); o[k] = localStorage.getItem(k); } return o; });
+      fs.writeFileSync(out.replace(/\.json$/, '') + '.abyss-start.json', JSON.stringify({ t, state, storage, events: log.events, samples: log.samples }));
+      console.log('snapshot saved at Abyss unlock');
+    }
     console.log(`game ${(t / 3600e3).toFixed(1)}h real ${((Date.now() - t0) / 60e3).toFixed(1)}m`, JSON.stringify(seg.s));
     log.errors = errs;
     fs.writeFileSync(out, JSON.stringify(log));

@@ -49,6 +49,8 @@
       esh: S.epicShards,
       csh: S.celestialShards || 0,
       cleared: (S.clearedAreas || []).slice(),
+      abyss: (S.abyssCleared || []).slice(),
+      lvlH: S.heroLevel,
       gear: gearSummary(),
       atk: hs.atk,
       hp: hs.hp
@@ -56,7 +58,7 @@
   }
 
   // Remember milestones
-  const seen = { area: {}, plus: {}, cel: {}, lvl: {} };
+  const seen = { area: {}, plus: {}, cel: {}, lvl: {}, abyss: {} };
   function milestones() {
     (S.clearedAreas || []).forEach(a => {
       if (!seen.area[a]) {
@@ -65,6 +67,16 @@
         lastProgressAt = now();
       }
     });
+    (S.abyssCleared || []).forEach(a => {
+      if (!seen.abyss[a]) {
+        seen.abyss[a] = 1;
+        ev("abyssClear", { a });
+      }
+    });
+    if (S.abyssUnlocked && !seen.abyssOpen) {
+      seen.abyssOpen = 1;
+      ev("abyssOpen");
+    }
     const gs = Object.values(S.gear || {}).filter(Boolean);
     if (gs.length) {
       const minPlus = Math.min(...gs.map(g => g.plus || 0));
@@ -96,6 +108,8 @@
 
   // ---------- town actions ----------
   const retired = new WeakSet();
+  // A player who has met Gamma's Crown of Thorns switches to a bow for good.
+  const bowMode = () => (S.clearedAreas || []).includes(14);
   function equipBetter() {
     let changed = false,
       swaps = 0;
@@ -112,14 +126,19 @@
         if (!g || !g.slot) continue;
         const cur = S.gear[g.slot];
         if (retired.has(g)) continue;
-        let better = !cur || cur.broken;
+        const isBow = x => x && x.wtype === "bow";
+        if (g.slot === "weapon" && bowMode() && !isBow(g)) continue;
+        let better = !cur || cur.broken || (g.slot === "weapon" && bowMode() && !isBow(cur));
         if (!better) {
-          // judge the new item as if it were forged to the same + level (a player would re-forge it)
+          // never trade an item that can go Celestial for one that cannot
+          if ((cur.rar || 0) >= 3 && (g.rar || 0) < 3) continue;
+          // judge the new item as if it were forged to the same level (a player would re-forge it)
           const probe = JSON.parse(JSON.stringify(g));
           probe.plus = cur.plus || 0;
-          probe.celestial = 0;
+          probe.celestial = (g.rar || 0) >= 3 ? Math.min(cur.celestial || 0, celestialCapFor(probe)) : 0;
           better = gpower(probe) > gpower(cur) * 1.1;
         }
+        if (better && g.slot === "weapon" && bowMode() && cur && !isBow(cur)) ev("bowSwap", { ilvl: g.ilvl, rar: g.rar });
         if (better) {
           if (swaps++ > 12) return changed;
           if (cur) retired.add(cur); // never swap the replaced item back in
@@ -391,9 +410,22 @@
     const h = (hist[ai] || []).filter(x => now() - x.t < 20 * 60000).slice(-4);
     return h.length ? h.reduce((a, b) => a + b.v, 0) / h.length : null;
   };
-  function chooseArea() {
+  // Keys: campaign stage i -> i, Abyss stage i -> 100 + i.
+  function pushTarget() {
     const cleared = S.clearedAreas || [];
-    const push = Math.min(cleared.length ? Math.max(...cleared) + 1 : 0, AREAS.length - 1);
+    const last = AREAS.length - 1;
+    if (!(S.abyssUnlocked && cleared.includes(last)))
+      return { key: Math.min(cleared.length ? Math.max(...cleared) + 1 : 0, last), below: k => k - 1, floor: 0 };
+    const ac = S.abyssCleared || [];
+    let t = 0;
+    while (t < last && ac.includes(t)) t++;
+    t = Math.min(t, S.abyssMax || 0);
+    // below the first Abyss stage, farm the highest campaign stage
+    return { key: 100 + t, below: k => (k > 100 ? k - 1 : last), floor: 0 };
+  }
+  function chooseArea() {
+    const P = pushTarget(),
+      push = P.key;
     const h = (hist[push] || []).slice(-2);
     const pushFailing = h.length === 2 && h.every(x => x.v < 1);
     if (!pushFailing) return push;
@@ -402,8 +434,8 @@
       return push; // retry the new area after farming
     }
     farmLeft--;
-    // farm the highest cleared area unless it has also been failing
-    for (let a = push - 1; a >= 0; a--) {
+    // farm the highest cleared stage unless it has also been failing
+    for (let a = P.below(push), n = 0; a >= 0 && n < 40; a = P.below(a), n++) {
       const r = rate(a);
       if (r === null || r >= 0.5) return a;
     }
@@ -434,7 +466,7 @@
         return click(document.getElementById("deadok"));
       }
       if (on("clear")) {
-        if (!clearMarked) { outcome(run && run.ai, 1); clearMarked = true; }
+        if (!clearMarked) { outcome(lastAi, 1); clearMarked = true; }
         const opts = [...document.querySelectorAll("#boons > *")].filter(vis);
         if (opts.length) {
           const pick = opts[boonPick++ % opts.length];
@@ -458,9 +490,9 @@
         lastBoss = (run.foes || []).some(f => f && f.boss);
         useActives();
         const rt = document.getElementById("retreat");
-        if (rt && vis(rt) && !rt.disabled && run.wave >= run.total && shouldRetreat(run.ai)) {
+        if (rt && vis(rt) && !rt.disabled && run.wave >= run.total && shouldRetreat(lastAi)) {
           ev("retreat", { a: run.ai });
-          outcome(run.ai, 0.5);
+          outcome(lastAi, 0.5);
           rt.click();
         }
         return;
@@ -490,6 +522,11 @@
         const ai = chooseArea();
         if (ai !== lastAi) deathsHere = 0;
         lastAi = ai;
+        if (ai >= 100) {
+          ev("run", { a: ai });
+          window.abyssAPIv50.enterAbyss(ai - 100);
+          return;
+        }
         clearMarked = false;
         ev("run", { a: ai });
         startRun(ai);

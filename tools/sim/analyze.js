@@ -5,6 +5,7 @@ const AREAS = ["Goblin Warrens","Frost Caverns","Stone Bastion","Shadow Keep","E
 function first(L, k, pred) { const e = L.events.find(e => e.k === k && pred(e)); return e ? e.t / 60000 : null; }
 const rows = [];
 AREAS.forEach((n, a) => rows.push({ what: 'Clear ' + n, v: runs.map(L => first(L, 'areaClear', e => e.a === a)) }));
+AREAS.forEach((n, a) => rows.push({ what: 'Abyss ' + n, v: runs.map(L => first(L, 'abyssClear', e => e.a === a)) }));
 for (let p = 1; p <= 20; p++) rows.push({ what: 'All gear +' + p, v: runs.map(L => first(L, 'allPlus', e => e.p === p)) });
 for (let c = 1; c <= 13; c++) rows.push({ what: 'All gear ✦' + c, v: runs.map(L => first(L, 'allCel', e => e.c === c)) });
 const fmt = m => m == null ? '—' : m < 60 ? m.toFixed(0) + 'm' : (m / 60).toFixed(1) + 'h';
