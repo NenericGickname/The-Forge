@@ -465,15 +465,7 @@ nextWave = function () {
     boss.atk = Math.round(boss.atk * p.incomingMult);
     buildFoeBars();
     $("wave").innerHTML =
-      '<b style="color:var(--mythic)">FINAL JUDGEMENT</b> · OMEGA · <span style="color:#dfffff">loadout resonance ' +
-      Math.round(p.score * 100) +
-      "%</span>";
-    $("rmsg").className = "msg";
-    $("rmsg").innerHTML =
-      "Ω OMEGA measures all six items · health ×" +
-      p.healthMult.toFixed(1) +
-      " · damage ×" +
-      p.incomingMult.toFixed(1);
+      '<b style="color:var(--mythic)">FINAL JUDGEMENT</b> · OMEGA';
     drawBars();
   }
   if (!run || run.hunt || run.ai !== 16 || run.wave <= run.total) return;
@@ -489,7 +481,7 @@ nextWave = function () {
   buildFoeBars();
   $("wave").innerHTML = '<b style="color:var(--mythic)">FINAL JUDGEMENT</b> · OMEGA';
   $("rmsg").className = "msg";
-  $("rmsg").textContent = "OMEGA tests the strength of your actual equipment and build.";
+  $("rmsg").textContent = "";
   drawBars();
 };
 /* abyss purple elites + boss tuning, injected after the base nextWave */

@@ -111,14 +111,7 @@ nextBossHuntWave = function () {
       (abyss ? "Abyss " : "") +
       a.boss;
     $("rmsg").className = "msg";
-    $("rmsg").textContent = abyss
-      ? "Abyss depth " +
-        ai +
-        " · boss health " +
-        fmt(f.max) +
-        " · item level up to " +
-        abyssRushDropLevelV61(ai)
-      : "The next boss enters the arena.";
+    $("rmsg").textContent = "The next boss enters the arena.";
     drawBars();
     updateRetreat();
     if (typeof resetStageDamageV51 === "function") resetStageDamageV51();

@@ -14056,9 +14056,9 @@ function abyssDepthV50() {
 // early ones die in 3s. Tanky enough to show their advanced abilities, killable with the right gear.
 function abyssBossHP() {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  const base = T.bossHpBase != null ? T.bossHpBase : 4000000,
-    per = T.bossHpPer != null ? T.bossHpPer : 750000;
-  return Math.round(base + per * abyssDepthV50()); // ~4.5M (Abyss start) -> ~23M (Abyss Omega)
+  const base = T.bossHpBase != null ? T.bossHpBase : 9000000,
+    per = T.bossHpPer != null ? T.bossHpPer : 1000000;
+  return Math.round(base + per * abyssDepthV50()); // 9M (Abyss start) -> 25M (Abyss Omega), tuned by simulation 2026-09-30
 }
 
 function abyssHasteMul(f) {
@@ -14077,9 +14077,9 @@ function abyssHasteMul(f) {
 function abyssDamageMul() {
   if (!(run && run.a && run.a.abyss)) return 1;
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  const base = T.dmgBase != null ? T.dmgBase : 1.0,
-    slope = T.dmgSlope != null ? T.dmgSlope : 0.028;
-  return base + slope * abyssDepthV50(); // ~1.35 (start) -> ~2.2 (Abyss Omega)
+  const base = T.dmgBase != null ? T.dmgBase : 1.7,
+    slope = T.dmgSlope != null ? T.dmgSlope : 0.02;
+  return base + slope * abyssDepthV50(); // 1.7 (start) -> ~2.0 (Abyss Omega)
 }
 
 /* ANTI-TANK: enemies deal bonus damage equal to a % of YOUR max HP, so a giant HP pool no
@@ -14107,11 +14107,14 @@ function abyssExcessHpDmg(maxHp) {
 
 // Stages sit at celestial+ level (160) and rise slowly to 180 at Abyss Omega; the real
 // challenge is the extended boss gimmicks (below), not inflated raw stats.
-// Abyss is a full re-gearing journey: stages start at level 160 (≈ the normal OMEGA boss) and
+// Abyss is a full re-gearing journey: stages run from level 178 to 214 (tuned by simulation 2026-09-30) and
 // ramp all the way to level 220 at Abyss Omega, so deep stages have far more HP/attack/defense and
 // genuinely demand the ✦13 gear you farm inside the Abyss — not just a good normal-mode set.
 function abyssLevel(ai) {
-  return 160 + Math.round((ai / 16) * 60);
+  const T = (typeof window !== "undefined" && window.__abyssTune) || {};
+  const base = T.levelBase != null ? T.levelBase : 178,
+    span = T.levelSpan != null ? T.levelSpan : 36;
+  return base + Math.round((ai / 16) * span);
 }
 
 function abyssAreaClone(ai, orig) {
@@ -14942,7 +14945,7 @@ function armGammaThorns() {
   buildFoeBars();
   drawBars();
   $("rmsg").className = "msg big";
-  $("rmsg").textContent = "✹ CROWN OF THORNS · melee damage is violently reflected · swap to a Bow";
+  $("rmsg").textContent = "✹ Gamma dons the Crown of Thorns";
   sayBoss("COME CLOSER. I INSIST.");
 }
 
@@ -15394,7 +15397,7 @@ function startRun(ai) {
   $("town").style.display = "none";
   $("run").style.display = "block";
   $("rmsg").className = "msg";
-  $("rmsg").textContent = "Entering " + a.n + " — weak to " + a.weak;
+  $("rmsg").textContent = "Entering " + a.n;
   startMusic();
   nextWave();
   clearInterval(timer);
@@ -26669,7 +26672,7 @@ if (typeof window.armGammaThornsV51 !== "function")
     buildFoeBars();
     drawBars();
     $("rmsg").className = "msg big";
-    $("rmsg").textContent = "✹ CROWN OF THORNS · melee damage is violently reflected · swap to a Bow";
+    $("rmsg").textContent = "✹ Gamma dons the Crown of Thorns";
     sayBoss("COME CLOSER. I INSIST.");
   };
 
@@ -27278,7 +27281,8 @@ killFoe = function (f, critTier) {
         b.lvl = dropLvl;
       }); // items drop at ✦0 — Celestial is forged by the player, never pre-applied
       // ONE mythic roll per kill (not per bag) — the boss dropping 3-4 bags was flooding mythics
-      const mch = f.boss ? 0.1 : f.abyssElite ? 0.05 : f.elite ? 0.012 : 0.003;
+      const TM = (typeof window !== "undefined" && window.__abyssTune) || {};
+      const mch = (f.boss ? 0.1 : f.abyssElite ? 0.05 : f.elite ? 0.012 : 0.003) * (TM.mythicMul != null ? TM.mythicMul : 0.5);
       if (newBags.length && Math.random() < mch) {
         let target = newBags[0];
         for (const b of newBags) if ((b.rar || 0) > (target.rar || 0)) target = b;
@@ -28210,7 +28214,10 @@ buildFoe = function (key, lvl, hpMul, boss, name) {
   const f = prevResult194;
   if (f && run && run.a && run.a.abyss) {
     const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-    const m = boss ? (T.bossHpMul != null ? T.bossHpMul : 1.05) : T.mobHpMul != null ? T.mobHpMul : 1.5;
+    const depth = typeof abyssDepthV50 === "function" ? abyssDepthV50() : 0;
+    const m = boss
+      ? T.bossHpMul != null ? T.bossHpMul : 1.05
+      : (T.mobHpMul != null ? T.mobHpMul : 3.5) + (T.mobHpSlope != null ? T.mobHpSlope : 0.05) * depth;
     f.max = Math.round(f.max * m);
     f.hp = f.max;
   }
@@ -29630,14 +29637,7 @@ nextBossHuntWave = function () {
       (abyss ? "Abyss " : "") +
       a.boss;
     $("rmsg").className = "msg";
-    $("rmsg").textContent = abyss
-      ? "Abyss depth " +
-        ai +
-        " · boss health " +
-        fmt(f.max) +
-        " · item level up to " +
-        abyssRushDropLevelV61(ai)
-      : "The next boss enters the arena.";
+    $("rmsg").textContent = "The next boss enters the arena.";
     drawBars();
     updateRetreat();
     if (typeof resetStageDamageV51 === "function") resetStageDamageV51();
@@ -30724,15 +30724,7 @@ nextWave = function () {
     boss.atk = Math.round(boss.atk * p.incomingMult);
     buildFoeBars();
     $("wave").innerHTML =
-      '<b style="color:var(--mythic)">FINAL JUDGEMENT</b> · OMEGA · <span style="color:#dfffff">loadout resonance ' +
-      Math.round(p.score * 100) +
-      "%</span>";
-    $("rmsg").className = "msg";
-    $("rmsg").innerHTML =
-      "Ω OMEGA measures all six items · health ×" +
-      p.healthMult.toFixed(1) +
-      " · damage ×" +
-      p.incomingMult.toFixed(1);
+      '<b style="color:var(--mythic)">FINAL JUDGEMENT</b> · OMEGA';
     drawBars();
   }
   if (!run || run.hunt || run.ai !== 16 || run.wave <= run.total) return;
@@ -30748,7 +30740,7 @@ nextWave = function () {
   buildFoeBars();
   $("wave").innerHTML = '<b style="color:var(--mythic)">FINAL JUDGEMENT</b> · OMEGA';
   $("rmsg").className = "msg";
-  $("rmsg").textContent = "OMEGA tests the strength of your actual equipment and build.";
+  $("rmsg").textContent = "";
   drawBars();
 };
 /* abyss purple elites + boss tuning, injected after the base nextWave */
@@ -32546,6 +32538,53 @@ setInterval(() => {
   watch("forgebefore", "forgeafter");
   watch("reforgebefore", "reforgeafter");
 })();
+/* Abyss Omega is the final boss: it measures the whole loadout. Anything short of six maxed
+   top-tier items (Mythic or Bloodforged, Celestial 13, Abyss item level) makes it tougher and
+   harder-hitting. Nothing about this is shown to the player. */
+function abyssItemReadiness(g) {
+  if (!g || g.broken) return 0;
+  const top = g.rar === 5 || g.unique === "bloodforged";
+  const rarity = top ? 1 : [0.05, 0.1, 0.2, 0.35, 0.55][Math.max(0, Math.min(4, g.rar || 0))],
+    level = Math.max(0, Math.min(1, ((g.ilvl || 1) - 140) / 45)),
+    plus = Math.max(0, Math.min(1, (g.plus || 0) / 20)),
+    cel = Math.max(0, Math.min(1, (g.celestial || 0) / 13));
+  return rarity * 0.35 + level * 0.2 + plus * 0.15 + cel * 0.3;
+}
+function abyssLoadoutReadiness() {
+  return SLOTS.reduce((sum, s) => sum + abyssItemReadiness(S.gear && S.gear[s.key]), 0) / SLOTS.length;
+}
+function abyssFinalProfile() {
+  const T = (typeof window !== "undefined" && window.__abyssTune) || {};
+  const score = abyssLoadoutReadiness(),
+    need = T.finalNeed != null ? T.finalNeed : 1,
+    gap = Math.max(0, need - score);
+  return {
+    score,
+    healthMult: 1 + gap * (T.finalHp != null ? T.finalHp : 25),
+    incomingMult: 1 + gap * (T.finalDmg != null ? T.finalDmg : 10)
+  };
+}
+{
+  const nextWaveBeforeAbyssFinal = nextWave;
+  nextWave = function () {
+    const r = nextWaveBeforeAbyssFinal.apply(this, arguments);
+    try {
+      if (run && !run.hunt && run.a && run.a.abyss && run.ai === 16 && run.wave > run.total) {
+        const boss = run.foes && run.foes.find(f => f.boss && f.hp > 0);
+        if (boss && !boss.abyssFinalCheck) {
+          const p = abyssFinalProfile();
+          boss.abyssFinalCheck = p.score;
+          boss.max = Math.round(boss.max * p.healthMult);
+          boss.hp = boss.max;
+          boss.atk = Math.round(boss.atk * p.incomingMult);
+          buildFoeBars();
+          drawBars();
+        }
+      }
+    } catch (e) {}
+    return r;
+  };
+}
 </script>
 </body>
 </html>

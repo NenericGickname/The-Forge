@@ -1614,9 +1614,9 @@ function abyssDepthV50() {
 // early ones die in 3s. Tanky enough to show their advanced abilities, killable with the right gear.
 function abyssBossHP() {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  const base = T.bossHpBase != null ? T.bossHpBase : 4000000,
-    per = T.bossHpPer != null ? T.bossHpPer : 750000;
-  return Math.round(base + per * abyssDepthV50()); // ~4.5M (Abyss start) -> ~23M (Abyss Omega)
+  const base = T.bossHpBase != null ? T.bossHpBase : 9000000,
+    per = T.bossHpPer != null ? T.bossHpPer : 1000000;
+  return Math.round(base + per * abyssDepthV50()); // 9M (Abyss start) -> 25M (Abyss Omega), tuned by simulation 2026-09-30
 }
 
 function abyssHasteMul(f) {
@@ -1635,9 +1635,9 @@ function abyssHasteMul(f) {
 function abyssDamageMul() {
   if (!(run && run.a && run.a.abyss)) return 1;
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  const base = T.dmgBase != null ? T.dmgBase : 1.0,
-    slope = T.dmgSlope != null ? T.dmgSlope : 0.028;
-  return base + slope * abyssDepthV50(); // ~1.35 (start) -> ~2.2 (Abyss Omega)
+  const base = T.dmgBase != null ? T.dmgBase : 1.7,
+    slope = T.dmgSlope != null ? T.dmgSlope : 0.02;
+  return base + slope * abyssDepthV50(); // 1.7 (start) -> ~2.0 (Abyss Omega)
 }
 
 /* ANTI-TANK: enemies deal bonus damage equal to a % of YOUR max HP, so a giant HP pool no
@@ -1665,11 +1665,14 @@ function abyssExcessHpDmg(maxHp) {
 
 // Stages sit at celestial+ level (160) and rise slowly to 180 at Abyss Omega; the real
 // challenge is the extended boss gimmicks (below), not inflated raw stats.
-// Abyss is a full re-gearing journey: stages start at level 160 (≈ the normal OMEGA boss) and
+// Abyss is a full re-gearing journey: stages run from level 178 to 214 (tuned by simulation 2026-09-30) and
 // ramp all the way to level 220 at Abyss Omega, so deep stages have far more HP/attack/defense and
 // genuinely demand the ✦13 gear you farm inside the Abyss — not just a good normal-mode set.
 function abyssLevel(ai) {
-  return 160 + Math.round((ai / 16) * 60);
+  const T = (typeof window !== "undefined" && window.__abyssTune) || {};
+  const base = T.levelBase != null ? T.levelBase : 178,
+    span = T.levelSpan != null ? T.levelSpan : 36;
+  return base + Math.round((ai / 16) * span);
 }
 
 function abyssAreaClone(ai, orig) {
@@ -2952,7 +2955,7 @@ function startRun(ai) {
   $("town").style.display = "none";
   $("run").style.display = "block";
   $("rmsg").className = "msg";
-  $("rmsg").textContent = "Entering " + a.n + " — weak to " + a.weak;
+  $("rmsg").textContent = "Entering " + a.n;
   startMusic();
   nextWave();
   clearInterval(timer);

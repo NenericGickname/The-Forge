@@ -286,7 +286,8 @@ killFoe = function (f, critTier) {
         b.lvl = dropLvl;
       }); // items drop at ✦0 — Celestial is forged by the player, never pre-applied
       // ONE mythic roll per kill (not per bag) — the boss dropping 3-4 bags was flooding mythics
-      const mch = f.boss ? 0.1 : f.abyssElite ? 0.05 : f.elite ? 0.012 : 0.003;
+      const TM = (typeof window !== "undefined" && window.__abyssTune) || {};
+      const mch = (f.boss ? 0.1 : f.abyssElite ? 0.05 : f.elite ? 0.012 : 0.003) * (TM.mythicMul != null ? TM.mythicMul : 0.5);
       if (newBags.length && Math.random() < mch) {
         let target = newBags[0];
         for (const b of newBags) if ((b.rar || 0) > (target.rar || 0)) target = b;

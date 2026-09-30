@@ -16,11 +16,13 @@ const mkSeed = s => `(()=>{let a=${s};Math.random=function(){a|=0;a=a+0x6D2B79F5
   const c = await b.newContext({ viewport: { width: 1280, height: 800 } });
   const errs = {};
   const log = { events: [], samples: [], stuck: [] };
-  let state = null, t = 0, snapped = false, restore = null;
+  let state = null, t = 0, snapped = false, restore = null, resetAbyss = false;
   if (process.env.FROM) {
     const snap = JSON.parse(fs.readFileSync(process.env.FROM, 'utf8'));
     state = snap.state; t = snap.t; restore = snap.storage; snapped = true;
-    log.events.push(...snap.events); log.samples.push(...snap.samples);
+    log.events.push(...snap.events.filter(e => e.k !== 'abyssClear')); log.samples.push(...snap.samples);
+    if (state) { state.seen.abyss = {}; for (const k in state.hist) if (+k >= 100) delete state.hist[k]; }
+    resetAbyss = true;
   }
   const total = +hours * 3600e3, chunk = 60e3, t0 = Date.now();
   while (t < total) {
@@ -28,6 +30,7 @@ const mkSeed = s => `(()=>{let a=${s};Math.random=function(){a|=0;a=a+0x6D2B79F5
     p.on('pageerror', e => { const k = e.message.slice(0, 120); errs[k] = (errs[k] || 0) + 1; });
     p.on('dialog', d => d.accept());
     await p.addInitScript(`window.__simStart=${START + t};`);
+    if (process.env.TUNE) await p.addInitScript(`window.__abyssTune=${process.env.TUNE};`);
     if (restore) { await p.addInitScript(st => { if (!sessionStorage.getItem('__restored')) { localStorage.clear(); for (const k in st) localStorage.setItem(k, st[k]); sessionStorage.setItem('__restored', '1'); } }, restore); restore = null; }
     await p.addInitScript(CLOCK);
     await p.addInitScript(mkSeed(seed * 1000 + Math.round(t / chunk)));
@@ -36,6 +39,7 @@ const mkSeed = s => `(()=>{let a=${s};Math.random=function(){a|=0;a=a+0x6D2B79F5
     await p.waitForTimeout(300);
     await p.evaluate(() => __advance(2000));
     t += 2000;
+    if (resetAbyss) { resetAbyss = false; await p.evaluate(() => { S.abyssCleared = []; S.abyssMax = 0; try { saveGame(true); } catch (e) {} }); }
     await p.evaluate(c => window.__bot.start(c), { hitRate: +(hitRate || 1), silverRate: +(silverRate || 1), offset: t, state });
     const segEnd = Math.min(total, t + SEG);
     for (; t < segEnd; t += chunk) {

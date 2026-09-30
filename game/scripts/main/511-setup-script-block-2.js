@@ -564,7 +564,10 @@ buildFoe = function (key, lvl, hpMul, boss, name) {
   const f = prevResult194;
   if (f && run && run.a && run.a.abyss) {
     const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-    const m = boss ? (T.bossHpMul != null ? T.bossHpMul : 1.05) : T.mobHpMul != null ? T.mobHpMul : 1.5;
+    const depth = typeof abyssDepthV50 === "function" ? abyssDepthV50() : 0;
+    const m = boss
+      ? T.bossHpMul != null ? T.bossHpMul : 1.05
+      : (T.mobHpMul != null ? T.mobHpMul : 3.5) + (T.mobHpSlope != null ? T.mobHpSlope : 0.05) * depth;
     f.max = Math.round(f.max * m);
     f.hp = f.max;
   }

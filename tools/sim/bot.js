@@ -109,7 +109,10 @@
   // ---------- town actions ----------
   const retired = new WeakSet();
   // A player who has met Gamma's Crown of Thorns switches to a bow for good.
-  const bowMode = () => (S.clearedAreas || []).includes(14);
+  const bowMode = () => {
+    const k = pushTarget().key;
+    return k === 15 || k === 115;
+  };
   function equipBetter() {
     let changed = false,
       swaps = 0;
@@ -132,6 +135,14 @@
         if (!better) {
           // never trade an item that can go Celestial for one that cannot
           if ((cur.rar || 0) >= 3 && (g.rar || 0) < 3) continue;
+          // once the Abyss is open, Mythic and Bloodforged items are the goal (they reach ✦13)
+          const top = x => x.rar === 5 || x.unique === "bloodforged";
+          if (S.abyssUnlocked && top(cur) && !top(g)) continue;
+          if (S.abyssUnlocked && top(g) && !top(cur) && (g.ilvl || 0) >= (cur.ilvl || 0) - 15) {
+            better = true;
+          }
+        }
+        if (!better && cur && !cur.broken) {
           // judge the new item as if it were forged to the same level (a player would re-forge it)
           const probe = JSON.parse(JSON.stringify(g));
           probe.plus = cur.plus || 0;
@@ -542,6 +553,7 @@
       L.stuck.push({ t: now(), err: String(e && e.message).slice(0, 200) });
     }
   }
+  window.__botDisabled = false;
   window.__bot = {
     start(c) {
       Object.assign(cfg, c || {});
