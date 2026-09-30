@@ -15575,13 +15575,42 @@ function poisonSpreadCapV51(g, hs) {
   return Math.max(6, Math.floor(poisonStackCap(g, hs) * 0.7));
 }
 
-/* Gamma's Crown of Thorns is permanent. Bows attack from outside its reflection field. */
+/* Gamma's Crown of Thorns rises in waves (4s up, 6s down). While it is up, every hit on Gamma
+   reflects part of its damage, whatever the weapon: a sustain test, not a weapon check. */
+function gammaCrownSync() {
+  if (!run || !run.foes) return null;
+  const b = run.foes.find(f => f.gammaThornsV51 && f.hp > 0);
+  if (!b) return null;
+  const T = (typeof window !== "undefined" && window.__abyssTune) || {};
+  const period = T.crownPeriod != null ? T.crownPeriod : 10000,
+    up = T.crownUp != null ? T.crownUp : 4000;
+  const t = run.time - (b.crownT0 || 0);
+  if (t < 0) {
+    b.thornUntil = 0;
+    return null;
+  }
+  const phase = t % period,
+    cycle = Math.floor(t / period);
+  if (phase < up) {
+    b.thornUntil = run.time + (up - phase);
+    if (b.crownCycle !== cycle) {
+      b.crownCycle = cycle;
+      try {
+        beep(520, 0.12, "triangle", 0.08);
+      } catch (e) {}
+    }
+    return b;
+  }
+  b.thornUntil = 0;
+  return null;
+}
 function armGammaThorns() {
   if (!run || run.ai !== 15) return;
   const b = run.foes && run.foes.find(f => f.boss && f.hp > 0);
   if (!b || b.gammaThornsV51) return;
   b.gammaThornsV51 = true;
-  b.thornUntil = Number.POSITIVE_INFINITY;
+  b.crownT0 = run.time + 3000;
+  b.thornUntil = 0;
   b.name = "✹ " + b.name;
   buildFoeBars();
   drawBars();
@@ -21824,7 +21853,7 @@ const ROCK_KEEPER_LINES = [
   "Elites drop better loot. They also object strongly to being farmed.",
   "Shamans heal their allies. Rude, but technically impressive.",
   "The poison frog can ruin your day for fifteen seconds after combat.",
-  "Thorns reflect melee damage. Bows call this somebody else's problem.",
+  "Thornbacks bristle now and then. Whatever you swing, it stings while they glow.",
   "Enemies can crit too. Fairness was a terrible design choice.",
   "Later areas raise enemy crit chance. The monsters read the patch notes.",
   "Every boss has a fifty percent chance to drop a Boss Rush token.",
@@ -23943,8 +23972,8 @@ tick = function () {
           }
           if (
             target.thornUntil &&
-            run.time < target.thornUntil &&
-            (!S.gear.weapon || S.gear.weapon.wtype !== "bow")
+            !target.gammaThornsV51 &&
+            run.time < target.thornUntil
           ) {
             const ref = Math.max(1, (target.lvl * 1.2 + target.atk * 0.18) * (target.elite ? 1.45 : 1));
             run.hero.hp -= ref;
@@ -24163,10 +24192,11 @@ updateStatusFx = function () {
     }
     /* ---- updateStatusFx: later layers (moved here) ---- */
     if (!run) break prev32;
+    if (typeof gammaCrownSync === "function") gammaCrownSync();
     run.foes.forEach((f, i) => {
       if (f.hp <= 0 || !f.thornUntil || run.time >= f.thornUntil) return;
       const el = $("foefx" + i);
-      if (el) el.innerHTML += fxIcon("✹", 1 - (f.thornUntil - run.time) / (f.elite ? 6200 : 4600), "buff");
+      if (el) el.innerHTML += fxIcon("✹", 1 - (f.thornUntil - run.time) / (f.gammaThornsV51 ? 4000 : f.elite ? 6200 : 4600), "buff");
     });
   }
   if (!run) return;
@@ -27308,7 +27338,8 @@ if (typeof window.armGammaThornsV51 !== "function")
     const b = run.foes && run.foes.find(f => f.boss && f.hp > 0);
     if (!b || b.gammaThornsV51) return;
     b.gammaThornsV51 = true;
-    b.thornUntil = Number.POSITIVE_INFINITY;
+    b.crownT0 = run.time + 3000;
+    b.thornUntil = 0;
     b.name = "✹ " + b.name;
     buildFoeBars();
     drawBars();
@@ -29989,12 +30020,12 @@ floatDmg = function (side, val, tier, color, x) {
 const floatDmgBeforeV51 = floatDmg;
 floatDmg = function (side, val, tier, color, x) {
   if (side === "foe" && typeof val === "number" && run && !run._gammaReflectV51) {
-    const b = run.foes && run.foes.find(f => f.gammaThornsV51 && f.hp > 0),
-      w = S.gear && S.gear.weapon,
+    const b = typeof gammaCrownSync === "function" ? gammaCrownSync() : null,
       lc = String(color || "").toLowerCase(),
       status = ["#7fe07f", "#9be07f", "#ff8a3a", "#ffe14d"].includes(lc);
-    if (b && (!w || w.wtype !== "bow") && !status) {
-      const ref = Math.min(run.hero.max * 0.28, Math.max(run.hero.max * 0.06, val * 0.42));
+    if (b && !status) {
+      const T = window.__abyssTune || {};
+      const ref = Math.min(run.hero.max * (T.crownCap != null ? T.crownCap : run.a && run.a.abyss ? 0.08 : 0.05), Math.max(run.hero.max * 0.02, val * (T.crownPct != null ? T.crownPct : 0.2)));
       run._gammaReflectV51 = true;
       run._incomingContextV41 = { label: "Gamma Crown of Thorns", icon: "✹", source: b };
       run.hero.hp -= ref;

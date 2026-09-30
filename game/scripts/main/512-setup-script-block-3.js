@@ -1039,12 +1039,12 @@ floatDmg = function (side, val, tier, color, x) {
 const floatDmgBeforeV51 = floatDmg;
 floatDmg = function (side, val, tier, color, x) {
   if (side === "foe" && typeof val === "number" && run && !run._gammaReflectV51) {
-    const b = run.foes && run.foes.find(f => f.gammaThornsV51 && f.hp > 0),
-      w = S.gear && S.gear.weapon,
+    const b = typeof gammaCrownSync === "function" ? gammaCrownSync() : null,
       lc = String(color || "").toLowerCase(),
       status = ["#7fe07f", "#9be07f", "#ff8a3a", "#ffe14d"].includes(lc);
-    if (b && (!w || w.wtype !== "bow") && !status) {
-      const ref = Math.min(run.hero.max * 0.28, Math.max(run.hero.max * 0.06, val * 0.42));
+    if (b && !status) {
+      const T = window.__abyssTune || {};
+      const ref = Math.min(run.hero.max * (T.crownCap != null ? T.crownCap : run.a && run.a.abyss ? 0.08 : 0.05), Math.max(run.hero.max * 0.02, val * (T.crownPct != null ? T.crownPct : 0.2)));
       run._gammaReflectV51 = true;
       run._incomingContextV41 = { label: "Gamma Crown of Thorns", icon: "✹", source: b };
       run.hero.hp -= ref;

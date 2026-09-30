@@ -2492,13 +2492,42 @@ function poisonSpreadCapV51(g, hs) {
   return Math.max(6, Math.floor(poisonStackCap(g, hs) * 0.7));
 }
 
-/* Gamma's Crown of Thorns is permanent. Bows attack from outside its reflection field. */
+/* Gamma's Crown of Thorns rises in waves (4s up, 6s down). While it is up, every hit on Gamma
+   reflects part of its damage, whatever the weapon: a sustain test, not a weapon check. */
+function gammaCrownSync() {
+  if (!run || !run.foes) return null;
+  const b = run.foes.find(f => f.gammaThornsV51 && f.hp > 0);
+  if (!b) return null;
+  const T = (typeof window !== "undefined" && window.__abyssTune) || {};
+  const period = T.crownPeriod != null ? T.crownPeriod : 10000,
+    up = T.crownUp != null ? T.crownUp : 4000;
+  const t = run.time - (b.crownT0 || 0);
+  if (t < 0) {
+    b.thornUntil = 0;
+    return null;
+  }
+  const phase = t % period,
+    cycle = Math.floor(t / period);
+  if (phase < up) {
+    b.thornUntil = run.time + (up - phase);
+    if (b.crownCycle !== cycle) {
+      b.crownCycle = cycle;
+      try {
+        beep(520, 0.12, "triangle", 0.08);
+      } catch (e) {}
+    }
+    return b;
+  }
+  b.thornUntil = 0;
+  return null;
+}
 function armGammaThorns() {
   if (!run || run.ai !== 15) return;
   const b = run.foes && run.foes.find(f => f.boss && f.hp > 0);
   if (!b || b.gammaThornsV51) return;
   b.gammaThornsV51 = true;
-  b.thornUntil = Number.POSITIVE_INFINITY;
+  b.crownT0 = run.time + 3000;
+  b.thornUntil = 0;
   b.name = "✹ " + b.name;
   buildFoeBars();
   drawBars();

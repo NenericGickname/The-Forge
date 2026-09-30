@@ -905,8 +905,8 @@ tick = function () {
           }
           if (
             target.thornUntil &&
-            run.time < target.thornUntil &&
-            (!S.gear.weapon || S.gear.weapon.wtype !== "bow")
+            !target.gammaThornsV51 &&
+            run.time < target.thornUntil
           ) {
             const ref = Math.max(1, (target.lvl * 1.2 + target.atk * 0.18) * (target.elite ? 1.45 : 1));
             run.hero.hp -= ref;
@@ -1125,10 +1125,11 @@ updateStatusFx = function () {
     }
     /* ---- updateStatusFx: later layers (moved here) ---- */
     if (!run) break prev32;
+    if (typeof gammaCrownSync === "function") gammaCrownSync();
     run.foes.forEach((f, i) => {
       if (f.hp <= 0 || !f.thornUntil || run.time >= f.thornUntil) return;
       const el = $("foefx" + i);
-      if (el) el.innerHTML += fxIcon("✹", 1 - (f.thornUntil - run.time) / (f.elite ? 6200 : 4600), "buff");
+      if (el) el.innerHTML += fxIcon("✹", 1 - (f.thornUntil - run.time) / (f.gammaThornsV51 ? 4000 : f.elite ? 6200 : 4600), "buff");
     });
   }
   if (!run) return;

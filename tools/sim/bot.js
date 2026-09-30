@@ -109,10 +109,7 @@
   // ---------- town actions ----------
   const retired = new WeakSet();
   // A player who has met Gamma's Crown of Thorns switches to a bow for good.
-  const bowMode = () => {
-    const k = pushTarget().key;
-    return k === 15 || k === 115;
-  };
+  const bowMode = () => false; // Gamma no longer requires a bow
   function equipBetter() {
     let changed = false,
       swaps = 0;

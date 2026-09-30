@@ -419,7 +419,8 @@ if (typeof window.armGammaThornsV51 !== "function")
     const b = run.foes && run.foes.find(f => f.boss && f.hp > 0);
     if (!b || b.gammaThornsV51) return;
     b.gammaThornsV51 = true;
-    b.thornUntil = Number.POSITIVE_INFINITY;
+    b.crownT0 = run.time + 3000;
+    b.thornUntil = 0;
     b.name = "✹ " + b.name;
     buildFoeBars();
     drawBars();

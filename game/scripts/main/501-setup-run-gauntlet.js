@@ -761,7 +761,7 @@ const ROCK_KEEPER_LINES = [
   "Elites drop better loot. They also object strongly to being farmed.",
   "Shamans heal their allies. Rude, but technically impressive.",
   "The poison frog can ruin your day for fifteen seconds after combat.",
-  "Thorns reflect melee damage. Bows call this somebody else's problem.",
+  "Thornbacks bristle now and then. Whatever you swing, it stings while they glow.",
   "Enemies can crit too. Fairness was a terrible design choice.",
   "Later areas raise enemy crit chance. The monsters read the patch notes.",
   "Every boss has a fifty percent chance to drop a Boss Rush token.",
