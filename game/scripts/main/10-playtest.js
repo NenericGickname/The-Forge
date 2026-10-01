@@ -83,6 +83,13 @@ function grantPlaytestActivePoints() {
   } catch (e) {}
 }
 
+// Super Late = the end of the Abyss: Mythic items at Abyss Omega's level, +20 ✦13 (Doc, 2026-10-01).
+// window.__presetGear = { ilvl, cel } lets test tools build earlier stages of the climb.
+function superLateGear() {
+  const o = (typeof window !== "undefined" && window.__presetGear) || {};
+  return { ilvl: o.ilvl || 240, cel: o.cel != null ? o.cel : 13 };
+}
+
 function makeSuperLateItem(slot, affix, effect, index) {
   let g;
   if (slot === "weapon") {
@@ -96,9 +103,9 @@ function makeSuperLateItem(slot, affix, effect, index) {
             : effect === "doom"
               ? "bow"
               : "sword";
-    g = makeWeapon(180, 5, type, effect);
+    g = makeWeapon(superLateGear().ilvl, 5, type, effect);
     g.stats[effect] = maxBaseRoll(g, effect);
-  } else g = makeGear(slot, 180, 5);
+  } else g = makeGear(slot, superLateGear().ilvl, 5);
   g.mythicAffix = affix;
   g.variant = (index || 0) % 5;
   return maximizePlaytestItem(g);
@@ -127,9 +134,9 @@ function maximizePlaytestItemBase(g) {
       break prev48;
     }
     g.rar = 5;
-    g.ilvl = 180;
+    g.ilvl = superLateGear().ilvl;
     g.plus = 20;
-    g.celestial = 10;
+    g.celestial = superLateGear().cel;
     g.maxPlusReached = 20;
     g.celestialAffixGranted = true;
     g.celestialDrop = true;

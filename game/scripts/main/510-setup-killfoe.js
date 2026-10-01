@@ -278,7 +278,7 @@ killFoe = function (f, critTier) {
       // Abyss drop item level = the actual foe's level (160-185). The base loot code derives level
       // from AREAS[run.ai].lvl, but abyss reuses the original low-level area indices, so it wrongly
       // produced ~lvl 1-6 → floored to 120. Use the foe level instead.
-      const dropLvl = Math.max(1, Math.min(190, (f && f.lvl) || run.a.lvl || 160));
+      const dropLvl = Math.max(1, Math.min(ABYSS_ITEM_LEVEL_CAP, (f && f.lvl) || run.a.lvl || 160));
       newBags.forEach(b => {
         if (b.rar === 5 && !b.unique) b.rar = 4;
         b.celestialDrop = true;

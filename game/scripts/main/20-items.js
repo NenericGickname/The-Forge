@@ -1153,8 +1153,11 @@ function weaponEffectWeight(type, stat) {
   return;
 }
 
+// Highest item level: Abyss Omega's level (was a flat 190, which made every stage past the
+// third drop identical items).
+const ABYSS_ITEM_LEVEL_CAP = 240;
 function abyssRushDropLevelV61(ai) {
-  return Math.min(190, abyssLevelV61(ai));
+  return Math.min(ABYSS_ITEM_LEVEL_CAP, abyssLevelV61(ai));
 }
 
 function allItemsV70_v70(state = S) {

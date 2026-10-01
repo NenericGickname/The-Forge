@@ -179,8 +179,8 @@ function lighten(hex, k) {
         if (f.mirrorScaled) return;
         f.mirrorScaled = true;
         const ab = !!(run.a && run.a.abyss),
-          hm = ab ? (T.abyssMirrorHp != null ? T.abyssMirrorHp : 4) : T.mirrorHp != null ? T.mirrorHp : 10,
-          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 1.4) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
+          hm = ab ? (T.abyssMirrorHp != null ? T.abyssMirrorHp : 2.4) : T.mirrorHp != null ? T.mirrorHp : 10,
+          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 1.05) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
         const sis = ab && f.mirrorSister ? (T.abyssSisterAtk != null ? T.abyssSisterAtk : 2.5) : 1;
         f.max = Math.round(f.max * hm);
         f.hp = Math.round(f.hp * hm);
@@ -216,7 +216,7 @@ function lighten(hex, k) {
         else st.sisters++;
         const T = window.__abyssTune || {};
         if (run.bags && Math.random() < (T.mirrorforgedChance != null ? T.mirrorforgedChance : ab ? 0.15 : 0.08)) {
-          run.bags.push({ rar: Math.random() < (ab ? 0.6 : 0.25) ? 5 : 4, lvl: Math.max(1, Math.min(190, f.lvl || 112)), slot: "weapon", unique: "mirrorforged", celestialDrop: true });
+          run.bags.push({ rar: Math.random() < (ab ? 0.6 : 0.25) ? 5 : 4, lvl: Math.max(1, Math.min(ABYSS_ITEM_LEVEL_CAP, f.lvl || 112)), slot: "weapon", unique: "mirrorforged", celestialDrop: true });
           try {
             addBagChip(4);
             $("rmsg").className = "msg big";

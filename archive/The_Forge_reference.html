@@ -942,13 +942,25 @@ button:disabled {
 .slot.celmax .in {
   text-shadow: 0 0 8px #ffd76a;
 }
-.slot.celmax:after {
+/* MAX sits inside the item's small picture (was floated into the card, behind the icon) */
+.slot.celmax .emb {
+  position: relative;
+  overflow: hidden;
+}
+.slot.celmax .emb:after {
   content: "MAX";
-  float: right;
-  margin-top: -9px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   font-size: 6px;
+  line-height: 7px;
   letter-spacing: 1px;
+  text-align: center;
+  font-weight: 700;
   color: #ffd76a;
+  background: rgba(10, 8, 4, 0.72);
+  text-shadow: 0 0 3px #000;
 }
 .forgegrid {
   display: grid;
@@ -3872,6 +3884,13 @@ function grantPlaytestActivePoints() {
   } catch (e) {}
 }
 
+// Super Late = the end of the Abyss: Mythic items at Abyss Omega's level, +20 ✦13 (Doc, 2026-10-01).
+// window.__presetGear = { ilvl, cel } lets test tools build earlier stages of the climb.
+function superLateGear() {
+  const o = (typeof window !== "undefined" && window.__presetGear) || {};
+  return { ilvl: o.ilvl || 240, cel: o.cel != null ? o.cel : 13 };
+}
+
 function makeSuperLateItem(slot, affix, effect, index) {
   let g;
   if (slot === "weapon") {
@@ -3885,9 +3904,9 @@ function makeSuperLateItem(slot, affix, effect, index) {
             : effect === "doom"
               ? "bow"
               : "sword";
-    g = makeWeapon(180, 5, type, effect);
+    g = makeWeapon(superLateGear().ilvl, 5, type, effect);
     g.stats[effect] = maxBaseRoll(g, effect);
-  } else g = makeGear(slot, 180, 5);
+  } else g = makeGear(slot, superLateGear().ilvl, 5);
   g.mythicAffix = affix;
   g.variant = (index || 0) % 5;
   return maximizePlaytestItem(g);
@@ -3916,9 +3935,9 @@ function maximizePlaytestItemBase(g) {
       break prev48;
     }
     g.rar = 5;
-    g.ilvl = 180;
+    g.ilvl = superLateGear().ilvl;
     g.plus = 20;
-    g.celestial = 10;
+    g.celestial = superLateGear().cel;
     g.maxPlusReached = 20;
     g.celestialAffixGranted = true;
     g.celestialDrop = true;
@@ -4721,8 +4740,11 @@ function renderGuildOffers() {
   grid.querySelectorAll("[data-offer]").forEach(b => (b.onclick = () => launchGuildOffer(b.dataset.offer)));
   const head = $("guildv70").querySelector(".guildheadv70 p");
   if (head)
-    head.textContent =
-      "Choose one of four contracts drawn from your accessible areas. Every offer has its own cooldown, shown on that contract after an attempt.";
+    head.innerHTML =
+      mode === "abyss"
+        ? '<b style="color:#1fb8ad">🌀 ABYSS CONTRACTS</b> · a separate board for the Abyss stages, with its own completions and abyss-scale bounties. Switch the stage map back to the campaign for campaign contracts.'
+        : "Choose one of four contracts drawn from your accessible areas. Every offer has its own cooldown, shown on that contract after an attempt." +
+          (S.abyssUnlocked ? " Switch the stage map to the Abyss for abyss contracts." : "");
 }
 
 function applyContractChallenge() {
@@ -4764,7 +4786,25 @@ function contractMarksV75() {
 }
 
 /* V99 — Guild window redesign: stage-scaled gold+shard bounty, +2 QP mastery, cleaner cards */
-function bounty(ai, mastery) {
+function bounty(ai, mastery, abyss) {
+  if (abyss) {
+    // Abyss contracts pay at abyss scale: about 1.3 stage clears of gold, celestial shards worth
+    // roughly half to one ✦ step, and an abyss token (Doc, 2026-10-01).
+    var k = Math.max(0, Math.min(16, ai | 0)),
+      ab = {
+        gold: Math.round(1500000 * (1 + 0.12 * k)),
+        shards: 0,
+        celestial: Math.round(5 + 0.9 * k),
+        tokens: 1,
+        abyss: true
+      };
+    if (mastery) {
+      ab.gold = Math.round(ab.gold * 1.35);
+      ab.celestial = Math.round(ab.celestial * 1.35);
+      ab.tokens = 2;
+    }
+    return ab;
+  }
   var n = (ai | 0) + 1,
     g = Math.round(400 * Math.pow(n, 1.5)),
     s = Math.round(7 * Math.pow(n, 1.25));
@@ -12087,8 +12127,11 @@ function weaponEffectWeight(type, stat) {
   return;
 }
 
+// Highest item level: Abyss Omega's level (was a flat 190, which made every stage past the
+// third drop identical items).
+const ABYSS_ITEM_LEVEL_CAP = 240;
 function abyssRushDropLevelV61(ai) {
-  return Math.min(190, abyssLevelV61(ai));
+  return Math.min(ABYSS_ITEM_LEVEL_CAP, abyssLevelV61(ai));
 }
 
 function allItemsV70_v70(state = S) {
@@ -14065,7 +14108,9 @@ function abyssBossHP() {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
   const base = T.bossHpBase != null ? T.bossHpBase : 9000000,
     per = T.bossHpPer != null ? T.bossHpPer : 1000000;
-  return Math.round(base + per * abyssDepthV50()); // 9M (Abyss start) -> 25M (Abyss Omega), tuned by simulation 2026-09-30
+  // compounding growth per stage (Doc, 2026-10-01: the Abyss must be a gear climb)
+  if (T.bossHpPer == null) return Math.round((T.bossHpStart || 8000000) * Math.pow(T.bossHpGrow || 1.096, abyssDepthV50()));
+  return Math.round(base + per * abyssDepthV50());
 }
 
 function abyssHasteMul(f) {
@@ -14086,7 +14131,8 @@ function abyssDamageMul() {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
   const base = T.dmgBase != null ? T.dmgBase : 1.7,
     slope = T.dmgSlope != null ? T.dmgSlope : 0.02;
-  return base + slope * abyssDepthV50(); // 1.7 (start) -> ~2.0 (Abyss Omega)
+  if (T.dmgSlope == null) return (T.dmgStart || 1.5) * Math.pow(T.dmgGrow || 1.035, abyssDepthV50());
+  return base + slope * abyssDepthV50();
 }
 
 /* ANTI-TANK: enemies deal bonus damage equal to a % of YOUR max HP, so a giant HP pool no
@@ -14119,8 +14165,9 @@ function abyssExcessHpDmg(maxHp) {
 // genuinely demand the ✦13 gear you farm inside the Abyss — not just a good normal-mode set.
 function abyssLevel(ai) {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  const base = T.levelBase != null ? T.levelBase : 178,
-    span = T.levelSpan != null ? T.levelSpan : 36;
+  // 180 → 240 (Doc, 2026-10-01): the Abyss is a gear climb, drops follow the stage level
+  const base = T.levelBase != null ? T.levelBase : 180,
+    span = T.levelSpan != null ? T.levelSpan : 60;
   return base + Math.round((ai / 16) * span);
 }
 
@@ -16140,9 +16187,11 @@ function areaClear() {
   try {
     if (cid != null && Number.isInteger(ai)) {
       var isM = cid === "mastery",
-        bt = bounty(ai, isM);
+        bt = bounty(ai, isM, run && (run.guildOfferModeV75 === "abyss" || (run.a && run.a.abyss)));
       S.gold = (S.gold || 0) + bt.gold;
       S.shards = (S.shards || 0) + bt.shards;
+      if (bt.celestial) S.celestialShards = (S.celestialShards || 0) + bt.celestial;
+      if (bt.tokens) S.abyssTokens = (S.abyssTokens || 0) + bt.tokens;
       if (isM) {
         try {
           S.questV74 = S.questV74 || {};
@@ -16158,9 +16207,10 @@ function areaClear() {
             "CONTRACT COMPLETE",
             "Bounty paid: <b style='color:var(--gold)'>" +
               fmt(bt.gold) +
-              " gold</b> and <b style='color:var(--rare)'>" +
-              bt.shards +
-              " shards</b>." +
+              " gold</b>" +
+              (bt.abyss
+                ? ", <b style='color:#c9b6ff'>" + bt.celestial + " celestial shards</b> and <b style='color:#1fb8ad'>" + bt.tokens + " Abyss token" + (bt.tokens === 1 ? "" : "s") + "</b>."
+                : " and <b style='color:var(--rare)'>" + bt.shards + " shards</b>.") +
               (isM ? "<br><br><b style='color:#1fb8ad'>★ +2 Quest Points</b> for the ultimate contract." : "")
           );
         } catch (e) {}
@@ -17941,11 +17991,11 @@ function renderTownBase() {
               const slotEls = [...$("slots").children];
               SLOTS.forEach((sd, i) => {
                 const g = S.gear[sd.key];
-                if (slotEls[i] && g && (g.celestial || 0) >= 10) slotEls[i].classList.add("celmax");
+                if (slotEls[i] && g && (g.celestial || 0) >= (typeof celestialCapFor === "function" ? celestialCapFor(g) : 10)) slotEls[i].classList.add("celmax");
               });
               const bagEls = [...$("inv").children];
               S.bag.forEach((bg, i) => {
-                if (bagEls[i] && (bg.celestial || 0) >= 10) bagEls[i].classList.add("celmax");
+                if (bagEls[i] && (bg.celestial || 0) >= (typeof celestialCapFor === "function" ? celestialCapFor(bg) : 10)) bagEls[i].classList.add("celmax");
               });
               const g = S.sel ? S.gear[S.sel] : null;
               if (g) {
@@ -17974,10 +18024,11 @@ function renderTownBase() {
                     ".</div>";
                 }
                 const cb = $("celbtn");
-                if (cb && (g.celestial || 0) >= 10) {
+                const celCap = typeof celestialCapFor === "function" ? celestialCapFor(g) : 10;
+                if (cb && (g.celestial || 0) >= celCap) {
                   cb.style.display = "block";
                   cb.disabled = true;
-                  cb.innerHTML = "✹ CELESTIAL MAX — LEVEL 10";
+                  cb.innerHTML = "✹ CELESTIAL MAX — LEVEL " + celCap;
                 }
               }
               const bc = {};
@@ -18393,15 +18444,18 @@ function decorateCard(card) {
         .replace(/^\s*Reward:\s*/i, "")
         .replace(/\.\s*$/, "")
     : "";
-  var bt = bounty(ai, isM);
+  var abyssCard = /Abyss/.test(atxt),
+    bt = bounty(ai, isM, abyssCard);
   var rew = document.createElement("div");
   rew.className = "cv99rew";
   rew.innerHTML =
     '<div class="cv99row bounty"><span class="lbl">Bounty</span><span class="val">' +
     fmt(bt.gold) +
-    ' g · <span class="sh">' +
-    bt.shards +
-    " ◆</span></span></div>" +
+    " g · " +
+    (abyssCard
+      ? '<span style="color:#c9b6ff">' + bt.celestial + " ✺</span> · " + '<span style="color:#1fb8ad">' + bt.tokens + " 🌀</span>"
+      : '<span class="sh">' + bt.shards + " ◆</span>") +
+    "</span></div>" +
     (isM
       ? '<div class="cv99row qp"><span class="lbl">Quest points</span><span class="val">★ +2 QP</span></div>'
       : "") +
@@ -27314,7 +27368,7 @@ killFoe = function (f, critTier) {
       // Abyss drop item level = the actual foe's level (160-185). The base loot code derives level
       // from AREAS[run.ai].lvl, but abyss reuses the original low-level area indices, so it wrongly
       // produced ~lvl 1-6 → floored to 120. Use the foe level instead.
-      const dropLvl = Math.max(1, Math.min(190, (f && f.lvl) || run.a.lvl || 160));
+      const dropLvl = Math.max(1, Math.min(ABYSS_ITEM_LEVEL_CAP, (f && f.lvl) || run.a.lvl || 160));
       newBags.forEach(b => {
         if (b.rar === 5 && !b.unique) b.rar = 4;
         b.celestialDrop = true;
@@ -28258,7 +28312,9 @@ buildFoe = function (key, lvl, hpMul, boss, name) {
     const depth = typeof abyssDepthV50 === "function" ? abyssDepthV50() : 0;
     const m = boss
       ? T.bossHpMul != null ? T.bossHpMul : 1.05
-      : (T.mobHpMul != null ? T.mobHpMul : 3.5) + (T.mobHpSlope != null ? T.mobHpSlope : 0.05) * depth;
+      : T.mobHpSlope == null
+        ? (T.mobHpStart || 3) * Math.pow(T.mobHpGrow || 1.054, depth)
+        : (T.mobHpMul != null ? T.mobHpMul : 3.5) + T.mobHpSlope * depth;
     f.max = Math.round(f.max * m);
     f.hp = f.max;
   }
@@ -33039,8 +33095,8 @@ function lighten(hex, k) {
         if (f.mirrorScaled) return;
         f.mirrorScaled = true;
         const ab = !!(run.a && run.a.abyss),
-          hm = ab ? (T.abyssMirrorHp != null ? T.abyssMirrorHp : 4) : T.mirrorHp != null ? T.mirrorHp : 10,
-          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 1.4) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
+          hm = ab ? (T.abyssMirrorHp != null ? T.abyssMirrorHp : 2.4) : T.mirrorHp != null ? T.mirrorHp : 10,
+          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 1.05) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
         const sis = ab && f.mirrorSister ? (T.abyssSisterAtk != null ? T.abyssSisterAtk : 2.5) : 1;
         f.max = Math.round(f.max * hm);
         f.hp = Math.round(f.hp * hm);
@@ -33076,7 +33132,7 @@ function lighten(hex, k) {
         else st.sisters++;
         const T = window.__abyssTune || {};
         if (run.bags && Math.random() < (T.mirrorforgedChance != null ? T.mirrorforgedChance : ab ? 0.15 : 0.08)) {
-          run.bags.push({ rar: Math.random() < (ab ? 0.6 : 0.25) ? 5 : 4, lvl: Math.max(1, Math.min(190, f.lvl || 112)), slot: "weapon", unique: "mirrorforged", celestialDrop: true });
+          run.bags.push({ rar: Math.random() < (ab ? 0.6 : 0.25) ? 5 : 4, lvl: Math.max(1, Math.min(ABYSS_ITEM_LEVEL_CAP, f.lvl || 112)), slot: "weapon", unique: "mirrorforged", celestialDrop: true });
           try {
             addBagChip(4);
             $("rmsg").className = "msg big";

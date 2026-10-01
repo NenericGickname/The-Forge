@@ -1616,7 +1616,9 @@ function abyssBossHP() {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
   const base = T.bossHpBase != null ? T.bossHpBase : 9000000,
     per = T.bossHpPer != null ? T.bossHpPer : 1000000;
-  return Math.round(base + per * abyssDepthV50()); // 9M (Abyss start) -> 25M (Abyss Omega), tuned by simulation 2026-09-30
+  // compounding growth per stage (Doc, 2026-10-01: the Abyss must be a gear climb)
+  if (T.bossHpPer == null) return Math.round((T.bossHpStart || 8000000) * Math.pow(T.bossHpGrow || 1.096, abyssDepthV50()));
+  return Math.round(base + per * abyssDepthV50());
 }
 
 function abyssHasteMul(f) {
@@ -1637,7 +1639,8 @@ function abyssDamageMul() {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
   const base = T.dmgBase != null ? T.dmgBase : 1.7,
     slope = T.dmgSlope != null ? T.dmgSlope : 0.02;
-  return base + slope * abyssDepthV50(); // 1.7 (start) -> ~2.0 (Abyss Omega)
+  if (T.dmgSlope == null) return (T.dmgStart || 1.5) * Math.pow(T.dmgGrow || 1.035, abyssDepthV50());
+  return base + slope * abyssDepthV50();
 }
 
 /* ANTI-TANK: enemies deal bonus damage equal to a % of YOUR max HP, so a giant HP pool no
@@ -1670,8 +1673,9 @@ function abyssExcessHpDmg(maxHp) {
 // genuinely demand the ✦13 gear you farm inside the Abyss — not just a good normal-mode set.
 function abyssLevel(ai) {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  const base = T.levelBase != null ? T.levelBase : 178,
-    span = T.levelSpan != null ? T.levelSpan : 36;
+  // 180 → 240 (Doc, 2026-10-01): the Abyss is a gear climb, drops follow the stage level
+  const base = T.levelBase != null ? T.levelBase : 180,
+    span = T.levelSpan != null ? T.levelSpan : 60;
   return base + Math.round((ai / 16) * span);
 }
 
@@ -3691,9 +3695,11 @@ function areaClear() {
   try {
     if (cid != null && Number.isInteger(ai)) {
       var isM = cid === "mastery",
-        bt = bounty(ai, isM);
+        bt = bounty(ai, isM, run && (run.guildOfferModeV75 === "abyss" || (run.a && run.a.abyss)));
       S.gold = (S.gold || 0) + bt.gold;
       S.shards = (S.shards || 0) + bt.shards;
+      if (bt.celestial) S.celestialShards = (S.celestialShards || 0) + bt.celestial;
+      if (bt.tokens) S.abyssTokens = (S.abyssTokens || 0) + bt.tokens;
       if (isM) {
         try {
           S.questV74 = S.questV74 || {};
@@ -3709,9 +3715,10 @@ function areaClear() {
             "CONTRACT COMPLETE",
             "Bounty paid: <b style='color:var(--gold)'>" +
               fmt(bt.gold) +
-              " gold</b> and <b style='color:var(--rare)'>" +
-              bt.shards +
-              " shards</b>." +
+              " gold</b>" +
+              (bt.abyss
+                ? ", <b style='color:#c9b6ff'>" + bt.celestial + " celestial shards</b> and <b style='color:#1fb8ad'>" + bt.tokens + " Abyss token" + (bt.tokens === 1 ? "" : "s") + "</b>."
+                : " and <b style='color:var(--rare)'>" + bt.shards + " shards</b>.") +
               (isM ? "<br><br><b style='color:#1fb8ad'>★ +2 Quest Points</b> for the ultimate contract." : "")
           );
         } catch (e) {}

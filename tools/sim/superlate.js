@@ -8,12 +8,14 @@ const CLOCK = fs.readFileSync(__dirname + '/clock.js', 'utf8');
   const b = await chromium.launch(); const p = await (await b.newContext()).newPage();
   const errs = []; p.on('pageerror', e => errs.push(String(e).slice(0, 150)));
   if (process.env.TUNE) await p.addInitScript(`window.__abyssTune=${process.env.TUNE};`);
+  await p.addInitScript(`window.__preset=${JSON.stringify(process.env.PRESET || '')};`);
+  if (process.env.PGEAR) await p.addInitScript(`window.__presetGear=${process.env.PGEAR};`);
   await p.addInitScript(CLOCK);
   await p.addInitScript(`(()=>{let a=${process.env.SEED || 5};Math.random=function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};HTMLMediaElement.prototype.play=function(){return Promise.resolve()};})();`);
   await p.goto('http://localhost:8766/index.html'); await p.waitForTimeout(400);
   const r = await p.evaluate(([target, tries, loadout]) => {
     __advance(2000);
-    applySuperLatePreset();
+    if (window.__preset === 'late') applyNormalLatePresetV50('late'); else applySuperLatePreset();
     __advance(3000);
     document.querySelectorAll('.on').forEach(e => /tip/.test(e.id) && e.classList.remove('on'));
     grantPlaytestActivePoints();
@@ -30,7 +32,7 @@ const CLOCK = fs.readFileSync(__dirname + '/clock.js', 'utf8');
     for (let i = 0; i < tries; i++) {
       for (const id of ['clear', 'dead', 'lootopen']) document.getElementById(id).classList.remove('on');
       if (target === 'mirror') startMirrorPlane(true);
-      else window.abyssAPIv50.enterAbyss(target === 'omega' ? 16 : +target.split(':')[1]);
+      else window.abyssAPIv50.enterAbyss(target === 'omega' ? 16 : +target.split(':')[1].split(',')[i % target.split(':')[1].split(',').length]);
       window.__src = {}; let maxHit = 0, maxHitBy = '';
       let t = 0, bossT = null, bossMax = 0;
       while (run && !run.over && t < 1800) {

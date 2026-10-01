@@ -937,13 +937,25 @@ button:disabled {
 .slot.celmax .in {
   text-shadow: 0 0 8px #ffd76a;
 }
-.slot.celmax:after {
+/* MAX sits inside the item's small picture (was floated into the card, behind the icon) */
+.slot.celmax .emb {
+  position: relative;
+  overflow: hidden;
+}
+.slot.celmax .emb:after {
   content: "MAX";
-  float: right;
-  margin-top: -9px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   font-size: 6px;
+  line-height: 7px;
   letter-spacing: 1px;
+  text-align: center;
+  font-weight: 700;
   color: #ffd76a;
+  background: rgba(10, 8, 4, 0.72);
+  text-shadow: 0 0 3px #000;
 }
 .forgegrid {
   display: grid;

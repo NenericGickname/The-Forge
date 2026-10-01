@@ -1642,11 +1642,11 @@ function renderTownBase() {
               const slotEls = [...$("slots").children];
               SLOTS.forEach((sd, i) => {
                 const g = S.gear[sd.key];
-                if (slotEls[i] && g && (g.celestial || 0) >= 10) slotEls[i].classList.add("celmax");
+                if (slotEls[i] && g && (g.celestial || 0) >= (typeof celestialCapFor === "function" ? celestialCapFor(g) : 10)) slotEls[i].classList.add("celmax");
               });
               const bagEls = [...$("inv").children];
               S.bag.forEach((bg, i) => {
-                if (bagEls[i] && (bg.celestial || 0) >= 10) bagEls[i].classList.add("celmax");
+                if (bagEls[i] && (bg.celestial || 0) >= (typeof celestialCapFor === "function" ? celestialCapFor(bg) : 10)) bagEls[i].classList.add("celmax");
               });
               const g = S.sel ? S.gear[S.sel] : null;
               if (g) {
@@ -1675,10 +1675,11 @@ function renderTownBase() {
                     ".</div>";
                 }
                 const cb = $("celbtn");
-                if (cb && (g.celestial || 0) >= 10) {
+                const celCap = typeof celestialCapFor === "function" ? celestialCapFor(g) : 10;
+                if (cb && (g.celestial || 0) >= celCap) {
                   cb.style.display = "block";
                   cb.disabled = true;
-                  cb.innerHTML = "✹ CELESTIAL MAX — LEVEL 10";
+                  cb.innerHTML = "✹ CELESTIAL MAX — LEVEL " + celCap;
                 }
               }
               const bc = {};
@@ -2094,15 +2095,18 @@ function decorateCard(card) {
         .replace(/^\s*Reward:\s*/i, "")
         .replace(/\.\s*$/, "")
     : "";
-  var bt = bounty(ai, isM);
+  var abyssCard = /Abyss/.test(atxt),
+    bt = bounty(ai, isM, abyssCard);
   var rew = document.createElement("div");
   rew.className = "cv99rew";
   rew.innerHTML =
     '<div class="cv99row bounty"><span class="lbl">Bounty</span><span class="val">' +
     fmt(bt.gold) +
-    ' g · <span class="sh">' +
-    bt.shards +
-    " ◆</span></span></div>" +
+    " g · " +
+    (abyssCard
+      ? '<span style="color:#c9b6ff">' + bt.celestial + " ✺</span> · " + '<span style="color:#1fb8ad">' + bt.tokens + " 🌀</span>"
+      : '<span class="sh">' + bt.shards + " ◆</span>") +
+    "</span></div>" +
     (isM
       ? '<div class="cv99row qp"><span class="lbl">Quest points</span><span class="val">★ +2 QP</span></div>'
       : "") +

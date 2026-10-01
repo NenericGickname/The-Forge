@@ -502,8 +502,11 @@ function renderGuildOffers() {
   grid.querySelectorAll("[data-offer]").forEach(b => (b.onclick = () => launchGuildOffer(b.dataset.offer)));
   const head = $("guildv70").querySelector(".guildheadv70 p");
   if (head)
-    head.textContent =
-      "Choose one of four contracts drawn from your accessible areas. Every offer has its own cooldown, shown on that contract after an attempt.";
+    head.innerHTML =
+      mode === "abyss"
+        ? '<b style="color:#1fb8ad">🌀 ABYSS CONTRACTS</b> · a separate board for the Abyss stages, with its own completions and abyss-scale bounties. Switch the stage map back to the campaign for campaign contracts.'
+        : "Choose one of four contracts drawn from your accessible areas. Every offer has its own cooldown, shown on that contract after an attempt." +
+          (S.abyssUnlocked ? " Switch the stage map to the Abyss for abyss contracts." : "");
 }
 
 function applyContractChallenge() {
@@ -545,7 +548,25 @@ function contractMarksV75() {
 }
 
 /* V99 — Guild window redesign: stage-scaled gold+shard bounty, +2 QP mastery, cleaner cards */
-function bounty(ai, mastery) {
+function bounty(ai, mastery, abyss) {
+  if (abyss) {
+    // Abyss contracts pay at abyss scale: about 1.3 stage clears of gold, celestial shards worth
+    // roughly half to one ✦ step, and an abyss token (Doc, 2026-10-01).
+    var k = Math.max(0, Math.min(16, ai | 0)),
+      ab = {
+        gold: Math.round(1500000 * (1 + 0.12 * k)),
+        shards: 0,
+        celestial: Math.round(5 + 0.9 * k),
+        tokens: 1,
+        abyss: true
+      };
+    if (mastery) {
+      ab.gold = Math.round(ab.gold * 1.35);
+      ab.celestial = Math.round(ab.celestial * 1.35);
+      ab.tokens = 2;
+    }
+    return ab;
+  }
   var n = (ai | 0) + 1,
     g = Math.round(400 * Math.pow(n, 1.5)),
     s = Math.round(7 * Math.pow(n, 1.25));
