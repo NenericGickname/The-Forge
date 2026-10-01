@@ -261,7 +261,7 @@ startLootOpen = function (onDone) {
       el.title = "Boss spoils — click to roll";
     } else {
       el.style.setProperty("--bc", cvar(RAR[bag.rar].col));
-      el.textContent = bag.unique ? "🩸" : "🎁";
+      el.textContent = bag.unique === "mirrorforged" ? "🪞" : bag.unique ? "🩸" : "🎁";
     }
     el.onclick = () => openOne(el, bag, index);
     $("lootbags").appendChild(el);

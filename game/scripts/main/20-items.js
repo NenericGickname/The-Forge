@@ -677,7 +677,7 @@ function gearArt(g) {
 /* Great Axe cleave: injected after every hero hit (applyWeaponEffectsV18 runs per hit) */
 function greataxeCleaveChance(w) {
   if (!w || w.wtype !== "greataxe") return 0;
-  const base = Math.min(35, 5 + (w.plus || 0) + (w.celestial || 0)),
+  const base = Math.min(45, 15 + (w.plus || 0) + (w.celestial || 0)), // was 5 + ..., capped 35
     bonus =
       typeof window.forgeV70AxeCleaveBonus === "function" ? Number(window.forgeV70AxeCleaveBonus(w)) || 0 : 0;
   return Math.min(45, base + bonus);
@@ -894,7 +894,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
   if (!others.length) return;
   greataxeSweep(target, others);
   // the sweep's power is shared: 60% against one or two others, down to 30% against four
-  const sweepFrac = 0.3 * Math.min(2, 4 / others.length);
+  const sweepFrac = Math.min(0.75, 1 / others.length); // 75% to one other; the sweep shares 100% among two or more
   others.forEach(o => {
     let cd = dd * sweepFrac;
     if (o.shieldUntil && run.time < o.shieldUntil) cd *= 0.18;

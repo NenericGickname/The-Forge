@@ -142,7 +142,7 @@ const FORGE_CHAIN = ["forge1", "forge10", "forge15", "forge20", "cel10", "mythic
 let pinGuard = false;
 
 /* ---- (patch scope opened) ---- */
-const GREAT_AXE_DAMAGE_BOOST = 1.02; // was 1.2; axe is the group weapon, not the boss weapon
+const GREAT_AXE_DAMAGE_BOOST = 1.15; // makes up for having no weapon effects (bleed, lightning)
 
 /* ================= script block 11 ================= */
 

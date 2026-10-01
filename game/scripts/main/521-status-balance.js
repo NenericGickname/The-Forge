@@ -14,9 +14,10 @@ function statusSkillMul() {
 }
 function statusMulFor(target, hs) {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  const amp = Math.min(T.ampCap != null ? T.ampCap : 400, (hs && hs.elementAmp) || 0),
+  const amp = Math.min(T.ampCap != null ? T.ampCap : 600, (hs && hs.elementAmp) || 0),
     ampDot = T.ampDot != null ? T.ampDot : 2; // Elemental Amp counts double for damage over time
-  const base = (1 + (ampDot * amp) / 100) * statusSkillMul() * (T.dotMul != null ? T.dotMul : 3.2) *
+  // flat part keeps status builds useful before amp is stacked; the amp part takes over late
+  const base = ((1 + (ampDot * amp) / 100) * (T.dotMul != null ? T.dotMul : 2.2) + (T.dotFlat != null ? T.dotFlat : 4)) * statusSkillMul() *
     (S.gear && S.gear.weapon && S.gear.weapon.wtype === "dagger" ? (T.daggerDot != null ? T.daggerDot : 1.15) : 1);
   return base * (1 - ((target && target.dotResist) || 0));
 }
@@ -74,50 +75,5 @@ const BOSS_RESIST = {
       if (w && w.wtype === "bow") h._bossDamage = (h._bossDamage || 0) + (T.bowBoss != null ? T.bowBoss : 0.15);
     } catch (e) {}
     return h;
-  };
-}
-
-/* Twin bosses: on these stages the boss arrives with an identical twin. Each has 60% of the
-   normal health and damage, so area damage (Great Axe cleave, chain lightning, spreading
-   poison) pays off. The twin drops no extra loot. Keys as in BOSS_RESIST. */
-const TWIN_STAGES = { 4: 1, 9: 1, 104: 1, 108: 1, 113: 1 };
-{
-  const nextWaveBeforeTwin = nextWave;
-  nextWave = function () {
-    const r = nextWaveBeforeTwin.apply(this, arguments);
-    try {
-      const T = window.__abyssTune || {},
-        key = run && run.a ? (run.a.abyss ? 100 : 0) + run.ai : -1,
-        twins = T.twinStages || TWIN_STAGES;
-      if (run && !run.hunt && !run.twinSpawned && twins[key]) {
-        const boss = run.foes.find(f => f.boss && f.hp > 0);
-        if (boss) {
-          run.twinSpawned = true;
-          const share = T.twinShare != null ? T.twinShare : 0.6;
-          boss.max = Math.round(boss.max * share);
-          boss.hp = Math.min(boss.hp, boss.max);
-          boss.atk = Math.round(boss.atk * share);
-          const twin = JSON.parse(JSON.stringify(boss));
-          twin.twinV1 = true;
-          twin.name = boss.name.replace(/^(\W*)/, "$1") + " II";
-          twin._x = (boss._x || 405) + 62;
-          twin.cd = (boss.cd || 600) + 450; // out of step with its twin
-          twin.enter = 1;
-          run.foes.push(twin);
-          buildFoeBars();
-          drawBars();
-        }
-      }
-    } catch (e) {}
-    return r;
-  };
-  const killFoeBeforeTwin = killFoe;
-  killFoe = function (f) {
-    if (f && f.twinV1 && !f.twinKilled) {
-      f.twinKilled = true;
-      f.boss = false; // count as an ordinary kill: no second boss loot, token or first-clear
-      f.noDrop = true;
-    }
-    return killFoeBeforeTwin.apply(this, arguments);
   };
 }

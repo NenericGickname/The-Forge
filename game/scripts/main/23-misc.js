@@ -313,7 +313,7 @@ function sourceArray(ref) {
 function elemAmpMul(hs) {
   var a = (hs && hs.elementAmp) || 0;
   var T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  return 1 + Math.min(T.ampCap != null ? T.ampCap : 400, a) / 100;
+  return 1 + Math.min(T.ampCap != null ? T.ampCap : 600, a) / 100;
 }
 
 /* V101 — explain the locking mechanic the 5th time loot is opened */
