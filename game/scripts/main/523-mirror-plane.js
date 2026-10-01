@@ -180,8 +180,8 @@ function lighten(hex, k) {
         f.mirrorScaled = true;
         const ab = !!(run.a && run.a.abyss),
           hm = ab ? (T.abyssMirrorHp != null ? T.abyssMirrorHp : 4) : T.mirrorHp != null ? T.mirrorHp : 10,
-          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 3) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
-        const sis = ab && f.mirrorSister ? (T.abyssSisterAtk != null ? T.abyssSisterAtk : 2.35) : 1;
+          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 1.4) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
+        const sis = ab && f.mirrorSister ? (T.abyssSisterAtk != null ? T.abyssSisterAtk : 2.5) : 1;
         f.max = Math.round(f.max * hm);
         f.hp = Math.round(f.hp * hm);
         f.atk = Math.round(f.atk * am * sis);

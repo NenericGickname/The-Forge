@@ -27,7 +27,12 @@ function statusMulFor(target, hs, kind) {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
   const sc = Object.assign({}, DOT_SCALE[kind || "poison"], (T.dot && T.dot[kind || "poison"]) || {}),
     amp = Math.min(T.ampCap != null ? T.ampCap : 600, (hs && hs.elementAmp) || 0) / 100;
-  let m = sc.c * (1 + sc.k * amp);
+  // Doom grows with amp^2.5: a partial amp build gets little, a dedicated one a lot
+  // (Doc, 2026-10-01: "50% of the damage without a dedicated amp build").
+  let m =
+    kind === "doom"
+      ? (T.doomBase != null ? T.doomBase : 0.4) + (T.doomSq != null ? T.doomSq : 0.5) * Math.pow(amp, T.doomExp != null ? T.doomExp : 2.5)
+      : sc.c * (1 + sc.k * amp);
   // lightning already carries the tree and skill bonus inside hs.lightning
   // doom is an execute: the skill helps it less (square root of the bonus)
   if (kind === "doom") m *= Math.sqrt(statusSkillMul());

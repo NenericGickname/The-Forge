@@ -16,48 +16,43 @@ const CLOCK = fs.readFileSync(__dirname + '/clock.js', 'utf8');
     applySuperLatePreset();
     __advance(3000);
     document.querySelectorAll('.on').forEach(e => /tip/.test(e.id) && e.classList.remove('on'));
+    grantPlaytestActivePoints();
     const a = ensureState_p21();
-    a.loadout = loadout.slice();
+    if (loadout[0] !== 'preset') a.loadout = loadout.slice();
+    window.__src = {};
+    recordDummyDamage = function (key, icon, label, amount) {
+      if (run && run.foes && run.foes.some(f => f.boss && f.hp > 0 || f.boss && f.doomExploded) && Number.isFinite(amount) && amount > 0) window.__src[label] = (window.__src[label] || 0) + amount;
+    };
     for (const id of loadout) { a.pow[id] = 10; a.dur[id] = 10; a.cd[id] = 10; }
     const hs = heroStats();
-    const out = { hp: Math.round(hs.hp), atk: Math.round(hs.atk), amp: Math.round(hs.elementAmp || 0), crit: Math.round(hs.critChance), cdmg: Math.round(hs.critDmg),
+    const out = { loadout: a.loadout.join(','), hp: Math.round(hs.hp), atk: Math.round(hs.atk), amp: Math.round(hs.elementAmp || 0), crit: Math.round(hs.critChance), cdmg: Math.round(hs.critDmg),
       weapon: S.gear.weapon.name + ' ' + Object.entries(S.gear.weapon.stats).map(([k, v]) => k + Math.round(v)).join(' '), arch: SLOTS.map(s => S.gear[s.key].archetype).join(','), runs: [] };
     for (let i = 0; i < tries; i++) {
       for (const id of ['clear', 'dead', 'lootopen']) document.getElementById(id).classList.remove('on');
       if (target === 'mirror') startMirrorPlane(true);
       else window.abyssAPIv50.enterAbyss(target === 'omega' ? 16 : +target.split(':')[1]);
-      const split = {}; let doomExec = 0;
-      const ofd = floatDmg;
-      floatDmg = function (side, val, tier, color) {
-        if (side === 'foe' && run && run.foes.some(f => f.boss && f.hp > 0)) {
-          const n = typeof val === 'number' ? val : parseFloat(String(val).replace(/[^0-9.]/g, '')) || 0;
-          const c = String(color).toLowerCase();
-          const k = { '#7fe07f': 'poison', '#9be07f': 'poison', '#ff8a3a': 'burn', '#ffe14d': 'lightning', '#fff2a0': 'lightning', '#b91430': 'bleed', '#dce8ff': 'echo' }[c] || (/DOOM/.test(String(val)) ? 'x' : 'hit');
-          if (n && k !== 'x') split[k] = (split[k] || 0) + n;
-        }
-        return ofd.apply(this, arguments);
-      };
+      window.__src = {}; let maxHit = 0, maxHitBy = '';
       let t = 0, bossT = null, bossMax = 0;
       while (run && !run.over && t < 1800) {
         const bossUp = run.foes.some(f => f.boss && f.hp > 0);
         if (bossUp && bossT == null) { bossT = t; bossMax = run.foes.filter(f => f.boss).reduce((s, f) => s + f.max, 0); }
         // doom executes: remember the health they remove
-        run.foes.forEach(f => { if (f.boss && f.doomExploded && !f.__counted) { f.__counted = true; doomExec += f.__lastHp || 0; } if (f.hp > 0) f.__lastHp = f.hp; });
+        const hp0 = run.hero.hp;
         for (const id of a.loadout) {
           if (id === 'heal') { if (run.hero.hp < run.hero.max * 0.55) activate(id); }
           else if (bossUp || id === 'toughen' || id === 'ninja') activate(id);
         }
-        __advance(250); t += 0.25;
+        __advance(150); t += 0.15;
+        if (run && run.hero && hp0 - run.hero.hp > maxHit) { maxHit = hp0 - run.hero.hp; maxHitBy = run.foes.filter(f => f.hp > 0).map(f => f.name).slice(0, 2).join('/'); }
         document.querySelectorAll('#boons > *').forEach((x, k) => k === 0 && x.click());
         const tip = document.getElementById('tipok'); if (tip && tip.offsetParent) tip.click();
         if (document.getElementById('huntchoice').classList.contains('on')) document.getElementById('huntleave').click();
       }
-      floatDmg = ofd;
       const dead = document.getElementById('dead').classList.contains('on');
-      const tot = Object.values(split).reduce((x, y) => x + y, 0) + doomExec;
-      if (doomExec) split['doom execute'] = doomExec;
+      const tot = Object.values(window.__src).reduce((x, y) => x + y, 0) || 1;
+      const split = window.__src;
       out.runs.push({ won: !dead && run && run.over, wave: run && run.wave, min: Math.round(t / 6) / 10, bossSecs: bossT == null ? null : Math.round(t - bossT), bossHpM: Math.round(bossMax / 1e6),
-        split: Object.entries(split).sort((x, y) => y[1] - x[1]).map(([k, v]) => k + ' ' + Math.round(100 * v / (tot || 1)) + '%').join(', ') });
+        split: Object.entries(split).sort((x, y) => y[1] - x[1]).slice(0, 4).map(([k, v]) => k + ' ' + Math.round(100 * v / tot) + '%').join(', '), maxHitPct: Math.round(100 * maxHit / run.hero.max), maxHitBy });
       __advance(6000);
       if (document.getElementById('lootopen').classList.contains('on')) { document.getElementById('lootleave').click(); __advance(1500); }
       if (run) run.over = true;
