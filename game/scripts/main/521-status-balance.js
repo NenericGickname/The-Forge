@@ -20,7 +20,7 @@ const DOT_SCALE = {
   poison: { c: 6, k: 1.2 },
   burn: { c: 1.8, k: 0.85 },
   bleed: { c: 9, k: 1.1 },
-  doom: { c: 0.5, k: 1 },
+  doom: { c: 7.5, k: 1.1 },
   lightning: { c: 4, k: 4 }
 };
 function statusMulFor(target, hs, kind) {

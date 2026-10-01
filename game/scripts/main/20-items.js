@@ -803,8 +803,14 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
       }
     }
     if (weapon.stats.doom) {
-      const pct = doomPercent(weapon),
-        doomGain = dd * pct * (typeof statusMulFor === "function" ? statusMulFor(target, hs, "doom") : 1);
+      // Doom fills from attack and the doom stat (like bleed), not from hit damage, so it scales
+      // with Elemental Amp and not with crit (Doc, 2026-10-01). Knob: __abyssTune.doomAtk.
+      const T = window.__abyssTune || {},
+        pct = doomPercent(weapon),
+        doomGain =
+          (hs.atk * (T.doomAtk != null ? T.doomAtk : 1.4) + gStat(weapon, "doom") * 4) *
+          pct *
+          (typeof statusMulFor === "function" ? statusMulFor(target, hs, "doom") : 1);
       target.doom = (target.doom || 0) + doomGain;
       target.demiseUntil = (weapon.celestial || 0) >= 5 ? run.time + 2600 : 0;
       spawnStatusParticles(target, "doom", 7);

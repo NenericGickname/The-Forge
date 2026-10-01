@@ -3130,8 +3130,8 @@ button:disabled {
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="mobile.css?v=37c5b87166">
-<link rel="stylesheet" href="landscape.css?v=37c5b87166">
+<link rel="stylesheet" href="mobile.css?v=0d5102509f">
+<link rel="stylesheet" href="landscape.css?v=0d5102509f">
 </head>
 <body>
 <div class="flash" id="flash"></div>
@@ -11750,8 +11750,14 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
       }
     }
     if (weapon.stats.doom) {
-      const pct = doomPercent(weapon),
-        doomGain = dd * pct * (typeof statusMulFor === "function" ? statusMulFor(target, hs, "doom") : 1);
+      // Doom fills from attack and the doom stat (like bleed), not from hit damage, so it scales
+      // with Elemental Amp and not with crit (Doc, 2026-10-01). Knob: __abyssTune.doomAtk.
+      const T = window.__abyssTune || {},
+        pct = doomPercent(weapon),
+        doomGain =
+          (hs.atk * (T.doomAtk != null ? T.doomAtk : 1.4) + gStat(weapon, "doom") * 4) *
+          pct *
+          (typeof statusMulFor === "function" ? statusMulFor(target, hs, "doom") : 1);
       target.doom = (target.doom || 0) + doomGain;
       target.demiseUntil = (weapon.celestial || 0) >= 5 ? run.time + 2600 : 0;
       spawnStatusParticles(target, "doom", 7);
@@ -32656,7 +32662,7 @@ const DOT_SCALE = {
   poison: { c: 6, k: 1.2 },
   burn: { c: 1.8, k: 0.85 },
   bleed: { c: 9, k: 1.1 },
-  doom: { c: 0.5, k: 1 },
+  doom: { c: 7.5, k: 1.1 },
   lightning: { c: 4, k: 4 }
 };
 function statusMulFor(target, hs, kind) {
@@ -33356,7 +33362,7 @@ setTimeout(() => {
   } catch (e) {}
 }, 0);
 </script>
-<script src="mobile.js?v=37c5b87166"></script>
-<script src="landscape.js?v=37c5b87166"></script>
+<script src="mobile.js?v=0d5102509f"></script>
+<script src="landscape.js?v=0d5102509f"></script>
 </body>
 </html>
