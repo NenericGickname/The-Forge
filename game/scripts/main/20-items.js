@@ -806,7 +806,6 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
       const pct = doomPercent(weapon),
         doomGain = dd * pct * (typeof statusMulFor === "function" ? statusMulFor(target, hs, "doom") : 1);
       target.doom = (target.doom || 0) + doomGain;
-      recordDummyDamage("doom", "☾", "Doom buildup", doomGain, "#9b55dd");
       target.demiseUntil = (weapon.celestial || 0) >= 5 ? run.time + 2600 : 0;
       spawnStatusParticles(target, "doom", 7);
       if (target.hp > 0 && target.doom >= target.hp) {

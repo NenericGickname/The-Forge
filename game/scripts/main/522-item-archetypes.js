@@ -128,16 +128,5 @@ function itemArchetype(g) {
     return g;
   };
 
-  const gearDescBeforeArch = gearDesc;
-  gearDesc = function (g) {
-    let html = gearDescBeforeArch.apply(this, arguments);
-    try {
-      const s = (g && g.stats) || {};
-      if (g && (s.critChance != null || s.critDmg != null || s.elementAmp != null || slotAllowsAmp(g))) {
-        const a = ARCHETYPES[itemArchetype(g)];
-        html += '<br><span style="color:' + a.col + ';font-weight:700">' + a.i + " " + a.n + "</span> · " + a.d;
-      }
-    } catch (e) {}
-    return html;
-  };
+  // No label in the tooltip: the type shows in the stats themselves (Doc, 2026-10-01).
 }

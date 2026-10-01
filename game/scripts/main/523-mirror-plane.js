@@ -179,11 +179,12 @@ function lighten(hex, k) {
         if (f.mirrorScaled) return;
         f.mirrorScaled = true;
         const ab = !!(run.a && run.a.abyss),
-          hm = ab ? (T.abyssMirrorHp != null ? T.abyssMirrorHp : 2.4) : T.mirrorHp != null ? T.mirrorHp : 10,
-          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 1.5) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
+          hm = ab ? (T.abyssMirrorHp != null ? T.abyssMirrorHp : 4) : T.mirrorHp != null ? T.mirrorHp : 10,
+          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 3) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
+        const sis = ab && f.mirrorSister ? (T.abyssSisterAtk != null ? T.abyssSisterAtk : 2.35) : 1;
         f.max = Math.round(f.max * hm);
         f.hp = Math.round(f.hp * hm);
-        f.atk = Math.round(f.atk * am);
+        f.atk = Math.round(f.atk * am * sis);
       });
       buildFoeBars();
       drawBars();
@@ -201,7 +202,7 @@ function lighten(hex, k) {
         f.boss = false;
         f.noDrop = true;
         other.hp = Math.min(other.max, other.hp + other.max * 0.25);
-        other.atk = Math.round(other.atk * 1.4);
+        other.atk = Math.round(other.atk * (window.__abyssTune && window.__abyssTune.griefAtk != null ? window.__abyssTune.griefAtk : 2));
         other.name = other.name.replace("★", "★ ✦");
         try {
           sayBoss(MIRROR_GRIEF_LINES[other.mirrorSister]);
