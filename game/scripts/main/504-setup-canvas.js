@@ -825,7 +825,9 @@ tick = function () {
         typeof swingIntervalV50 === "function"
           ? swingIntervalV50(hs.atkSpeed, S.gear.weapon && S.gear.weapon.wtype)
           : Math.max(500, 1400 / (1 + hs.atkSpeed / 100));
+      // carry the overshoot so swings are not rounded up to whole 150ms ticks
       hCd =
+        Math.max(-149, Math.min(0, hCd)) +
         (_swBase / (enr ? 1.6 : 1)) *
         (1 + 0.16 * (run.slowStacks || 0)) *
         (1 + 0.1 * (run.chillV102 || 0)) *
@@ -861,7 +863,7 @@ tick = function () {
             (hs.ice || 0) * em(target.res.ice) +
             (hs.lightning || 0) * em(target.res.lightning)) *
           (typeof elemHitFactorV50 === "function" ? elemHitFactorV50(target) : 1);
-        let dmg = (phys + ele) * critMultiplier(tier, hs.critDmg) * (0.9 + Math.random() * 0.2);
+        let dmg = (phys + ele) * (typeof resistedCritMult === "function" ? resistedCritMult(target, tier, hs.critDmg) : critMultiplier(tier, hs.critDmg)) * (0.9 + Math.random() * 0.2);
         if (target.boss) dmg *= 1 + (hs._bossDamage || 0);
         if (target.hp / target.max < 0.35) dmg *= 1 + (hs._woundDamage || 0);
         if (run.hero.hp / run.hero.max < 0.5) dmg *= hs._berserk;
@@ -1049,7 +1051,7 @@ tick = function () {
               (hs.poison || 0) *
               0.22 *
               (f.diseasePower ? 2 : 1) *
-              (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1);
+              (typeof statusMulFor === "function" ? statusMulFor(f, hs) : 1);
             if (pd > 0) {
               f.hp -= pd;
               run.dmgLog.push([run.time, pd]);
@@ -1063,7 +1065,7 @@ tick = function () {
           }
           if (f.hp > 0 && f.burnDmg > 0 && (f.burnUntil > run.time || (f.combustStacks || 0) > 0)) {
             const stacks = (f.burnUntil > run.time ? 1 : 0) + (f.combustStacks || 0),
-              bd = f.burnDmg * stacks * (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1);
+              bd = f.burnDmg * stacks * (typeof statusMulFor === "function" ? statusMulFor(f, hs) : 1);
             f.hp -= bd;
             run.dmgLog.push([run.time, bd]);
             floatDmg("foe", bd, 0, "#ff8a3a", f._x);

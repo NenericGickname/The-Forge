@@ -783,7 +783,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
         pc = cel ? Math.min(0.6, 0.3 + 0.03 * Math.min(10, weapon.celestial || 0)) : 0.3;
       if (Math.random() < pc) {
         const baseLb =
-            hs.lightning * (cel ? 2.2 : 1.8) * (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1),
+            hs.lightning * (cel ? 2.2 : 1.8) * elemAmpMul(hs),
           lb = baseLb * em(target.res.lightning);
         target.hp -= lb;
         run.dmgLog.push([run.time, lb]);
@@ -804,7 +804,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
     }
     if (weapon.stats.doom) {
       const pct = doomPercent(weapon),
-        doomGain = dd * pct * (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1);
+        doomGain = dd * pct * (typeof statusMulFor === "function" ? statusMulFor(target, hs) : 1);
       target.doom = (target.doom || 0) + doomGain;
       recordDummyDamage("doom", "☾", "Doom buildup", doomGain, "#9b55dd");
       target.demiseUntil = (weapon.celestial || 0) >= 5 ? run.time + 2600 : 0;
@@ -874,7 +874,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
       if (target.bleedC >= 4) {
         target.bleedC = 0;
         const bd =
-          (hs.atk * 0.85 + hs.bleed * 2.5) * (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1);
+          (hs.atk * 0.85 + hs.bleed * 2.5) * (typeof statusMulFor === "function" ? statusMulFor(target, hs) : 1);
         target.hp -= bd;
         run.dmgLog.push([run.time, bd]);
         floatDmg("foe", "🩸 BLEED " + Math.round(bd), 0, "#b91430", target._x);
@@ -893,8 +893,10 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
   const others = run.foes.filter(x => x && x.hp > 0 && x !== target);
   if (!others.length) return;
   greataxeSweep(target, others);
+  // the sweep's power is shared: 60% against one or two others, down to 30% against four
+  const sweepFrac = 0.3 * Math.min(2, 4 / others.length);
   others.forEach(o => {
-    let cd = dd * 0.3;
+    let cd = dd * sweepFrac;
     if (o.shieldUntil && run.time < o.shieldUntil) cd *= 0.18;
     o.hp -= cd;
     o.hurt = 1;

@@ -2362,14 +2362,14 @@ function attackPowerPct(g) {
 
 function swingTypeMulV50(wtype) {
   const T = (typeof window !== "undefined" && window.__spdTune) || {};
-  const m = T.typeMul || { dagger: 0.78, bow: 0.92, sword: 1.07, greataxe: 1.37 };
+  const m = T.typeMul || { dagger: 0.78, bow: 0.92, sword: 1.07, greataxe: 1.3 }; // was 1.37; 1.3 = exactly one 150ms tick slower than a sword at campaign and maxed speed
   return m[wtype] != null ? m[wtype] : 1.0;
 }
 
 function swingInterval(atkSpeed, wtype) {
   const T = (typeof window !== "undefined" && window.__spdTune) || {};
   const floor = T.floor != null ? T.floor : 240,
-    base = T.base != null ? T.base : 1400,
+    base = T.base != null ? T.base : 1500, // was 1400 with swings rounded up to whole ticks
     K = T.K != null ? T.K : 150;
   return Math.max(floor, (base / (1 + Math.max(0, atkSpeed) / K)) * swingTypeMulV50(wtype));
 }

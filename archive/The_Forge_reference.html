@@ -11717,7 +11717,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
         pc = cel ? Math.min(0.6, 0.3 + 0.03 * Math.min(10, weapon.celestial || 0)) : 0.3;
       if (Math.random() < pc) {
         const baseLb =
-            hs.lightning * (cel ? 2.2 : 1.8) * (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1),
+            hs.lightning * (cel ? 2.2 : 1.8) * elemAmpMul(hs),
           lb = baseLb * em(target.res.lightning);
         target.hp -= lb;
         run.dmgLog.push([run.time, lb]);
@@ -11738,7 +11738,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
     }
     if (weapon.stats.doom) {
       const pct = doomPercent(weapon),
-        doomGain = dd * pct * (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1);
+        doomGain = dd * pct * (typeof statusMulFor === "function" ? statusMulFor(target, hs) : 1);
       target.doom = (target.doom || 0) + doomGain;
       recordDummyDamage("doom", "☾", "Doom buildup", doomGain, "#9b55dd");
       target.demiseUntil = (weapon.celestial || 0) >= 5 ? run.time + 2600 : 0;
@@ -11808,7 +11808,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
       if (target.bleedC >= 4) {
         target.bleedC = 0;
         const bd =
-          (hs.atk * 0.85 + hs.bleed * 2.5) * (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1);
+          (hs.atk * 0.85 + hs.bleed * 2.5) * (typeof statusMulFor === "function" ? statusMulFor(target, hs) : 1);
         target.hp -= bd;
         run.dmgLog.push([run.time, bd]);
         floatDmg("foe", "🩸 BLEED " + Math.round(bd), 0, "#b91430", target._x);
@@ -11827,8 +11827,10 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
   const others = run.foes.filter(x => x && x.hp > 0 && x !== target);
   if (!others.length) return;
   greataxeSweep(target, others);
+  // the sweep's power is shared: 60% against one or two others, down to 30% against four
+  const sweepFrac = 0.3 * Math.min(2, 4 / others.length);
   others.forEach(o => {
-    let cd = dd * 0.3;
+    let cd = dd * sweepFrac;
     if (o.shieldUntil && run.time < o.shieldUntil) cd *= 0.18;
     o.hp -= cd;
     o.hurt = 1;
@@ -14804,14 +14806,14 @@ function attackPowerPct(g) {
 
 function swingTypeMulV50(wtype) {
   const T = (typeof window !== "undefined" && window.__spdTune) || {};
-  const m = T.typeMul || { dagger: 0.78, bow: 0.92, sword: 1.07, greataxe: 1.37 };
+  const m = T.typeMul || { dagger: 0.78, bow: 0.92, sword: 1.07, greataxe: 1.3 }; // was 1.37; 1.3 = exactly one 150ms tick slower than a sword at campaign and maxed speed
   return m[wtype] != null ? m[wtype] : 1.0;
 }
 
 function swingInterval(atkSpeed, wtype) {
   const T = (typeof window !== "undefined" && window.__spdTune) || {};
   const floor = T.floor != null ? T.floor : 240,
-    base = T.base != null ? T.base : 1400,
+    base = T.base != null ? T.base : 1500, // was 1400 with swings rounded up to whole ticks
     K = T.K != null ? T.K : 150;
   return Math.max(floor, (base / (1 + Math.max(0, atkSpeed) / K)) * swingTypeMulV50(wtype));
 }
@@ -14934,13 +14936,42 @@ function poisonSpreadCapV51(g, hs) {
   return Math.max(6, Math.floor(poisonStackCap(g, hs) * 0.7));
 }
 
-/* Gamma's Crown of Thorns is permanent. Bows attack from outside its reflection field. */
+/* Gamma's Crown of Thorns rises in waves (4s up, 6s down). While it is up, every hit on Gamma
+   reflects part of its damage, whatever the weapon: a sustain test, not a weapon check. */
+function gammaCrownSync() {
+  if (!run || !run.foes) return null;
+  const b = run.foes.find(f => f.gammaThornsV51 && f.hp > 0);
+  if (!b) return null;
+  const T = (typeof window !== "undefined" && window.__abyssTune) || {};
+  const period = T.crownPeriod != null ? T.crownPeriod : 10000,
+    up = T.crownUp != null ? T.crownUp : 4000;
+  const t = run.time - (b.crownT0 || 0);
+  if (t < 0) {
+    b.thornUntil = 0;
+    return null;
+  }
+  const phase = t % period,
+    cycle = Math.floor(t / period);
+  if (phase < up) {
+    b.thornUntil = run.time + (up - phase);
+    if (b.crownCycle !== cycle) {
+      b.crownCycle = cycle;
+      try {
+        beep(520, 0.12, "triangle", 0.08);
+      } catch (e) {}
+    }
+    return b;
+  }
+  b.thornUntil = 0;
+  return null;
+}
 function armGammaThorns() {
   if (!run || run.ai !== 15) return;
   const b = run.foes && run.foes.find(f => f.boss && f.hp > 0);
   if (!b || b.gammaThornsV51) return;
   b.gammaThornsV51 = true;
-  b.thornUntil = Number.POSITIVE_INFINITY;
+  b.crownT0 = run.time + 3000;
+  b.thornUntil = 0;
   b.name = "✹ " + b.name;
   buildFoeBars();
   drawBars();
@@ -19099,7 +19130,8 @@ function sourceArray(ref) {
 
 function elemAmpMul(hs) {
   var a = (hs && hs.elementAmp) || 0;
-  return 1 + Math.min(105, a) / 100;
+  var T = (typeof window !== "undefined" && window.__abyssTune) || {};
+  return 1 + Math.min(T.ampCap != null ? T.ampCap : 400, a) / 100;
 }
 
 /* V101 — explain the locking mechanic the 5th time loot is opened */
@@ -21183,7 +21215,7 @@ const ROCK_KEEPER_LINES = [
   "Elites drop better loot. They also object strongly to being farmed.",
   "Shamans heal their allies. Rude, but technically impressive.",
   "The poison frog can ruin your day for fifteen seconds after combat.",
-  "Thorns reflect melee damage. Bows call this somebody else's problem.",
+  "Thornbacks bristle now and then. Whatever you swing, it stings while they glow.",
   "Enemies can crit too. Fairness was a terrible design choice.",
   "Later areas raise enemy crit chance. The monsters read the patch notes.",
   "Every boss has a fifty percent chance to drop a Boss Rush token.",
@@ -21964,7 +21996,7 @@ const FORGE_CHAIN = ["forge1", "forge10", "forge15", "forge20", "cel10", "mythic
 let pinGuard = false;
 
 /* ---- (patch scope opened) ---- */
-const GREAT_AXE_DAMAGE_BOOST = 1.2;
+const GREAT_AXE_DAMAGE_BOOST = 1.02; // was 1.2; axe is the group weapon, not the boss weapon
 
 /* ================= script block 11 ================= */
 
@@ -23222,7 +23254,9 @@ tick = function () {
         typeof swingIntervalV50 === "function"
           ? swingIntervalV50(hs.atkSpeed, S.gear.weapon && S.gear.weapon.wtype)
           : Math.max(500, 1400 / (1 + hs.atkSpeed / 100));
+      // carry the overshoot so swings are not rounded up to whole 150ms ticks
       hCd =
+        Math.max(-149, Math.min(0, hCd)) +
         (_swBase / (enr ? 1.6 : 1)) *
         (1 + 0.16 * (run.slowStacks || 0)) *
         (1 + 0.1 * (run.chillV102 || 0)) *
@@ -23258,7 +23292,7 @@ tick = function () {
             (hs.ice || 0) * em(target.res.ice) +
             (hs.lightning || 0) * em(target.res.lightning)) *
           (typeof elemHitFactorV50 === "function" ? elemHitFactorV50(target) : 1);
-        let dmg = (phys + ele) * critMultiplier(tier, hs.critDmg) * (0.9 + Math.random() * 0.2);
+        let dmg = (phys + ele) * (typeof resistedCritMult === "function" ? resistedCritMult(target, tier, hs.critDmg) : critMultiplier(tier, hs.critDmg)) * (0.9 + Math.random() * 0.2);
         if (target.boss) dmg *= 1 + (hs._bossDamage || 0);
         if (target.hp / target.max < 0.35) dmg *= 1 + (hs._woundDamage || 0);
         if (run.hero.hp / run.hero.max < 0.5) dmg *= hs._berserk;
@@ -23302,8 +23336,8 @@ tick = function () {
           }
           if (
             target.thornUntil &&
-            run.time < target.thornUntil &&
-            (!S.gear.weapon || S.gear.weapon.wtype !== "bow")
+            !target.gammaThornsV51 &&
+            run.time < target.thornUntil
           ) {
             const ref = Math.max(1, (target.lvl * 1.2 + target.atk * 0.18) * (target.elite ? 1.45 : 1));
             run.hero.hp -= ref;
@@ -23446,7 +23480,7 @@ tick = function () {
               (hs.poison || 0) *
               0.22 *
               (f.diseasePower ? 2 : 1) *
-              (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1);
+              (typeof statusMulFor === "function" ? statusMulFor(f, hs) : 1);
             if (pd > 0) {
               f.hp -= pd;
               run.dmgLog.push([run.time, pd]);
@@ -23460,7 +23494,7 @@ tick = function () {
           }
           if (f.hp > 0 && f.burnDmg > 0 && (f.burnUntil > run.time || (f.combustStacks || 0) > 0)) {
             const stacks = (f.burnUntil > run.time ? 1 : 0) + (f.combustStacks || 0),
-              bd = f.burnDmg * stacks * (typeof elemAmpMulV93 === "function" ? elemAmpMulV93(hs) : 1);
+              bd = f.burnDmg * stacks * (typeof statusMulFor === "function" ? statusMulFor(f, hs) : 1);
             f.hp -= bd;
             run.dmgLog.push([run.time, bd]);
             floatDmg("foe", bd, 0, "#ff8a3a", f._x);
@@ -23522,10 +23556,11 @@ updateStatusFx = function () {
     }
     /* ---- updateStatusFx: later layers (moved here) ---- */
     if (!run) break prev32;
+    if (typeof gammaCrownSync === "function") gammaCrownSync();
     run.foes.forEach((f, i) => {
       if (f.hp <= 0 || !f.thornUntil || run.time >= f.thornUntil) return;
       const el = $("foefx" + i);
-      if (el) el.innerHTML += fxIcon("✹", 1 - (f.thornUntil - run.time) / (f.elite ? 6200 : 4600), "buff");
+      if (el) el.innerHTML += fxIcon("✹", 1 - (f.thornUntil - run.time) / (f.gammaThornsV51 ? 4000 : f.elite ? 6200 : 4600), "buff");
     });
   }
   if (!run) return;
@@ -26667,7 +26702,8 @@ if (typeof window.armGammaThornsV51 !== "function")
     const b = run.foes && run.foes.find(f => f.boss && f.hp > 0);
     if (!b || b.gammaThornsV51) return;
     b.gammaThornsV51 = true;
-    b.thornUntil = Number.POSITIVE_INFINITY;
+    b.crownT0 = run.time + 3000;
+    b.thornUntil = 0;
     b.name = "✹ " + b.name;
     buildFoeBars();
     drawBars();
@@ -29348,12 +29384,12 @@ floatDmg = function (side, val, tier, color, x) {
 const floatDmgBeforeV51 = floatDmg;
 floatDmg = function (side, val, tier, color, x) {
   if (side === "foe" && typeof val === "number" && run && !run._gammaReflectV51) {
-    const b = run.foes && run.foes.find(f => f.gammaThornsV51 && f.hp > 0),
-      w = S.gear && S.gear.weapon,
+    const b = typeof gammaCrownSync === "function" ? gammaCrownSync() : null,
       lc = String(color || "").toLowerCase(),
       status = ["#7fe07f", "#9be07f", "#ff8a3a", "#ffe14d"].includes(lc);
-    if (b && (!w || w.wtype !== "bow") && !status) {
-      const ref = Math.min(run.hero.max * 0.28, Math.max(run.hero.max * 0.06, val * 0.42));
+    if (b && !status) {
+      const T = window.__abyssTune || {};
+      const ref = Math.min(run.hero.max * (T.crownCap != null ? T.crownCap : run.a && run.a.abyss ? 0.08 : 0.05), Math.max(run.hero.max * 0.02, val * (T.crownPct != null ? T.crownPct : 0.2)));
       run._gammaReflectV51 = true;
       run._incomingContextV41 = { label: "Gamma Crown of Thorns", icon: "✹", source: b };
       run.hero.hp -= ref;
@@ -31027,8 +31063,9 @@ gStat = function (g, stat) {
   }
   var v = prevResult199;
   if (stat === "elementAmp" && g && g.stats) {
-    var d = g.stats.elementAmp || 0;
-    v = d + (v - d) * 0.15;
+    var d = g.stats.elementAmp || 0,
+      TA = (typeof window !== "undefined" && window.__abyssTune) || {};
+    v = d + (v - d) * (TA.ampForge != null ? TA.ampForge : 0.6);
   }
   return v;
 };
@@ -32583,6 +32620,129 @@ function abyssFinalProfile() {
       }
     } catch (e) {}
     return r;
+  };
+}
+/* Status builds: one multiplier for all damage over time (poison, burn, bleed bursts, doom).
+   It combines the Elemental Amp stat, the skill-tree elemental nodes and the Element Amp
+   active skill, minus the target's resistance to damage over time. */
+function statusSkillMul() {
+  let m = 1;
+  try {
+    const b = skillBonuses();
+    m *= b.eleMult || 1;
+  } catch (e) {}
+  try {
+    if (typeof activeMods === "function") m *= activeMods().eleMult || 1;
+  } catch (e) {}
+  return m;
+}
+function statusMulFor(target, hs) {
+  const T = (typeof window !== "undefined" && window.__abyssTune) || {};
+  const amp = Math.min(T.ampCap != null ? T.ampCap : 400, (hs && hs.elementAmp) || 0),
+    ampDot = T.ampDot != null ? T.ampDot : 2; // Elemental Amp counts double for damage over time
+  const base = (1 + (ampDot * amp) / 100) * statusSkillMul() * (T.dotMul != null ? T.dotMul : 3.2) *
+    (S.gear && S.gear.weapon && S.gear.weapon.wtype === "dagger" ? (T.daggerDot != null ? T.daggerDot : 1.15) : 1);
+  return base * (1 - ((target && target.dotResist) || 0));
+}
+window.elemAmpMulV93 = function (hs) {
+  return elemAmpMul(hs) * statusSkillMul();
+};
+/* Crit resistance only shrinks the bonus part of a crit. */
+function resistedCritMult(target, tier, critDmg) {
+  const m = critMultiplier(tier, critDmg),
+    r = (target && target.critResist) || 0;
+  return r > 0 && m > 1 ? 1 + (m - 1) * (1 - r) : m;
+}
+/* Some bosses shrug off one damage style. Keys: campaign stage index, Abyss = 100 + index.
+   Never a wall: at most 40%, so every build can still win with better gear. */
+const BOSS_RESIST = {
+  15: { crit: 0.25 },
+  105: { crit: 0.4 },
+  107: { dot: 0.4 },
+  109: { crit: 0.4 },
+  112: { dot: 0.4 },
+  114: { dot: 0.4 },
+  115: { crit: 0.4 }
+};
+{
+  const nextWaveBeforeResist = nextWave;
+  nextWave = function () {
+    const r = nextWaveBeforeResist.apply(this, arguments);
+    try {
+      if (run && !run.hunt && run.foes) {
+        const key = (run.a && run.a.abyss ? 100 : 0) + run.ai,
+          T = window.__abyssTune || {},
+          res = (T.bossResist && T.bossResist[key]) || BOSS_RESIST[key];
+        if (res)
+          run.foes.forEach(f => {
+            if (f.boss && !f.resistSet) {
+              f.resistSet = true;
+              f.critResist = res.crit || 0;
+              f.dotResist = res.dot || 0;
+            }
+          });
+      }
+    } catch (e) {}
+    return r;
+  };
+}
+
+/* Weapon niches: the bow is the boss killer (bonus damage to bosses). */
+{
+  const heroStatsBeforeNiche = heroStats;
+  heroStats = function () {
+    const h = heroStatsBeforeNiche.apply(this, arguments);
+    try {
+      const w = S.gear && S.gear.weapon,
+        T = window.__abyssTune || {};
+      if (w && w.wtype === "bow") h._bossDamage = (h._bossDamage || 0) + (T.bowBoss != null ? T.bowBoss : 0.15);
+    } catch (e) {}
+    return h;
+  };
+}
+
+/* Twin bosses: on these stages the boss arrives with an identical twin. Each has 60% of the
+   normal health and damage, so area damage (Great Axe cleave, chain lightning, spreading
+   poison) pays off. The twin drops no extra loot. Keys as in BOSS_RESIST. */
+const TWIN_STAGES = { 4: 1, 9: 1, 104: 1, 108: 1, 113: 1 };
+{
+  const nextWaveBeforeTwin = nextWave;
+  nextWave = function () {
+    const r = nextWaveBeforeTwin.apply(this, arguments);
+    try {
+      const T = window.__abyssTune || {},
+        key = run && run.a ? (run.a.abyss ? 100 : 0) + run.ai : -1,
+        twins = T.twinStages || TWIN_STAGES;
+      if (run && !run.hunt && !run.twinSpawned && twins[key]) {
+        const boss = run.foes.find(f => f.boss && f.hp > 0);
+        if (boss) {
+          run.twinSpawned = true;
+          const share = T.twinShare != null ? T.twinShare : 0.6;
+          boss.max = Math.round(boss.max * share);
+          boss.hp = Math.min(boss.hp, boss.max);
+          boss.atk = Math.round(boss.atk * share);
+          const twin = JSON.parse(JSON.stringify(boss));
+          twin.twinV1 = true;
+          twin.name = boss.name.replace(/^(\W*)/, "$1") + " II";
+          twin._x = (boss._x || 405) + 62;
+          twin.cd = (boss.cd || 600) + 450; // out of step with its twin
+          twin.enter = 1;
+          run.foes.push(twin);
+          buildFoeBars();
+          drawBars();
+        }
+      }
+    } catch (e) {}
+    return r;
+  };
+  const killFoeBeforeTwin = killFoe;
+  killFoe = function (f) {
+    if (f && f.twinV1 && !f.twinKilled) {
+      f.twinKilled = true;
+      f.boss = false; // count as an ordinary kill: no second boss loot, token or first-clear
+      f.noDrop = true;
+    }
+    return killFoeBeforeTwin.apply(this, arguments);
   };
 }
 </script>

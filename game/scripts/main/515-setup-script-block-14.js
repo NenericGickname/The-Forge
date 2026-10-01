@@ -172,8 +172,9 @@ gStat = function (g, stat) {
   }
   var v = prevResult199;
   if (stat === "elementAmp" && g && g.stats) {
-    var d = g.stats.elementAmp || 0;
-    v = d + (v - d) * 0.15;
+    var d = g.stats.elementAmp || 0,
+      TA = (typeof window !== "undefined" && window.__abyssTune) || {};
+    v = d + (v - d) * (TA.ampForge != null ? TA.ampForge : 0.6);
   }
   return v;
 };
