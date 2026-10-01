@@ -623,7 +623,7 @@ function powVal(id) {
     case "rage":
       return 30 + 6 * p;
     case "elementAmp":
-      return 100 + 10 * p;
+      return 50 + 5 * p; // was 100 + 10p: doubled every status effect
     case "toughen":
       return { pen: 15 - 1.5 * p, mit: 40 + 3 * p };
     case "ninja":

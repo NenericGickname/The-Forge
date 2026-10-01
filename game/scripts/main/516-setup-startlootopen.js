@@ -514,7 +514,7 @@ try {
           rows +=
             '<div class="spmod" style="color:#d7a2f0">✨ Element Amp · +' +
             nf(powVal("elementAmp")) +
-            "% elemental dmg · " +
+            "% elemental & status dmg · " +
             secs("elementAmp") +
             "s</div>";
         if (buffOn("toughen")) {

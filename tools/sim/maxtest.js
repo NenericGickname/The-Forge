@@ -7,7 +7,7 @@ const BOT = fs.readFileSync(__dirname + '/bot.js', 'utf8'), CLOCK = fs.readFileS
 (async () => {
   const b = await chromium.launch(); const p = await (await b.newContext({ viewport: { width: 1280, height: 800 } })).newPage();
   await p.addInitScript(`window.__simStart=${Date.parse('2026-01-01T10:00:00Z') + snap.t};`);
-  await p.addInitScript(`window.__wt=${JSON.stringify(process.env.WT||'sword')};window.__campaign=${process.env.CAMPAIGN?1:0};window.__relabel=${JSON.stringify(process.env.RELABEL||'')};window.__mirror=${process.env.MIRROR?1:0};`);
+  await p.addInitScript(`window.__wt=${JSON.stringify(process.env.WT||'sword')};window.__campaign=${process.env.CAMPAIGN?1:0};window.__relabel=${JSON.stringify(process.env.RELABEL||'')};window.__mirror=${process.env.MIRROR==='abyss'?2:process.env.MIRROR?1:0};`);
   if (process.env.TUNE) await p.addInitScript(`window.__abyssTune=${process.env.TUNE};`);
   await p.addInitScript(st => { localStorage.clear(); for (const k in st) localStorage.setItem(k, st[k]); }, snap.storage);
   await p.addInitScript(CLOCK);
@@ -29,7 +29,7 @@ const BOT = fs.readFileSync(__dirname + '/bot.js', 'utf8'), CLOCK = fs.readFileS
     const hs = heroStats();
     const recaps = []; let wins = 0, waves = [], dur = [];
     for (let i = 0; i < tries; i++) {
-      if (window.__mirror) startMirrorPlane(); else if (window.__campaign) startRun(+stage); else window.abyssAPIv50.enterAbyss(+stage);
+      if (window.__mirror) { S.abyssUnlocked = true; S.abyssCleared = [...new Set([...(S.abyssCleared || []), 13])]; window.__mc0 = JSON.stringify(mirrorState()); startMirrorPlane(window.__mirror === 2); } else if (window.__campaign) startRun(+stage); else window.abyssAPIv50.enterAbyss(+stage);
       const t0 = Date.now(); let lastW = 0; S.abyssCleared = (S.abyssCleared || []).filter(x => x !== +stage);
       while (run && !run.over && Date.now() - t0 < 30 * 60000) {
         __advance(400);
@@ -41,7 +41,7 @@ const BOT = fs.readFileSync(__dirname + '/bot.js', 'utf8'), CLOCK = fs.readFileS
       }
       const rc = run && run.combatRecapV41; if (rc) recaps.push(Object.values(rc.damage).sort((a,b)=>b.amount-a.amount).slice(0,4).map(r=>r.label+' '+Math.round(r.amount/1000)+'k/'+r.hits).join(', ') + ' | heal ' + Math.round(rc.totalHealing/1000)+'k');
       if (Date.now() - t0 >= 30 * 60000) (window.__hang = window.__hang || []).push({ on: [...document.querySelectorAll('.on')].map(e => e.id || e.className).slice(0, 8), over: run && run.over, wave: run && run.wave, foes: run && run.foes.map(f => Math.round(f.hp) + '/' + f.max).join(' '), hero: run && Math.round(run.hero.hp), timerOk: typeof timer });
-      const dead = document.getElementById('dead').classList.contains('on'); const won = window.__campaign ? !dead && Date.now() - t0 < 30 * 60000 && lastW >= (run ? run.total : 0) : (S.abyssCleared || []).includes(+stage) && !dead;
+      const dead = document.getElementById('dead').classList.contains('on'); const won = window.__mirror ? JSON.stringify(mirrorState()) !== window.__mc0 && !dead : window.__campaign ? !dead && Date.now() - t0 < 30 * 60000 && lastW >= (run ? run.total : 0) : (S.abyssCleared || []).includes(+stage) && !dead;
       if (won) wins++; waves.push(won ? 'W' : lastW); dur.push(Math.round((Date.now() - t0) / 60000));
       __advance(6000); if (document.getElementById('lootopen').classList.contains('on')) { document.getElementById('lootleave').click(); __advance(1500); }
       for (const id of ['clear', 'dead', 'lootopen']) document.getElementById(id).classList.remove('on');

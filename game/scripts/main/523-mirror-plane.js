@@ -44,9 +44,17 @@ function mirrorState() {
 function mirrorUnlocked() {
   return (S.clearedAreas || []).includes(13);
 }
-function startMirrorPlane() {
-  if (!mirrorUnlocked()) return;
+function abyssMirrorUnlocked() {
+  return !!S.abyssUnlocked && (S.abyssCleared || []).includes(13);
+}
+let nextRunMirrorAbyss = false,
+  lastWasMirrorAbyss = false;
+function startMirrorPlane(abyss) {
+  abyss = abyss === true;
+  if (abyss ? !abyssMirrorUnlocked() : !mirrorUnlocked()) return;
   nextRunMirror = true;
+  nextRunMirrorAbyss = !!abyss;
+  if (abyss) nextRunAbyss = true;
   startRun(MIRROR_BASE_AI);
 }
 function lighten(hex, k) {
@@ -61,23 +69,32 @@ function lighten(hex, k) {
   /* ---- entering ---- */
   const startRunBeforeMirror = startRun;
   startRun = function (ai) {
-    const mirror = nextRunMirror && ai === MIRROR_BASE_AI;
+    const mirror = nextRunMirror && ai === MIRROR_BASE_AI,
+      abyss = mirror && nextRunMirrorAbyss;
     nextRunMirror = false;
+    nextRunMirrorAbyss = false;
     if (!mirror) {
       lastWasMirror = false;
+      lastWasMirrorAbyss = false;
       return startRunBeforeMirror.apply(this, arguments);
     }
-    const orig = AREAS[MIRROR_BASE_AI];
-    AREAS[MIRROR_BASE_AI] = Object.assign({}, MIRROR_AREA);
+    const orig = AREAS[MIRROR_BASE_AI],
+      levelBefore = abyssLevel;
+    AREAS[MIRROR_BASE_AI] = Object.assign({}, MIRROR_AREA, abyss ? { n: "Mirror Plane", abyssMirror: true } : {});
+    // the Abyss Mirror Plane sits at Abyss Omega's level
+    if (abyss) abyssLevel = () => levelBefore(16);
     let r;
     try {
       r = startRunBeforeMirror.call(this, MIRROR_BASE_AI);
     } finally {
       AREAS[MIRROR_BASE_AI] = orig;
+      abyssLevel = levelBefore;
     }
     if (run) {
       run.mirrorPlane = true; // also readable as run.a.mirrorPlane from the first wave on
+      if (abyss) run.mirror = 16; // boss health, haste and damage at Abyss Omega depth
       lastWasMirror = true;
+      lastWasMirrorAbyss = abyss;
       try {
         $("rmsg").className = "msg";
         $("rmsg").textContent = "Entering the Mirror Plane";
@@ -91,7 +108,11 @@ function lighten(hex, k) {
       el.addEventListener(
         "click",
         () => {
-          if (lastWasMirror) nextRunMirror = true;
+          if (lastWasMirror) {
+            nextRunMirror = true;
+            nextRunMirrorAbyss = lastWasMirrorAbyss;
+            if (lastWasMirrorAbyss) nextRunAbyss = true;
+          }
         },
         true
       );
@@ -157,8 +178,9 @@ function lighten(hex, k) {
       run.foes.forEach(f => {
         if (f.mirrorScaled) return;
         f.mirrorScaled = true;
-        const hm = T.mirrorHp != null ? T.mirrorHp : 10,
-          am = T.mirrorAtk != null ? T.mirrorAtk : 3.2;
+        const ab = !!(run.a && run.a.abyss),
+          hm = ab ? (T.abyssMirrorHp != null ? T.abyssMirrorHp : 2.4) : T.mirrorHp != null ? T.mirrorHp : 10,
+          am = ab ? (T.abyssMirrorAtk != null ? T.abyssMirrorAtk : 1.5) : T.mirrorAtk != null ? T.mirrorAtk : 3.2;
         f.max = Math.round(f.max * hm);
         f.hp = Math.round(f.hp * hm);
         f.atk = Math.round(f.atk * am);
@@ -187,11 +209,13 @@ function lighten(hex, k) {
         } catch (e) {}
         buildFoeBars();
       } else {
-        const st = mirrorState();
-        st.sisters++;
+        const st = mirrorState(),
+          ab = !!(run.a && run.a.abyss);
+        if (ab) st.abyssSisters = (st.abyssSisters || 0) + 1;
+        else st.sisters++;
         const T = window.__abyssTune || {};
-        if (run.bags && Math.random() < (T.mirrorforgedChance != null ? T.mirrorforgedChance : 0.08)) {
-          run.bags.push({ rar: Math.random() < 0.25 ? 5 : 4, lvl: Math.max(1, Math.min(190, f.lvl || 112)), slot: "weapon", unique: "mirrorforged", celestialDrop: true });
+        if (run.bags && Math.random() < (T.mirrorforgedChance != null ? T.mirrorforgedChance : ab ? 0.15 : 0.08)) {
+          run.bags.push({ rar: Math.random() < (ab ? 0.6 : 0.25) ? 5 : 4, lvl: Math.max(1, Math.min(190, f.lvl || 112)), slot: "weapon", unique: "mirrorforged", celestialDrop: true });
           try {
             addBagChip(4);
             $("rmsg").className = "msg big";
@@ -216,16 +240,18 @@ function lighten(hex, k) {
   const areaClearBeforeMirror = areaClear;
   areaClear = function () {
     if (!(run && run.mirrorPlane)) return areaClearBeforeMirror.apply(this, arguments);
-    const clears = S.areaClearsV51,
-      claims = S.areaMedalClaimsV51;
-    S.areaClearsV51 = {};
-    S.areaMedalClaimsV51 = {};
+    const keep = {};
+    ["areaClearsV51", "areaMedalClaimsV51", "abyssAreaClearsV51", "abyssAreaMedalClaimsV51", "abyssCleared", "abyssMax"].forEach(k => {
+      keep[k] = S[k];
+      S[k] = k === "abyssCleared" ? [] : k === "abyssMax" ? 0 : {};
+    });
+    const ab = !!(run.a && run.a.abyss);
     try {
       return areaClearBeforeMirror.apply(this, arguments);
     } finally {
-      S.areaClearsV51 = clears;
-      S.areaMedalClaimsV51 = claims;
-      mirrorState().clears++;
+      Object.keys(keep).forEach(k => (S[k] = keep[k]));
+      if (ab) mirrorState().abyssClears = (mirrorState().abyssClears || 0) + 1;
+      else mirrorState().clears++;
       try {
         scheduleSave();
       } catch (e) {}
@@ -294,10 +320,37 @@ function lighten(hex, k) {
           " waves + the Mirror Sisters<br>depth " + MIRROR_AREA.lvl + "+ · every creature brings its reflection</div>" +
           '<div class="tw">cleared ×' + st.clears + "</div>" +
           '<div style="color:var(--gold);font-size:10px;margin-top:6px;font-weight:700">▶ click to enter</div></div>';
-        d.onclick = startMirrorPlane;
+        d.onclick = () => startMirrorPlane(false);
+        ael.appendChild(d);
+      }
+      if (ael && abyssMirrorUnlocked() && S.abyssMode && !$("abyssmirrortilev1")) {
+        const st = mirrorState(),
+          d = document.createElement("div");
+        d.id = "abyssmirrortilev1";
+        d.className = "atile abysstilev50 mirrortilev1";
+        d.innerHTML =
+          '<div class="as">🪞</div><div class="anm">Mirror' + (st.abyssClears ? " ✓" : "") + "</div>" +
+          '<div class="atip"><div class="tn">🌀🪞 Abyss · Mirror Plane</div><div class="td">' + MIRROR_AREA.waves +
+          " waves + the Mirror Sisters<br>abyss depth " + abyssLevel(16) + " · every creature brings its reflection</div>" +
+          '<div class="tw">cleared ×' + (st.abyssClears || 0) + "</div>" +
+          '<div style="color:var(--gold);font-size:10px;margin-top:6px;font-weight:700">▶ click to enter</div></div>';
+        d.onclick = () => startMirrorPlane(true);
         ael.appendChild(d);
       }
       S.flags = S.flags || {};
+      const regularIntroSeen = !!S.flags.mirrorPlaneIntroV1 || !mirrorUnlocked();
+      if (regularIntroSeen && abyssMirrorUnlocked() && !S.flags.abyssMirrorIntroV1 && !(run && !run.over)) {
+        S.flags.abyssMirrorIntroV1 = true;
+        scheduleSave();
+        setTimeout(
+          () =>
+            showTip(
+              "THE MIRROR CRACKS",
+              "Abyss Alpha's fall split the Mirror Plane down the middle. On the other side the silver has gone dark, and the sisters have stopped pretending to be two people.<br><br>The <b>🌀🪞 Abyss Mirror Plane</b> now sits among the Abyss stages. It is as deep as anything the Abyss holds. Bring your very best set; the sisters here carry Mirrorforged weapons more often, and more of them are Mythic."
+            ),
+          2100
+        );
+      }
       if (mirrorUnlocked() && !S.flags.mirrorPlaneIntroV1 && !(run && !run.over)) {
         S.flags.mirrorPlaneIntroV1 = true;
         scheduleSave();
@@ -393,7 +446,9 @@ function mirrorPageHtml() {
     '<div class="amnextv117">She claims to be the better copy. When one sister falls, the other takes her strength.</div></div>' +
     '<div class="amrowv117"><div class="amheadv117"><span class="amsymv117">🪞</span><span class="amnamev117">Your record</span></div>' +
     '<div class="amnextv117">Mirror Plane cleared <b>' + st.clears + "</b> times · Sisters defeated <b>" + st.sisters +
-    "</b> · Mirrorforged weapons found <b>" + st.forged + "</b></div></div>" +
+    "</b> · Mirrorforged weapons found <b>" + st.forged + "</b>" +
+    (abyssMirrorUnlocked() ? "<br>Abyss Mirror Plane cleared <b>" + (st.abyssClears || 0) + "</b> times · Abyss sisters defeated <b>" + (st.abyssSisters || 0) + "</b>" : "") +
+    "</div></div>" +
     '<div class="amrowv117"><div class="amheadv117"><span class="amsymv117">✦</span><span class="amnamev117">Mirrorforged weapons</span></div>' +
     '<div class="amnextv117">Rare weapons only the sisters carry. A quarter of their hits echo onto another enemy.</div></div>' +
     "</div>"
@@ -430,3 +485,10 @@ function mirrorPageHtml() {
     return r;
   };
 }
+
+/* The town is first drawn before this file loads; draw it once more so the tiles and popups appear. */
+setTimeout(() => {
+  try {
+    if (!(run && !run.over)) renderTown();
+  } catch (e) {}
+}, 0);

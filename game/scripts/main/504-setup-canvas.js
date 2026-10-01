@@ -1051,7 +1051,7 @@ tick = function () {
               (hs.poison || 0) *
               0.22 *
               (f.diseasePower ? 2 : 1) *
-              (typeof statusMulFor === "function" ? statusMulFor(f, hs) : 1);
+              (typeof statusMulFor === "function" ? statusMulFor(f, hs, "poison") : 1);
             if (pd > 0) {
               f.hp -= pd;
               run.dmgLog.push([run.time, pd]);
@@ -1064,8 +1064,8 @@ tick = function () {
             }
           }
           if (f.hp > 0 && f.burnDmg > 0 && (f.burnUntil > run.time || (f.combustStacks || 0) > 0)) {
-            const stacks = (f.burnUntil > run.time ? 1 : 0) + (f.combustStacks || 0),
-              bd = f.burnDmg * stacks * (typeof statusMulFor === "function" ? statusMulFor(f, hs) : 1);
+            const stacks = Math.pow((f.burnUntil > run.time ? 1 : 0) + (f.combustStacks || 0), 0.7), // diminishing: 10 stacks ≈ 5×, not 11×
+              bd = f.burnDmg * stacks * (typeof statusMulFor === "function" ? statusMulFor(f, hs, "burn") : 1);
             f.hp -= bd;
             run.dmgLog.push([run.time, bd]);
             floatDmg("foe", bd, 0, "#ff8a3a", f._x);

@@ -12,14 +12,29 @@ function statusSkillMul() {
   } catch (e) {}
   return m;
 }
-function statusMulFor(target, hs) {
+/* Per-effect scaling: M = c × (1 + k × amp) × tree × skill. c is what a build without
+   Elemental Amp gets (small), k is how strongly amp carries the effect. Doom fills an execute
+   bar from hit damage, so it gets no base factor at all. Tuned 2026-10-01 so an Elemental set
+   with its best effect lands near a pure crit set. Knobs: window.__abyssTune.dot[kind]. */
+const DOT_SCALE = {
+  poison: { c: 6, k: 1.2 },
+  burn: { c: 1.8, k: 0.85 },
+  bleed: { c: 9, k: 1.1 },
+  doom: { c: 0.36, k: 7.5 },
+  lightning: { c: 4, k: 4 }
+};
+function statusMulFor(target, hs, kind) {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
-  const amp = Math.min(T.ampCap != null ? T.ampCap : 600, (hs && hs.elementAmp) || 0),
-    ampDot = T.ampDot != null ? T.ampDot : 2; // Elemental Amp counts double for damage over time
-  // flat part keeps status builds useful before amp is stacked; the amp part takes over late
-  const base = ((1 + (ampDot * amp) / 100) * (T.dotMul != null ? T.dotMul : 2.2) + (T.dotFlat != null ? T.dotFlat : 4)) * statusSkillMul() *
-    (S.gear && S.gear.weapon && S.gear.weapon.wtype === "dagger" ? (T.daggerDot != null ? T.daggerDot : 1.15) : 1);
-  return base * (1 - ((target && target.dotResist) || 0));
+  const sc = Object.assign({}, DOT_SCALE[kind || "poison"], (T.dot && T.dot[kind || "poison"]) || {}),
+    amp = Math.min(T.ampCap != null ? T.ampCap : 600, (hs && hs.elementAmp) || 0) / 100;
+  let m = sc.c * (1 + sc.k * amp);
+  // lightning already carries the tree and skill bonus inside hs.lightning
+  // doom is an execute: the skill helps it less (square root of the bonus)
+  if (kind === "doom") m *= Math.sqrt(statusSkillMul());
+  else if (kind !== "lightning") m *= statusSkillMul();
+  const w = S.gear && S.gear.weapon;
+  if (w && w.wtype === "dagger" && kind !== "doom" && kind !== "lightning") m *= T.daggerDot != null ? T.daggerDot : 1.15;
+  return m * (1 - ((target && target.dotResist) || 0));
 }
 window.elemAmpMulV93 = function (hs) {
   return elemAmpMul(hs) * statusSkillMul();
