@@ -3142,8 +3142,8 @@ button:disabled {
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="mobile.css?v=ae9161184f">
-<link rel="stylesheet" href="landscape.css?v=ae9161184f">
+<link rel="stylesheet" href="mobile.css?v=424e4ac561">
+<link rel="stylesheet" href="landscape.css?v=424e4ac561">
 </head>
 <body>
 <div class="flash" id="flash"></div>
@@ -3862,16 +3862,15 @@ function playtestCodeHash(str) {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
 
+/* One code guards the whole Playtest menu (asked when the menu opens, mobile.js); the presets
+   inside load without a code (Doc, 2026-10-02). */
+const PLAYTEST_GATE_HASH = "2057vwp4rpc";
+function playtestGateOk(entered) {
+  return entered != null && playtestCodeHash(String(entered).trim().toLowerCase()) === PLAYTEST_GATE_HASH;
+}
+window.playtestGateOk = playtestGateOk;
+
 function requestPlaytestPresetV20(kind) {
-  const entered = prompt("Enter playtest access code");
-  if (entered == null) return;
-  if (playtestCodeHash(String(entered).trim().toLowerCase()) !== PLAYTEST_CODE_HASHES[kind]) {
-    try {
-      beep(120, 0.12, "square", 0.05);
-    } catch (e) {}
-    showTip("ACCESS DENIED", "The playtest code is incorrect.");
-    return;
-  }
   if (kind === "late")
     buildTestCharV91(); // item-inspection test character (defined in V91)
   else if (kind === "superlate") applySuperLatePreset();
@@ -21226,13 +21225,6 @@ const AUTO_SALVAGE = [
 
 const weaponSlot = SLOTS.find(s => s.key === "weapon");
 
-const PLAYTEST_CODE_HASHES = {
-  early: "10psbu0fr3d",
-  mid: "2bx5wjydu58",
-  late: "4nefi3k0uj",
-  superlate: "8h49vugxb5"
-};
-
 // ============ V19 PORTABLE SAVE FILES ============
 const PORTABLE_SAVE_FORMAT = "the-forge-portable-save",
   PORTABLE_SAVE_VERSION = 1,
@@ -33462,8 +33454,8 @@ setTimeout(() => {
    Moments: campaign end (ilvl 160, +20 ✦10, Omega open, Abyss locked)
             abyss end    (ilvl 240, +20 ✦13, every Abyss stage open)
    Every set comes with a bag holding each weapon type with each effect it can carry, all in the
-   set's style, so weapons and effects can be swapped freely. Campaign sets use the END GAME
-   access code, Abyss sets the SUPER LATE code. Picked from Options → Playtest (mobile.js). */
+   set's style, so weapons and effects can be swapped freely. Picked from Options → Playtest
+   (mobile.js), which asks one code for the whole menu. */
 const PLAYTEST_BUILDS = {
   crit: {
     label: "⚔ Crit",
@@ -33632,15 +33624,6 @@ function applyPlaytestBuild(style, momentKey) {
   requestPlaytestPresetV20 = function (kind) {
     const m = /^(campaign|abyss)-(crit|hybrid|elemental)$/.exec(String(kind || ""));
     if (!m) return requestBeforeBuilds.apply(this, arguments);
-    const entered = prompt("Enter playtest access code");
-    if (entered == null) return;
-    if (playtestCodeHash(String(entered).trim().toLowerCase()) !== PLAYTEST_CODE_HASHES[PLAYTEST_MOMENTS[m[1]].code]) {
-      try {
-        beep(120, 0.12, "square", 0.05);
-      } catch (e) {}
-      showTip("ACCESS DENIED", "The playtest code is incorrect.");
-      return;
-    }
     applyPlaytestBuild(m[2], m[1]);
     grantPlaytestActivePoints();
     try {
@@ -33673,7 +33656,7 @@ function applyPlaytestBuild(style, momentKey) {
   };
 }
 </script>
-<script src="mobile.js?v=ae9161184f"></script>
-<script src="landscape.js?v=ae9161184f"></script>
+<script src="mobile.js?v=424e4ac561"></script>
+<script src="landscape.js?v=424e4ac561"></script>
 </body>
 </html>

@@ -48,16 +48,15 @@ function playtestCodeHash(str) {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
 
+/* One code guards the whole Playtest menu (asked when the menu opens, mobile.js); the presets
+   inside load without a code (Doc, 2026-10-02). */
+const PLAYTEST_GATE_HASH = "2057vwp4rpc";
+function playtestGateOk(entered) {
+  return entered != null && playtestCodeHash(String(entered).trim().toLowerCase()) === PLAYTEST_GATE_HASH;
+}
+window.playtestGateOk = playtestGateOk;
+
 function requestPlaytestPresetV20(kind) {
-  const entered = prompt("Enter playtest access code");
-  if (entered == null) return;
-  if (playtestCodeHash(String(entered).trim().toLowerCase()) !== PLAYTEST_CODE_HASHES[kind]) {
-    try {
-      beep(120, 0.12, "square", 0.05);
-    } catch (e) {}
-    showTip("ACCESS DENIED", "The playtest code is incorrect.");
-    return;
-  }
   if (kind === "late")
     buildTestCharV91(); // item-inspection test character (defined in V91)
   else if (kind === "superlate") applySuperLatePreset();

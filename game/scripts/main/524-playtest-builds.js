@@ -3,8 +3,8 @@
    Moments: campaign end (ilvl 160, +20 ✦10, Omega open, Abyss locked)
             abyss end    (ilvl 240, +20 ✦13, every Abyss stage open)
    Every set comes with a bag holding each weapon type with each effect it can carry, all in the
-   set's style, so weapons and effects can be swapped freely. Campaign sets use the END GAME
-   access code, Abyss sets the SUPER LATE code. Picked from Options → Playtest (mobile.js). */
+   set's style, so weapons and effects can be swapped freely. Picked from Options → Playtest
+   (mobile.js), which asks one code for the whole menu. */
 const PLAYTEST_BUILDS = {
   crit: {
     label: "⚔ Crit",
@@ -173,15 +173,6 @@ function applyPlaytestBuild(style, momentKey) {
   requestPlaytestPresetV20 = function (kind) {
     const m = /^(campaign|abyss)-(crit|hybrid|elemental)$/.exec(String(kind || ""));
     if (!m) return requestBeforeBuilds.apply(this, arguments);
-    const entered = prompt("Enter playtest access code");
-    if (entered == null) return;
-    if (playtestCodeHash(String(entered).trim().toLowerCase()) !== PLAYTEST_CODE_HASHES[PLAYTEST_MOMENTS[m[1]].code]) {
-      try {
-        beep(120, 0.12, "square", 0.05);
-      } catch (e) {}
-      showTip("ACCESS DENIED", "The playtest code is incorrect.");
-      return;
-    }
     applyPlaytestBuild(m[2], m[1]);
     grantPlaytestActivePoints();
     try {

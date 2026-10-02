@@ -694,13 +694,6 @@ const AUTO_SALVAGE = [
 
 const weaponSlot = SLOTS.find(s => s.key === "weapon");
 
-const PLAYTEST_CODE_HASHES = {
-  early: "10psbu0fr3d",
-  mid: "2bx5wjydu58",
-  late: "4nefi3k0uj",
-  superlate: "8h49vugxb5"
-};
-
 // ============ V19 PORTABLE SAVE FILES ============
 const PORTABLE_SAVE_FORMAT = "the-forge-portable-save",
   PORTABLE_SAVE_VERSION = 1,

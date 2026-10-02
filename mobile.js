@@ -366,10 +366,21 @@ new MutationObserver(function(){ if (!$id("fxBackups")) addBackupButton(); }).ob
 
 /* ================= 6. PLAYTEST MENU (moved from the shop to Options) ================= */
 var PLAYTEST = [["early","Early"],["mid","Middle"],["late","End game"],["superlate","Super late"]];
+var playtestUnlocked = false;
 function inRunNow(){ try { return typeof run === "object" && run && !run.over && document.getElementById("run").style.display === "block"; } catch(_) { return false; } }
 function openPlaytest(){
   if (inRunNow()) { showTip("LEAVE THE RUN FIRST", "Playtest presets replace your whole character, so they can only be loaded in town."); return; }
-  var html = 'Load a prepared progression point for testing. Each option asks for its access code and replaces the current progress.<br><br>';
+  if (!playtestUnlocked) {
+    var entered = prompt("Enter playtest access code");
+    if (entered == null) return;
+    if (!(typeof playtestGateOk === "function" && playtestGateOk(entered))) {
+      try { beep(120, 0.12, "square", 0.05); } catch(_){}
+      showTip("ACCESS DENIED", "The playtest code is incorrect.");
+      return;
+    }
+    playtestUnlocked = true; // until the game is closed
+  }
+  var html = 'Load a prepared progression point for testing. Each option replaces the current progress.<br><br>';
   function ptBtn(kind, label, half){
     var active = (typeof S === "object" && S && S.playtestPreset === kind) ? " ✓" : "";
     return '<button class="go fxpt" style="' + (half ? 'flex:1 1 0;min-width:0;padding:8px 4px;margin:0' : 'width:100%;margin:4px 0') + '" data-fxpt="' + kind + '">' + (half ? '' : '🧪 ') + label + active + '</button>';
@@ -380,7 +391,7 @@ function openPlaytest(){
     html += '<div style="margin:12px 0 4px;font-size:11px;letter-spacing:.5px;color:#9fd8ff">' + m[1] + '</div><div style="display:flex;gap:6px">' +
       ptBtn(m[0] + "-crit", "⚔ Crit", true) + ptBtn(m[0] + "-hybrid", "⚖ Hybrid", true) + ptBtn(m[0] + "-elemental", "✨ Elemental", true) + '</div>';
   });
-  html += '<div style="margin-top:8px;font-size:10.5px;opacity:.75">Campaign sets use the End game code, Abyss sets the Super late code. Each set has every weapon type with every effect in its bag.</div>';
+  html += '<div style="margin-top:8px;font-size:10.5px;opacity:.75">Each set has every weapon type with every effect in its bag.</div>';
   showTip("PLAYTEST", html);
   document.querySelectorAll("[data-fxpt]").forEach(function(btn){
     btn.onclick = function(){
