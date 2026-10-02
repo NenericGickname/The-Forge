@@ -8,6 +8,8 @@
      · crits: largest, on top of everything, gold rim and a short pop, so they never drown
    - weapon hits float left of the enemy, effects right, both with random scatter */
 const EFFECT_COLOURS = ["#7fe07f", "#9be07f", "#ff8a3a", "#ffe14d", "#fff2a0", "#ff6a2f"];
+// small effect symbol drawn behind each effect number (Doc, 2026-10-02: effect numbers were faint and anonymous)
+const EFFECT_ICONS = { "#7fe07f": "☠️", "#9be07f": "☠️", "#ff8a3a": "🔥", "#ffe14d": "⚡", "#fff2a0": "⚡", "#ff6a2f": "💥", "#b91430": "🩸" };
 function fullDamageNumber(n) {
   return Number.isFinite(n) ? Math.round(n).toLocaleString("en-US") : String(n);
 }
@@ -55,7 +57,13 @@ function fullNumbersIn(el) {
       if (!d.classList || !d.classList.contains("dmg")) continue;
       d.classList.add("numv127");
       if ((tier || 0) >= 1) d.classList.add("critv127");
-      else if (effect) d.classList.add("fxv127");
+      else if (effect || lc === "#b91430") {
+        d.classList.add("fxv127");
+        if (EFFECT_ICONS[lc]) d.dataset.fx = EFFECT_ICONS[lc];
+        // bleed bursts arrive as "🩸 BLEED 1234": show the number, the symbol sits behind it
+        const m = !numeric && /^🩸 BLEED (\d+)/.exec(String(val));
+        if (m) d.textContent = m[1];
+      }
       else if (side === "foe") d.classList.add("hitv127");
       fullNumbersIn(d);
       // sum effect ticks per enemy and colour
@@ -91,10 +99,14 @@ function fullNumbersIn(el) {
   st.textContent =
     ".dmg.numv127{font-family:inherit;font-weight:900;letter-spacing:.2px;text-shadow:0 0 2px #000,1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000}" +
     ".dmg.hitv127{font-size:12px;opacity:.82;z-index:3}" +
-    ".dmg.fxv127{font-size:14px;z-index:4}" +
+    ".dmg.fxv127{font-size:15px;z-index:4;filter:brightness(1.12)}" +
+    ".dmg.fxv127[data-fx]{padding-left:.95em}" +
+    ".dmg.fxv127[data-fx]::before{content:attr(data-fx);position:absolute;left:-.05em;top:50%;transform:translateY(-50%) rotate(-8deg);font-size:1.25em;opacity:.95;z-index:-1;text-shadow:none;-webkit-text-stroke:0;filter:drop-shadow(0 0 2px #000)}" +
+    // crits one step smaller than before (Doc, 2026-10-02)
+    ".dmg.critv127.t1{font-size:16px}.dmg.critv127.t2{font-size:20px}.dmg.critv127.t3{font-size:25px}.dmg.critv127.t4{font-size:30px}.dmg.critv127.t5{font-size:36px}" +
     ".dmg.critv127{z-index:6;-webkit-text-stroke:.6px #2a1a00;text-shadow:0 0 2px #000,1px 1px 0 #000,-1px -1px 0 #000,0 0 10px #ffcf5c,0 0 18px currentColor;animation:critpopv127 1.05s ease-out forwards}" +
     ".dmg.critv127 .clbl{color:#ffe7a8;text-shadow:0 0 2px #000,1px 1px 0 #000}" +
-    "@keyframes critpopv127{0%{opacity:0;transform:scale(.6)}12%{opacity:1;transform:scale(1.18)}24%{transform:scale(1)}75%{opacity:1;transform:translateY(-12px)}100%{opacity:0;transform:translateY(-26px)}}";
+    "@keyframes critpopv127{0%{opacity:0;transform:scale(.6)}12%{opacity:1;transform:scale(1.12)}24%{transform:scale(1)}75%{opacity:1;transform:translateY(-12px)}100%{opacity:0;transform:translateY(-26px)}}";
   document.head.appendChild(st);
   window.fullDamageNumber = fullDamageNumber;
 }
