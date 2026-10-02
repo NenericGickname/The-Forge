@@ -18,7 +18,7 @@ function statusSkillMul() {
    with its best effect lands near a pure crit set. Knobs: window.__abyssTune.dot[kind]. */
 const DOT_SCALE = {
   poison: { c: 6, k: 1.2 },
-  burn: { c: 1.8, k: 0.85 },
+  burn: { c: 1.1, k: 0.85 }, // was 1.8 (Doc 2026-10-02: burn cleared Abyss Omega waves ~1.5x faster than other effects)
   bleed: { c: 9, k: 1.1 },
   doom: { c: 7.5, k: 1.1 },
   lightning: { c: 4, k: 4 }

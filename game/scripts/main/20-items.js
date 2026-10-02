@@ -890,7 +890,13 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
         spawnStatusParticles(target, "bleed", 18);
         softShake();
         if ((weapon.celestial || 0) >= 5) {
-          const heal = (bd * bloodthirstHealPct(weapon)) / 100;
+          // Doc 2026-10-02: Bloodthirst follows the realm Leech reduction and is capped per burst
+          const TB = (typeof window !== "undefined" && window.__abyssTune) || {},
+            lr = typeof celestialLeechReductionV50 === "function" ? celestialLeechReductionV50() : 0,
+            heal = Math.min(
+              run.hero.max * (TB.bloodCap != null ? TB.bloodCap : 0.05),
+              ((bd * bloodthirstHealPct(weapon)) / 100) * (1 - lr)
+            );
           run.hero.hp = Math.min(run.hero.max, run.hero.hp + heal);
           floatDmg("hero", "🩸 +" + Math.round(heal), 0, "#e35a70");
         }

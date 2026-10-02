@@ -1318,7 +1318,7 @@ function poisonShot(f) {
 
 function bloodthirstHealPct(g) {
   if (run) run._healingContextV41 = "Bloodthirst";
-  return 5 + 5 * celestialProgress(g);
+  return 3 + 3 * celestialProgress(g); // was 5 + 5 (Doc 2026-10-02: overtuned)
 
   return;
 }
