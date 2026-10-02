@@ -97,3 +97,24 @@ const BOSS_RESIST = {
     return h;
   };
 }
+
+/* Status leech (Doc, 2026-10-02): poison, burn, bleed, lightning and doom damage heal through Leech
+   at three quarters of the rate of weapon hits, with the same per-hit cap and the same realm reduction. Without
+   it, Elemental and Hybrid sets dealt twice the crit set's damage on Abyss Omega but healed half as
+   much, and died in the waves. Knob: window.__abyssTune.statusLeech (fraction, default 0.75). */
+function statusLeech(dmg, hs) {
+  try {
+    if (!run || !run.hero || !(dmg > 0)) return;
+    hs = hs || heroStats();
+    if (!(hs.lifesteal > 0)) return;
+    const T = (typeof window !== "undefined" && window.__abyssTune) || {},
+      frac = T.statusLeech != null ? T.statusLeech : 0.75,
+      lr = typeof celestialLeechReductionV50 === "function" ? celestialLeechReductionV50() : 0,
+      heal = Math.min(run.hero.max * (hs._leechCap || 0.04), ((dmg * leechPct(hs.lifesteal)) / 100) * (1 - lr) * frac);
+    if (heal > 0) {
+      run._healingContextV41 = "Leech (effects)";
+      run.hero.hp = Math.min(run.hero.max, run.hero.hp + heal);
+    }
+  } catch (e) {}
+}
+window.statusLeech = statusLeech;

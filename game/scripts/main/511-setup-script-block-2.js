@@ -568,7 +568,7 @@ buildFoe = function (key, lvl, hpMul, boss, name) {
     const m = boss
       ? T.bossHpMul != null ? T.bossHpMul : 1.05
       : T.mobHpSlope == null
-        ? (T.mobHpStart || 3) * Math.pow(T.mobHpGrow || 1.054, depth)
+        ? (T.mobHpStart || 3) * Math.pow(T.mobHpGrow || 1.07, depth)
         : (T.mobHpMul != null ? T.mobHpMul : 3.5) + T.mobHpSlope * depth;
     f.max = Math.round(f.max * m);
     f.hp = f.max;

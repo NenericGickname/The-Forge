@@ -425,6 +425,12 @@ nextWave = function () {
       f.max = Math.round(f.max * (1.55 + tier * 0.12));
       f.hp = f.max;
       f.atk = Math.round(f.atk * (1.06 + tier * 0.04));
+      // Abyss gates fight one-on-one, so only heavy self-healing (Bloodthirst) survived them; softer
+      // in the Abyss so any end-of-Abyss weapon can pass (Doc's rule: no forced weapon). Knob gateAtk.
+      if (run.a && run.a.abyss) {
+        const TG = (typeof window !== "undefined" && window.__abyssTune) || {};
+        f.atk = Math.round(f.atk * (TG.gateAtk != null ? TG.gateAtk : 1));
+      }
       f._x = foeBaseX(0, 1);
       run.foes = [f];
     } else

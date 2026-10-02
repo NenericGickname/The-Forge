@@ -1617,7 +1617,7 @@ function abyssBossHP() {
   const base = T.bossHpBase != null ? T.bossHpBase : 9000000,
     per = T.bossHpPer != null ? T.bossHpPer : 1000000;
   // compounding growth per stage (Doc, 2026-10-01: the Abyss must be a gear climb)
-  if (T.bossHpPer == null) return Math.round((T.bossHpStart || 8000000) * Math.pow(T.bossHpGrow || 1.096, abyssDepthV50()));
+  if (T.bossHpPer == null) return Math.round((T.bossHpStart || 8000000) * Math.pow(T.bossHpGrow || 1.11, abyssDepthV50()));
   return Math.round(base + per * abyssDepthV50());
 }
 
@@ -1639,7 +1639,7 @@ function abyssDamageMul() {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
   const base = T.dmgBase != null ? T.dmgBase : 1.7,
     slope = T.dmgSlope != null ? T.dmgSlope : 0.02;
-  if (T.dmgSlope == null) return (T.dmgStart || 1.5) * Math.pow(T.dmgGrow || 1.035, abyssDepthV50());
+  if (T.dmgSlope == null) return (T.dmgStart || 1.5) * Math.pow(T.dmgGrow || 1.06, abyssDepthV50());
   return base + slope * abyssDepthV50();
 }
 
@@ -1656,7 +1656,9 @@ function abyssExcessHpDmg(maxHp) {
   const T = (typeof window !== "undefined" && window.__abyssTune) || {};
   // Threshold sits above a normal legal max build (~138k HP) so only genuinely HP-STACKED builds
   // (~150k+) get taxed — ordinary and even balanced-maxed builds pay nothing. Abyss-only.
-  const thresh = T.hpThresh != null ? T.hpThresh : 150000;
+  // 2026-10-02: raised to 215k because ilvl 240 gear gives a plain legal build ~189k health; at 150k
+  // every end-of-Abyss build paid ~19.5k extra damage per hit on Abyss Omega.
+  const thresh = T.hpThresh != null ? T.hpThresh : 215000;
   if (!run.a.abyss) return 0;
   const excess = Math.max(0, (maxHp || 0) - thresh);
   if (excess <= 0) return 0;

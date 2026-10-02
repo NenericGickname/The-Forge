@@ -8,6 +8,7 @@ const CLOCK = fs.readFileSync(__dirname + '/clock.js', 'utf8');
   const b = await chromium.launch(); const p = await (await b.newContext()).newPage();
   const errs = []; p.on('pageerror', e => errs.push(String(e).slice(0, 150)));
   if (process.env.TUNE) await p.addInitScript(`window.__abyssTune=${process.env.TUNE};`);
+  await p.addInitScript(`window.__swapW=${JSON.stringify(process.env.SWAPW || '')};`);
   await p.addInitScript(`window.__preset=${JSON.stringify(process.env.PRESET || '')};`);
   if (process.env.PGEAR) await p.addInitScript(`window.__presetGear=${process.env.PGEAR};`);
   await p.addInitScript(CLOCK);
@@ -15,7 +16,7 @@ const CLOCK = fs.readFileSync(__dirname + '/clock.js', 'utf8');
   await p.goto('http://localhost:8766/index.html'); await p.waitForTimeout(400);
   const r = await p.evaluate(([target, tries, loadout]) => {
     __advance(2000);
-    if (window.__preset === 'late') applyNormalLatePresetV50('late'); else applySuperLatePreset();
+    if (window.__preset === 'late') applyNormalLatePresetV50('late'); else if (/^(campaign|abyss)-/.test(window.__preset)) { const [m, st] = window.__preset.split('-'); applyPlaytestBuild(st, m); if (window.__swapW) { const [wt, ef] = window.__swapW.split(':'); const w = S.bag.find(g => g.wtype === wt && (ef ? g.stats[ef] > 0 : true)); if (w) { S.bag.splice(S.bag.indexOf(w), 1); S.bag.push(S.gear.weapon); S.gear.weapon = w; } } } else applySuperLatePreset();
     __advance(3000);
     document.querySelectorAll('.on').forEach(e => /tip/.test(e.id) && e.classList.remove('on'));
     grantPlaytestActivePoints();
@@ -32,6 +33,7 @@ const CLOCK = fs.readFileSync(__dirname + '/clock.js', 'utf8');
     for (let i = 0; i < tries; i++) {
       for (const id of ['clear', 'dead', 'lootopen']) document.getElementById(id).classList.remove('on');
       if (target === 'mirror') startMirrorPlane(true);
+      else if (target === 'campomega') startRun(16);
       else window.abyssAPIv50.enterAbyss(target === 'omega' ? 16 : +target.split(':')[1].split(',')[i % target.split(':')[1].split(',').length]);
       window.__src = {}; let maxHit = 0, maxHitBy = '';
       let t = 0, bossT = null, bossMax = 0;

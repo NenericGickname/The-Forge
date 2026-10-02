@@ -786,6 +786,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
             hs.lightning * (cel ? 2.2 : 1.8) * (typeof statusMulFor === "function" ? statusMulFor(null, hs, "lightning") : elemAmpMul(hs)),
           lb = baseLb * em(target.res.lightning);
         target.hp -= lb;
+        if (typeof statusLeech === "function") statusLeech(lb, hs);
         run.dmgLog.push([run.time, lb]);
         floatDmg("foe", Math.round(lb), 0, "#ffe14d", target._x);
         if (cel && run && run.foes) {
@@ -794,6 +795,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
               const ad = baseLb * 0.55 * em(o.res.lightning);
               o.hp -= ad;
               o.hurt = 1;
+              if (typeof statusLeech === "function") statusLeech(ad, hs);
               run.dmgLog.push([run.time, ad]);
               floatDmg("foe", Math.round(ad), 0, "#fff2a0", o._x);
               if (o.hp <= 0) killFoe(o, 0);
@@ -816,6 +818,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
       spawnStatusParticles(target, "doom", 7);
       if (target.hp > 0 && target.doom >= target.hp) {
         const executed = target.hp;
+        if (typeof statusLeech === "function") statusLeech(executed, hs);
         recordDummyDamage("doomexecute", "☾", "Doom execute", executed, "#6f239d");
         target.hp = 0;
         target.doomExploded = true;
@@ -881,6 +884,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
         const bd =
           (hs.atk * 0.85 + hs.bleed * 2.5) * (typeof statusMulFor === "function" ? statusMulFor(target, hs, "bleed") : 1);
         target.hp -= bd;
+        if (typeof statusLeech === "function") statusLeech(bd, hs);
         run.dmgLog.push([run.time, bd]);
         floatDmg("foe", "🩸 BLEED " + Math.round(bd), 0, "#b91430", target._x);
         spawnStatusParticles(target, "bleed", 18);

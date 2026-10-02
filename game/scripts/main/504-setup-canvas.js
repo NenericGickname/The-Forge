@@ -1054,6 +1054,7 @@ tick = function () {
               (typeof statusMulFor === "function" ? statusMulFor(f, hs, "poison") : 1);
             if (pd > 0) {
               f.hp -= pd;
+              if (typeof statusLeech === "function") statusLeech(pd, hs);
               run.dmgLog.push([run.time, pd]);
               floatDmg("foe", pd, 0, "#7fe07f", f._x);
               spawnStatusParticles(f, "poison", 3);
@@ -1067,6 +1068,7 @@ tick = function () {
             const stacks = Math.pow((f.burnUntil > run.time ? 1 : 0) + (f.combustStacks || 0), 0.7), // diminishing: 10 stacks ≈ 5×, not 11×
               bd = f.burnDmg * stacks * (typeof statusMulFor === "function" ? statusMulFor(f, hs, "burn") : 1);
             f.hp -= bd;
+            if (typeof statusLeech === "function") statusLeech(bd, hs);
             run.dmgLog.push([run.time, bd]);
             floatDmg("foe", bd, 0, "#ff8a3a", f._x);
             spawnStatusParticles(f, "burn", 3);

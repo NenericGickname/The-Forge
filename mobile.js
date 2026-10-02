@@ -370,10 +370,17 @@ function inRunNow(){ try { return typeof run === "object" && run && !run.over &&
 function openPlaytest(){
   if (inRunNow()) { showTip("LEAVE THE RUN FIRST", "Playtest presets replace your whole character, so they can only be loaded in town."); return; }
   var html = 'Load a prepared progression point for testing. Each option asks for its access code and replaces the current progress.<br><br>';
-  PLAYTEST.forEach(function(p){
-    var active = (typeof S === "object" && S && S.playtestPreset === p[0]) ? " ✓" : "";
-    html += '<button class="go fxpt" style="width:100%;margin:4px 0" data-fxpt="' + p[0] + '">🧪 ' + p[1] + active + '</button>';
+  function ptBtn(kind, label, half){
+    var active = (typeof S === "object" && S && S.playtestPreset === kind) ? " ✓" : "";
+    return '<button class="go fxpt" style="' + (half ? 'flex:1 1 0;min-width:0;padding:8px 4px;margin:0' : 'width:100%;margin:4px 0') + '" data-fxpt="' + kind + '">' + (half ? '' : '🧪 ') + label + active + '</button>';
+  }
+  PLAYTEST.forEach(function(p){ html += ptBtn(p[0], p[1]); });
+  // build sets (524-playtest-builds.js): three styles at campaign end and at Abyss end
+  [["campaign", "Campaign end · Omega · item level 160 ✦10"], ["abyss", "Abyss end · item level 240 ✦13"]].forEach(function(m){
+    html += '<div style="margin:12px 0 4px;font-size:11px;letter-spacing:.5px;color:#9fd8ff">' + m[1] + '</div><div style="display:flex;gap:6px">' +
+      ptBtn(m[0] + "-crit", "⚔ Crit", true) + ptBtn(m[0] + "-hybrid", "⚖ Hybrid", true) + ptBtn(m[0] + "-elemental", "✨ Elemental", true) + '</div>';
   });
+  html += '<div style="margin-top:8px;font-size:10.5px;opacity:.75">Campaign sets use the End game code, Abyss sets the Super late code. Each set has every weapon type with every effect in its bag.</div>';
   showTip("PLAYTEST", html);
   document.querySelectorAll("[data-fxpt]").forEach(function(btn){
     btn.onclick = function(){
