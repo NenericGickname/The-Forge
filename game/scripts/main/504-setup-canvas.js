@@ -1032,7 +1032,7 @@ tick = function () {
         run.dpsT -= 1000;
         const dps = run.dmgLog.reduce((a, e) => a + e[1], 0) / 10;
         const de = $("dps");
-        if (de) de.textContent = "DPS " + (typeof shortDamageNumber === "function" ? shortDamageNumber(dps) : fmt(dps));
+        if (de) de.textContent = "DPS " + fmt(dps);
         const df = $("dpsfill");
         if (df) df.style.width = Math.min(100, Math.max(2, (Math.log10(dps + 1) / 5) * 100)) + "%";
       }
