@@ -791,7 +791,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
         floatDmg("foe", Math.round(lb), 0, "#ffe14d", target._x);
         if (cel && run && run.foes) {
           run.foes.forEach(o => {
-            if (o && o !== target && o.hp > 0) {
+            if (o && o !== target && o.hp > 0 && !o.evasiveV127) {
               const ad = baseLb * 0.55 * em(o.res.lightning);
               o.hp -= ad;
               o.hurt = 1;
@@ -822,7 +822,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
         recordDummyDamage("doomexecute", "☾", "Doom execute", executed, "#6f239d");
         target.hp = 0;
         target.doomExploded = true;
-        floatDmg("foe", "☾ DOOM", 4, "#8c43c9", target._x);
+        floatDmg("foe", Math.round(executed), 0, "#8c43c9", target._x); // the executed health, shown as a number (Doc 2026-10-03)
         spawnStatusParticles(target, "doom", 32);
         flash("#541078");
         softShake();
@@ -905,7 +905,7 @@ function applyWeaponEffectsBase(target, dd, tier, hs, weapon, em) {
   }
   if (!weapon || weapon.wtype !== "greataxe" || !run || run.over) return;
   if (Math.random() * 100 >= greataxeCleaveChance(weapon)) return;
-  const others = run.foes.filter(x => x && x.hp > 0 && x !== target);
+  const others = run.foes.filter(x => x && x.hp > 0 && x !== target && !x.evasiveV127);
   if (!others.length) return;
   greataxeSweep(target, others);
   // the sweep's power is shared: 60% against one or two others, down to 30% against four

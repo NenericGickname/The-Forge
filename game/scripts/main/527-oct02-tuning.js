@@ -7,7 +7,9 @@
       after WEAPON_PITY bags without a weapon of at least your weapon's rarity (capped at Legendary),
       the next bag becomes one.
    5. Murderquito: a rare post-"The End?" mosquito. Tiny health, huge armour-piercing bites.
-      The answer is Toughen Up (or tanking / healing through it). */
+      It gives Toughen Up a reason to be in your kit; tanking or healing through it works too.
+      Revised 2026-10-03 (Doc): bite scales with the stage (enemy attack), not with your health;
+      no Toughen Up highlight; easier to notice (announcement, bigger); ignores splash damage. */
 
 /* ---------- 1. celestial strike on press ---------- */
 {
@@ -137,10 +139,10 @@ function bestWeaponRarityV127() {
 /* ---------- 5. Murderquito ---------- */
 const MQ = {
   chance: 0.4, // per eligible run, so about once every 2 to 3 runs
-  bite: 0.45, // of hero max health, before Toughen Up / Berserk / resistances; ignores armour and dodge
+  bite: 3, // x its own attack (a normal enemy of that level), ignores armour and dodge; x1.5 in the Abyss like every ability
   firstBite: 2800, // ms after it appears: time to react
   every: 3400,
-  hpMul: 0.6
+  hpMul: 1
 };
 ENEMIES.murderquito = {
   n: "Murderquito",
@@ -211,11 +213,8 @@ function spawnMurderquitoV127() {
   } catch (e) {}
   mqWhineV127(1.4, 1.2);
   floatDmg("foe", "🦟 MEEEEEE…", 0, "#ff5a6e", m._x);
-  if (!S.flags || !S.flags.mqTipV127) {
-    S.flags = S.flags || {};
-    S.flags.mqTipV127 = true;
-    floatDmg("hero", "🛡️ MURDERQUITO! Toughen Up or tank it", 0, "#ff9aa6");
-  }
+  m.evasiveV127 = true; // too small for sweeps, chains and spreads
+  floatDmg("hero", "🦟 A MURDERQUITO APPEARS", 0, "#ff9aa6");
 }
 if (typeof nextWave === "function") {
   const nextWaveBeforeMq = nextWave;
@@ -260,7 +259,7 @@ if (typeof nextWave === "function") {
           f.atkA = 1;
           const abyss = !!(run.a && run.a.abyss),
             // abilityHitHero adds x1.5 in the Abyss; the bite is defined as a share of max health, so undo it
-            dmg = (run.hero.max * MQ.bite * (abyss ? 1.12 : 1)) / (abyss ? 1.5 : 1);
+            dmg = Math.max(1, f.atk * MQ.bite);
           run._queuedAbilitySourceV41 = f;
           abilityHitHero(dmg, "🦟 BITE", "#ff3355");
           run._queuedAbilitySourceV41 = null;
@@ -269,9 +268,6 @@ if (typeof nextWave === "function") {
           } catch (e) {}
         }
       }
-      // light up Toughen Up while a Murderquito is alive
-      const c = typeof ensureCombatBtns === "function" ? ensureCombatBtns() : null;
-      if (c && c._btns && c._btns.toughen) c._btns.toughen.b.classList.toggle("mqwarnv127", alive);
     } catch (e) {}
     return r;
   };
@@ -292,7 +288,7 @@ if (typeof drawFoe === "function") {
       ctx.ellipse(cx, gy + 2, 10, 2.5, 0, 0, 7);
       ctx.fill();
       ctx.translate(x, y);
-      ctx.scale(1.3, 1.3); // readable on a phone
+      ctx.scale(1.6, 1.6); // readable on a phone
       ctx.translate(-x, -y);
       // wings, beating fast
       const flap = Math.sin(t * 60) * 0.5 + 0.5;
@@ -352,11 +348,43 @@ if (typeof drawFoe === "function") {
     } catch (e) {}
   };
 }
-{
-  const st = document.createElement("style");
-  st.textContent =
-    ".actbtnv111.mqwarnv127:not(:disabled){animation:mqpulsev127 .55s ease-in-out infinite alternate;box-shadow:0 0 0 2px #ff3355,0 0 14px #ff3355}" +
-    "@keyframes mqpulsev127{from{transform:scale(1)}to{transform:scale(1.12)}}";
-  document.head.appendChild(st);
-}
 window.forgeV127 = { MQ, spawnMurderquito: spawnMurderquitoV127, whine: mqWhineV127, AUTO_RUN_SPEED, BAG_CAP_MAX, WEAPON_PITY };
+
+/* ---------- 6. Frost deals damage (Doc, 2026-10-03) ----------
+   Frost only slowed and (at ✦5) froze, so a frost weapon on an Elemental build dealt almost nothing.
+   Now every hit also deals Frostbite: ice damage from attack and the frost stat, scaled like the other
+   effects (Elemental Amp, tree, Element Amp skill, dagger bonus), growing with the target's frost stacks.
+   Frozen targets take extra Frostbite. Knobs: window.__abyssTune.frost {atk, stat, stack, frozen},
+   window.__abyssTune.dot.frost {c, k}. */
+DOT_SCALE.frost = { c: 10, k: 1.1 }; // Abyss Omega wave clear, Elemental dagger: frost ~195 s vs poison 196, burn 191
+const FROST = { atk: 0.2, stat: 0.6, stack: 0.6, frozen: 1.5 };
+{
+  const effectsBeforeFrostbite = applyWeaponEffects;
+  applyWeaponEffects = function (target, dd, tier, hs, g, em) {
+    const r = effectsBeforeFrostbite.apply(this, arguments);
+    try {
+      if (g && g.stats && g.stats.frost && target && target.hp > 0 && run && !run.over && hs) {
+        const T = Object.assign({}, FROST, (window.__abyssTune && window.__abyssTune.frost) || {}),
+          stacks = target.frostStacks || 0,
+          max = Math.max(1, target.frostMax || 3),
+          frozen = target.freezeUntil && run.time < target.freezeUntil,
+          res = typeof em === "function" ? em(target.res && target.res.ice) : 1,
+          bite =
+            (hs.atk * T.atk + gStat(g, "frost") * T.stat) *
+            statusMulFor(target, hs, "frost") *
+            (1 + (T.stack * stacks) / max) *
+            (frozen ? T.frozen : 1) *
+            res;
+        if (bite > 0 && Number.isFinite(bite)) {
+          target.hp -= bite;
+          target.hurt = 1;
+          if (typeof statusLeech === "function") statusLeech(bite, hs);
+          if (run.dmgLog) run.dmgLog.push([run.time, bite]);
+          recordDummyDamage("frostbite", "❄", "Frostbite", bite, "#8fe0ff");
+          floatDmg("foe", Math.round(bite), 0, "#8fe0ff", target._x);
+        }
+      }
+    } catch (e) {}
+    return r;
+  };
+}

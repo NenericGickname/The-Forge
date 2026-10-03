@@ -7,9 +7,11 @@
      · effects: own lane right of the enemy, effect colour
      · crits: largest, on top of everything, gold rim and a short pop, so they never drown
    - weapon hits float left of the enemy, effects right, both with random scatter */
-const EFFECT_COLOURS = ["#7fe07f", "#9be07f", "#ff8a3a", "#ffe14d", "#fff2a0", "#ff6a2f"];
+const EFFECT_COLOURS = ["#7fe07f", "#9be07f", "#ff8a3a", "#ffe14d", "#fff2a0", "#ff6a2f", "#8fe0ff", "#8c43c9", "#b91430"];
+// only true damage over time is summed (Doc, 2026-10-03): poison and burn tick; lightning, frost, bleed, doom and combust hit once
+const SUMMED_COLOURS = ["#7fe07f", "#ff8a3a"];
 // small effect symbol drawn behind each effect number (Doc, 2026-10-02: effect numbers were faint and anonymous)
-const EFFECT_ICONS = { "#7fe07f": "☠️", "#9be07f": "☠️", "#ff8a3a": "🔥", "#ffe14d": "⚡", "#fff2a0": "⚡", "#ff6a2f": "💥", "#b91430": "🩸" };
+const EFFECT_ICONS = { "#7fe07f": "☠️", "#9be07f": "☠️", "#ff8a3a": "🔥", "#ffe14d": "⚡", "#fff2a0": "⚡", "#ff6a2f": "💥", "#b91430": "🩸", "#8fe0ff": "❄️", "#8c43c9": "☾" };
 function fullDamageNumber(n) {
   return Number.isFinite(n) ? Math.round(n).toLocaleString("en-US") : String(n);
 }
@@ -56,18 +58,20 @@ function fullNumbersIn(el) {
       const d = b.children[i];
       if (!d.classList || !d.classList.contains("dmg")) continue;
       d.classList.add("numv127");
-      if ((tier || 0) >= 1) d.classList.add("critv127");
-      else if (effect || lc === "#b91430") {
+      // labelled effect bursts ("🩸 BLEED 1234", "💥 COMBUST 1234") show as effect numbers with their symbol
+      const burst = !numeric && /^\S+ (?:BLEED|COMBUST) (\d+)/.exec(String(val));
+      if ((tier || 0) >= 1 && !burst && !(lc === "#8c43c9" && numeric)) d.classList.add("critv127");
+      else if (effect || burst) {
         d.classList.add("fxv127");
         if (EFFECT_ICONS[lc]) d.dataset.fx = EFFECT_ICONS[lc];
         // bleed bursts arrive as "🩸 BLEED 1234": show the number, the symbol sits behind it
-        const m = !numeric && /^🩸 BLEED (\d+)/.exec(String(val));
-        if (m) d.textContent = m[1];
+        if (burst) d.textContent = burst[1];
+        if (burst || (lc === "#8c43c9" && numeric)) d.classList.add("fxbigv127");
       }
       else if (side === "foe") d.classList.add("hitv127");
       fullNumbersIn(d);
       // sum effect ticks per enemy and colour
-      if (side === "foe" && numeric && effect && !(tier >= 1) && run) {
+      if (side === "foe" && numeric && SUMMED_COLOURS.includes(lc) && !(tier >= 1) && run) {
         const key = Math.round((x == null ? 405 : x) / 30) + lc,
           p = pending.get(key);
         if (p) {
@@ -101,6 +105,7 @@ function fullNumbersIn(el) {
     ".dmg.hitv127{font-size:12px;opacity:.82;z-index:3}" +
     ".dmg.fxv127{font-size:15px;z-index:4;filter:brightness(1.12)}" +
     ".dmg.fxv127[data-fx]{padding-left:.95em}" +
+    ".dmg.fxbigv127{font-size:19px}" +
     ".dmg.fxv127[data-fx]::before{content:attr(data-fx);position:absolute;left:-.05em;top:50%;transform:translateY(-50%) rotate(-8deg);font-size:1.25em;opacity:.95;z-index:-1;text-shadow:none;-webkit-text-stroke:0;filter:drop-shadow(0 0 2px #000)}" +
     // crits one step smaller than before (Doc, 2026-10-02)
     ".dmg.critv127.t1{font-size:16px}.dmg.critv127.t2{font-size:20px}.dmg.critv127.t3{font-size:25px}.dmg.critv127.t4{font-size:30px}.dmg.critv127.t5{font-size:36px}" +
